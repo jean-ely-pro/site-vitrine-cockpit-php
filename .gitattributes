@@ -1,0 +1,16 @@
+# Normalisation des fins de ligne : LF dans le dépôt, quelle que soit la plateforme.
+* text=auto eol=lf
+
+# Fichiers exécutés sur l'hébergement : LF obligatoire.
+*.php   text eol=lf
+*.twig  text eol=lf
+*.sh    text eol=lf
+.htaccess text eol=lf
+
+# Binaires : jamais de conversion.
+*.png   binary
+*.jpg   binary
+*.webp  binary
+*.avif  binary
+*.woff2 binary
+*.sqlite binary

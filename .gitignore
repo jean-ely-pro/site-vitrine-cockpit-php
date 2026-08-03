@@ -1,0 +1,38 @@
+# ─── Documents de pilotage : LOCAL UNIQUEMENT, jamais commités ───
+CLAUDE.md
+SPEC.md
+/docs/planning/
+*.local.md
+
+# ─── Secrets / environnement ───
+.env
+.env.local
+!.env.example
+
+# ─── Cockpit : base SQLite et données (jamais dans le dépôt) ───
+/cockpit/storage/
+*.sqlite
+*.sqlite3
+
+# ─── Cache de pages rendu ───
+/cache/
+/public/cache/
+
+# ─── Dépendances ───
+/vendor/
+node_modules/
+
+# ─── Médias uploadés ───
+/uploads/
+/public/media/
+
+# ─── Logs ───
+*.log
+
+# ─── Système / éditeurs ───
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
