@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Page introuvable{% if site.nom is defined and site.nom %} — {{ site.nom }}{% endif %}{% endblock %}
+
+{% block head %}
+    <meta name="robots" content="noindex">
+{% endblock %}
+
+{% block main %}
+    <article class="page">
+        <h1>Cette page n’existe pas</h1>
+        <p>L’adresse demandée ne correspond à aucune page du site.</p>
+        <p><a href="/">Revenir à l’accueil</a></p>
+    </article>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% set titreOnglet = page.seoTitre ?: page.titre %}
+{% set resume = page.seoDescription ?: site.description|default('') %}
+
+{# The site name is appended only when the title does not already carry it,
+   so a hand-written SEO title never reads « … Bloom — Bloom ». #}
+{% block title %}{{ titreOnglet }}{% if site.nom and site.nom not in titreOnglet %} — {{ site.nom }}{% endif %}{% endblock %}
+
+{% block head %}
+    {% if resume %}<meta name="description" content="{{ resume }}">{% endif %}
+{% endblock %}
+
+{% block main %}
+    <article class="page">
+        <h1>{{ page.titre }}</h1>
+
+        {% if page.contenu %}
+            {# Rich text produced by the admin editor: intentionally not escaped. #}
+            <div class="page__contenu">{{ page.contenu|raw }}</div>
+        {% endif %}
+    </article>
+{% endblock %}
