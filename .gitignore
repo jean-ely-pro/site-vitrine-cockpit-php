@@ -9,22 +9,20 @@ SPEC.md
 .env.local
 !.env.example
 
-# ─── Cockpit : base SQLite et données (jamais dans le dépôt) ───
-/cockpit/storage/
-*.sqlite
-*.sqlite3
+# ─── Cockpit : installé par `php bin/install-cockpit.php`, jamais versionné ───
+# La configuration et le modèle de contenu vivent dans /cockpit et sont copiés
+# dans /public/admin à l'installation.
+/public/admin/
 
-# ─── Cache de pages rendu ───
-/cache/
-/public/cache/
+# ─── Données d'exécution : base SQLite, index, cache des pages ───
+/var/
+
+# ─── Médias envoyés depuis l'administration ───
+/public/media/
 
 # ─── Dépendances ───
 /vendor/
 node_modules/
-
-# ─── Médias uploadés ───
-/uploads/
-/public/media/
 
 # ─── Logs ───
 *.log

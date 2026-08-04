@@ -1,0 +1,31 @@
+{# Page shell. Content is rendered server-side and complete on first response. #}
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{{ site.nom|default('Site') }}{% endblock %}</title>
+    {% block head %}{% endblock %}
+    <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+
+<a class="lien-evitement" href="#contenu">Aller au contenu</a>
+
+<header class="en-tete">
+    <p class="en-tete__nom"><a href="/">{{ site.nom|default('Site') }}</a></p>
+    {% if site.slogan is defined and site.slogan %}
+        <p class="en-tete__slogan">{{ site.slogan }}</p>
+    {% endif %}
+</header>
+
+<main id="contenu">
+    {% block main %}{% endblock %}
+</main>
+
+<footer class="pied">
+    <p>{{ site.nom|default('Site') }}</p>
+</footer>
+
+</body>
+</html>

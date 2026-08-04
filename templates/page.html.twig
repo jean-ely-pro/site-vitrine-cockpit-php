@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% set titreOnglet = page.seoTitre ?: page.titre %}
+{% set resume = page.seoDescription ?: site.description|default('') %}
+
+{% block title %}{{ titreOnglet }}{% if site.nom is defined and site.nom %} — {{ site.nom }}{% endif %}{% endblock %}
+
+{% block head %}
+    {% if resume %}<meta name="description" content="{{ resume }}">{% endif %}
+{% endblock %}
+
+{% block main %}
+    <article class="page">
+        <h1>{{ page.titre }}</h1>
+
+        {% if page.contenu %}
+            {# Rich text produced by the admin editor: intentionally not escaped. #}
+            <div class="page__contenu">{{ page.contenu|raw }}</div>
+        {% endif %}
+    </article>
+{% endblock %}
