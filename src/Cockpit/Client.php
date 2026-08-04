@@ -104,8 +104,14 @@ final class Client
             throw new ContentUnavailable("Contenu injoignable : {$error}");
         }
 
-        if ($status === 401 || $status === 403) {
+        if ($status === 401 || $status === 403 || $status === 412) {
             throw new ContentUnavailable('Clé de lecture refusée par Cockpit.');
+        }
+
+        // Cockpit answers 404 when nothing matches the filter. That is an
+        // absent page, not a broken service: the caller turns it into a 404.
+        if ($status === 404) {
+            return null;
         }
 
         if ($status >= 400) {

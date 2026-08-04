@@ -3,7 +3,9 @@
 {% set titreOnglet = page.seoTitre ?: page.titre %}
 {% set resume = page.seoDescription ?: site.description|default('') %}
 
-{% block title %}{{ titreOnglet }}{% if site.nom is defined and site.nom %} — {{ site.nom }}{% endif %}{% endblock %}
+{# The site name is appended only when the title does not already carry it,
+   so a hand-written SEO title never reads « … Bloom — Bloom ». #}
+{% block title %}{{ titreOnglet }}{% if site.nom and site.nom not in titreOnglet %} — {{ site.nom }}{% endif %}{% endblock %}
 
 {% block head %}
     {% if resume %}<meta name="description" content="{{ resume }}">{% endif %}

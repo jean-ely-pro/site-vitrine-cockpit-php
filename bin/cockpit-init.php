@@ -186,7 +186,7 @@ $content = $app->module('content');
 if (empty($content->item('settings')['nom'])) {
 
     $content->saveItem('settings', [
-        'nom' => 'Atelier#Bloom',
+        'nom' => 'Atelier Bloom',
         'slogan' => 'Fleuriste artisanal depuis 2015',
         'description' => 'Bouquets et compositions florales réalisés sur commande, à Nantes.',
         'siret' => '000 000 000 00000',
@@ -242,5 +242,5 @@ if ($password !== null) {
     echo "  À noter maintenant : il n'est plus affiché ensuite.\n\n";
 }
 
-echo "  Administration : http://localhost:8081/\n";
+echo "  Administration : http://localhost:8090/\n";
 echo "  Site public    : http://localhost:8080/\n\n";

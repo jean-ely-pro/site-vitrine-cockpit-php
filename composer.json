@@ -23,6 +23,6 @@
         "install-cockpit": "@php bin/install-cockpit.php",
         "init-cockpit": "@php bin/cockpit-init.php",
         "serve": "@php -S localhost:8080 -t public",
-        "serve-admin": "@php -S localhost:8081 -t public/admin public/admin/index.php"
+        "serve-admin": "@php -S localhost:8090 -t public/admin public/admin/index.php"
     }
 }
