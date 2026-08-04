@@ -233,6 +233,17 @@ foreach ([
     }
 }
 
+// Cockpit's shipped .htaccess protects its code but says nothing about
+// storage. Everything there is internal — except uploads, which the public
+// site serves.
+foreach (['storage', 'storage/content', 'storage/cache', 'storage/tmp'] as $dir) {
+    file_put_contents("{$target}/{$dir}/.htaccess", "Require all denied\n<IfModule !mod_authz_core.c>\n    Deny from all\n</IfModule>\n");
+}
+
+file_put_contents("{$target}/storage/uploads/.htaccess", "Require all granted\n<IfModule !mod_authz_core.c>\n    Allow from all\n</IfModule>\n");
+
+step('Dossiers internes de Cockpit fermés à la consultation.');
+
 // Cockpit's own secret, read from public/admin/.env by config/config.php.
 $adminEnv = "{$target}/.env";
 

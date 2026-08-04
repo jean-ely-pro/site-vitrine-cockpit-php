@@ -21,7 +21,11 @@ return [
     'i18n' => 'fr',
 
     // Internal secret, generated per installation into public/admin/.env.
-    'sec-key' => env('COCKPIT_SEC_KEY', null) ?? 'cle-non-definie-voir-public-admin-env',
+    // Falling back to a constant would silently weaken every session and
+    // signature, so a missing key is a hard failure instead.
+    'sec-key' => env('COCKPIT_SEC_KEY', null) ?: throw new RuntimeException(
+        'COCKPIT_SEC_KEY est absent de public/admin/.env — relancer php bin/install-cockpit.php',
+    ),
 
     // The database lives outside the web root: it can never be downloaded,
     // even if a rewrite rule is lost.
