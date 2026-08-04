@@ -1,0 +1,205 @@
+<?php
+
+/**
+ * Site identity, colours, contact details and opening hours.
+ *
+ * Fixed structure: the customer fills it in, never edits it. Installed to
+ * public/admin/storage/content/ by bin/install-cockpit.php.
+ */
+
+return [
+    'name' => 'settings',
+    'label' => 'Identité du site',
+    'info' => 'Les informations reprises sur toutes les pages.',
+    'type' => 'singleton',
+    'group' => null,
+    'preview' => [],
+    'meta' => null,
+    '_created' => 1754179200,
+    '_modified' => 1754179200,
+
+    'fields' => [
+
+        // ── Identité ──────────────────────────────────────────────────────
+        [
+            'name' => 'nom',
+            'type' => 'text',
+            'label' => 'Nom du site',
+            'info' => "Apparaît dans l'en-tête, dans le pied de page et dans l'onglet du navigateur.",
+            'required' => true,
+            'localize' => false,
+            'multiple' => false,
+            'group' => 'Identité',
+            'width' => '1-1',
+            'opts' => [],
+        ],
+        [
+            'name' => 'slogan',
+            'type' => 'text',
+            'label' => 'Slogan',
+            'info' => "Apparaît sous le nom du site, en haut de la page d'accueil.",
+            'required' => false,
+            'localize' => false,
+            'multiple' => false,
+            'group' => 'Identité',
+            'width' => '1-1',
+            'opts' => ['maxlength' => 120],
+        ],
+        [
+            'name' => 'logo',
+            'type' => 'asset',
+            'label' => 'Logo',
+            'info' => "Apparaît dans l'en-tête de toutes les pages.",
+            'required' => false,
+            'localize' => false,
+            'multiple' => false,
+            'group' => 'Identité',
+            'width' => '1-2',
+            'opts' => ['filter' => ['type' => 'image']],
+        ],
+        [
+            'name' => 'description',
+            'type' => 'text',
+            'label' => 'Description du site',
+            'info' => "Sert de résumé dans les résultats de recherche pour les pages qui n'ont pas leur propre description.",
+            'required' => false,
+            'localize' => false,
+            'multiple' => false,
+            'group' => 'Identité',
+            'width' => '1-1',
+            'opts' => ['multiline' => true, 'maxlength' => 160, 'showCount' => true],
+        ],
+        [
+            'name' => 'siret',
+            'type' => 'text',
+            'label' => 'SIRET',
+            'info' => 'Apparaît dans les mentions légales.',
+            'required' => false,
+            'localize' => false,
+            'multiple' => false,
+            'group' => 'Identité',
+            'width' => '1-2',
+            'opts' => [],
+        ],
+
+        // ── Couleurs ──────────────────────────────────────────────────────
+        [
+            'name' => 'couleurPrincipale',
+            'type' => 'color',
+            'label' => 'Couleur principale',
+            'info' => 'Couleur des boutons et des liens sur tout le site.',
+            'required' => false,
+            'localize' => false,
+            'multiple' => false,
+            'group' => 'Couleurs',
+            'width' => '1-2',
+            'opts' => [],
+        ],
+        [
+            'name' => 'couleurTexte',
+            'type' => 'color',
+            'label' => 'Couleur du texte',
+            'info' => 'Couleur du texte courant sur fond clair.',
+            'required' => false,
+            'localize' => false,
+            'multiple' => false,
+            'group' => 'Couleurs',
+            'width' => '1-2',
+            'opts' => [],
+        ],
+
+        // ── Coordonnées ───────────────────────────────────────────────────
+        [
+            'name' => 'email',
+            'type' => 'text',
+            'label' => 'Adresse e-mail',
+            'info' => 'Apparaît dans le pied de page, cliquable pour ouvrir la messagerie du visiteur.',
+            'required' => false,
+            'localize' => false,
+            'multiple' => false,
+            'group' => 'Coordonnées',
+            'width' => '1-2',
+            'opts' => [],
+        ],
+        [
+            'name' => 'telephone',
+            'type' => 'text',
+            'label' => 'Numéro de téléphone',
+            'info' => 'Apparaît dans le pied de page, cliquable depuis un téléphone.',
+            'required' => false,
+            'localize' => false,
+            'multiple' => false,
+            'group' => 'Coordonnées',
+            'width' => '1-2',
+            'opts' => [],
+        ],
+        [
+            'name' => 'adresse',
+            'type' => 'text',
+            'label' => 'Adresse postale',
+            'info' => 'Apparaît dans le pied de page et dans les mentions légales.',
+            'required' => false,
+            'localize' => false,
+            'multiple' => false,
+            'group' => 'Coordonnées',
+            'width' => '1-1',
+            'opts' => ['multiline' => true],
+        ],
+
+        // ── Horaires ──────────────────────────────────────────────────────
+        [
+            'name' => 'horaires',
+            'type' => 'set',
+            'label' => "Horaires d'ouverture",
+            'info' => 'Apparaissent dans le pied de page. Laisser vide un jour de fermeture.',
+            'required' => false,
+            'localize' => false,
+            'multiple' => false,
+            'group' => 'Horaires',
+            'width' => '1-1',
+            'opts' => [
+                'fields' => [
+                    ['name' => 'lundi', 'type' => 'text', 'label' => 'Lundi', 'width' => '1-2', 'opts' => ['placeholder' => '9h – 18h']],
+                    ['name' => 'mardi', 'type' => 'text', 'label' => 'Mardi', 'width' => '1-2', 'opts' => ['placeholder' => '9h – 18h']],
+                    ['name' => 'mercredi', 'type' => 'text', 'label' => 'Mercredi', 'width' => '1-2', 'opts' => ['placeholder' => '9h – 18h']],
+                    ['name' => 'jeudi', 'type' => 'text', 'label' => 'Jeudi', 'width' => '1-2', 'opts' => ['placeholder' => '9h – 18h']],
+                    ['name' => 'vendredi', 'type' => 'text', 'label' => 'Vendredi', 'width' => '1-2', 'opts' => ['placeholder' => '9h – 18h']],
+                    ['name' => 'samedi', 'type' => 'text', 'label' => 'Samedi', 'width' => '1-2', 'opts' => ['placeholder' => '9h – 12h']],
+                    ['name' => 'dimanche', 'type' => 'text', 'label' => 'Dimanche', 'width' => '1-2', 'opts' => ['placeholder' => 'Fermé']],
+                ],
+            ],
+        ],
+
+        // ── Réseaux ───────────────────────────────────────────────────────
+        [
+            'name' => 'reseaux',
+            'type' => 'set',
+            'label' => 'Réseaux sociaux',
+            'info' => 'Apparaissent dans le pied de page.',
+            'required' => false,
+            'localize' => false,
+            'multiple' => true,
+            'group' => 'Réseaux',
+            'width' => '1-1',
+            'opts' => [
+                'display' => '{{ data.nom }}',
+                'fields' => [
+                    [
+                        'name' => 'nom',
+                        'type' => 'select',
+                        'label' => 'Réseau',
+                        'width' => '1-2',
+                        'opts' => ['options' => ['Facebook', 'Instagram', 'LinkedIn', 'X', 'YouTube']],
+                    ],
+                    [
+                        'name' => 'url',
+                        'type' => 'text',
+                        'label' => 'Adresse du profil',
+                        'width' => '1-2',
+                        'opts' => ['placeholder' => 'https://…'],
+                    ],
+                ],
+            ],
+        ],
+    ],
+];

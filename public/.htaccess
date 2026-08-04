@@ -1,0 +1,18 @@
+ServerSignature Off
+Options -Indexes
+AddDefaultCharset UTF-8
+
+<IfModule mod_rewrite.c>
+
+    Options -MultiViews
+    RewriteEngine On
+
+    # The admin and its API ship their own rules: never rewrite them here.
+    RewriteRule ^admin(/|$) - [L]
+
+    # Anything that exists on disk is served as is; everything else is a page.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . index.php [L]
+
+</IfModule>
