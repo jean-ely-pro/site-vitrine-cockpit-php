@@ -63,9 +63,13 @@ jour ne l'efface pas.
   passe contenant le nom du compte ou l'adresse e-mail.
 
 La règle est appliquée **côté serveur**, seul endroit qui compte : elle ne peut pas être
-contournée en modifiant la page. Un indicateur de force accompagne la saisie dans
-l'administration, à titre indicatif seulement, et n'apparaît jamais sur le formulaire de
-connexion.
+contournée en modifiant la page. Elle couvre **les deux chemins** qui fixent un mot de passe —
+le formulaire de compte dans l'administration, et le lien de réinitialisation envoyé par
+e-mail. Ne couvrir que le premier l'aurait rendue évitable.
+
+Un indicateur de force accompagne la saisie dans l'administration, à titre indicatif seulement,
+et n'apparaît jamais sur le formulaire de connexion : commenter un mot de passe existant
+n'aiderait que quelqu'un regardant par-dessus l'épaule.
 
 ## Clés d'API
 
