@@ -101,6 +101,19 @@ hors plage sont ramenés, quel que soit le chemin emprunté.
 
 Tout est détaillé dans [docs/guide-client.md](docs/guide-client.md).
 
+## Médias
+
+Une image envoyée depuis l'administration est aussitôt déclinée en **copies allégées** — 480,
+960 et 1440 px, en WebP — jamais plus larges que l'original. Le navigateur choisit celle qui
+convient à la place dont il dispose ; le repli est la copie de 960 px, jamais l'original.
+
+Les copies sont faites **à l'envoi**, pas au rendu, et leurs adresses sont portées par le média
+lui-même : afficher une page n'exige aucun appel supplémentaire.
+
+**La description d'une image est obligatoire** : l'enregistrement est refusé sans elle.
+
+Détails dans [docs/medias.md](docs/medias.md) — point focal, alerte de poids, régénération.
+
 ## Sections de page
 
 Une page est une suite de **sections**. Trois types sont fournis :
@@ -209,6 +222,7 @@ horaires structurés faux serait pire que de n'en publier aucun.
 
 - [Ce que le client peut faire](docs/guide-client.md) — modèles de page, menu, actualités,
   référencement, limites de l'éditeur
+- [Médias](docs/medias.md) — copies allégées, point focal, description obligatoire, poids
 - [Sécurité de l'installation](docs/securite.md) — HTTPS, double authentification, mots de
   passe, clés d'API, en-têtes, vérifications à passer sur chaque installation
 - [Prérequis et capacités de Cockpit](docs/cockpit-prerequis.md) — version retenue, rôles,

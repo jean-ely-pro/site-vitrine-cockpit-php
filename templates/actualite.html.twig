@@ -6,8 +6,6 @@
     'conseil': 'Conseil'
 } %}
 
-{% set image = media_url(article.image) %}
-
 {% block title %}{{ article.titre }}{% if site.nom %} — {{ site.nom }}{% endif %}{% endblock %}
 
 {% block head %}
@@ -28,15 +26,13 @@
 
         <h1 class="page__titre">{{ article.titre }}</h1>
 
-        {% if image %}
-            <img class="actualite__image"
-                 src="{{ image }}"
-                 alt="{{ article.alt|default('') }}"
-                 {% if article.image.width %}width="{{ article.image.width }}"{% endif %}
-                 {% if article.image.height %}height="{{ article.image.height }}"{% endif %}
-                 loading="eager"
-                 decoding="async">
-        {% endif %}
+        {% include 'partials/image.html.twig' with {
+            asset: article.image,
+            alt: article.alt,
+            classe: 'actualite__image',
+            sizes: '(min-width: 62rem) 960px, 100vw',
+            eager: true
+        } only %}
 
         {% if article.contenu %}
             {# Rich text produced by the admin editor: intentionally not escaped. #}
