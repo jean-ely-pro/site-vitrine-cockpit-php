@@ -142,6 +142,22 @@ php bin/purge-cache.php
 Le cache est **inactif** quand `APP_ENV=dev`, pour voir ses modifications immédiatement.
 `PAGE_CACHE=true` dans `.env` permet de le tester en local.
 
+## Sécurité
+
+L'administration est le point sensible de cette installation. En résumé :
+
+- **HTTPS forcé** partout, avec prise en compte des hébergements qui terminent le TLS en amont.
+- **Double authentification** sur les comptes d'administration — native dans Cockpit, à activer
+  compte par compte dès l'installation.
+- **Politique de mot de passe** appliquée côté serveur, avec indicateur de force à la saisie.
+- **Clés d'API porteuses d'un rôle** : celle du site est en lecture seule et ne peut rien
+  écrire. Aucune clé d'écriture n'existe tant qu'aucun besoin ne la justifie.
+- **En-têtes de sécurité** dont une politique de contenu stricte, cohérente avec un site qui ne
+  charge aucune ressource tierce.
+
+Tout est détaillé dans [docs/securite.md](docs/securite.md), avec les commandes de vérification
+à passer sur chaque installation.
+
 ## Référencement
 
 Chaque page porte son propre `<title>` et sa méta-description, et le site publie
@@ -163,6 +179,8 @@ horaires structurés faux serait pire que de n'en publier aucun.
 
 ## Documentation
 
+- [Sécurité de l'installation](docs/securite.md) — HTTPS, double authentification, mots de
+  passe, clés d'API, en-têtes, vérifications à passer sur chaque installation
 - [Prérequis et capacités de Cockpit](docs/cockpit-prerequis.md) — version retenue, rôles,
   double authentification, API, avis de sécurité, procédure de mise à jour
 - [Développement local](docs/developpement-local.md) — ports, dépannage, réinitialisation
