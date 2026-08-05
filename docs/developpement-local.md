@@ -32,7 +32,16 @@ Changer alors le port dans `composer.json` (`serve`, `serve-admin`) **et** dans 
 | `APP_ENV` | `dev` : erreurs détaillées, gabarits recompilés à chaque requête. `prod` : l'inverse. |
 | `COCKPIT_API_URL` | Adresse de l'API de contenu, terminée par `/api`. |
 | `COCKPIT_API_KEY` | Clé de lecture, écrite par `bin/cockpit-init.php`. Elle n'autorise aucune écriture. |
+| `SITE_URL` | Adresse publique du site. Sert au plan du site et aux données structurées, qui exigent des adresses complètes. |
+| `MEDIA_BASE_URL` | Où sont servies les images. En développement l'administration a son propre port, d'où une adresse complète ; en production, `/admin/storage/uploads`. |
 | `HOME_PAGE_SLUG` | Adresse de la page servie à la racine du site. |
+
+## Le point d'entrée sert aussi de routeur en développement
+
+Le serveur intégré de PHP répond 404 lui-même pour toute adresse qui ressemble à un fichier :
+`/sitemap.xml` et `/robots.txt` n'atteindraient jamais le site. `public/index.php` lui sert
+donc de routeur — il livre ce qui existe sur le disque et traite le reste, exactement ce que
+fait Apache en production. D'où le `public/index.php` final dans `composer serve`.
 
 ## Réinitialiser complètement
 
