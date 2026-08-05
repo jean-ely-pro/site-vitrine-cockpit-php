@@ -93,10 +93,17 @@ final class Application
     /**
      * The LocalBusiness description, ready to be dropped into the page.
      *
+     * Empty until the site has at least a name: structured data describing a
+     * business with no name says nothing and is better left out.
+     *
      * @param array<string, mixed> $settings
      */
     private function jsonLd(array $settings): string
     {
+        if (trim((string) ($settings['nom'] ?? '')) === '') {
+            return '';
+        }
+
         $data = LocalBusiness::fromSettings(
             $settings,
             $this->siteUrl,
