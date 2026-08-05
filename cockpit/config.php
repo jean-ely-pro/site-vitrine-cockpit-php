@@ -44,4 +44,21 @@ return [
         'server' => "indexlite://{$root}/var/data",
         'options' => [],
     ],
+
+    'assets' => [
+
+        // Generated variants go next to the uploads, which the web server
+        // hands out directly. The default place, storage/tmp, is closed to
+        // the outside — see the rules in public/.htaccess.
+        'storage' => 'uploads://variantes',
+
+        // The widths the site actually asks for, in WebP: far lighter than
+        // the original, and understood everywhere. Height follows the width,
+        // so nothing is cropped unless a focal point says otherwise.
+        'presets' => [
+            'w480' => ['width' => 480, 'mode' => 'fitToWidth', 'quality' => 82, 'mime' => 'webp'],
+            'w960' => ['width' => 960, 'mode' => 'fitToWidth', 'quality' => 82, 'mime' => 'webp'],
+            'w1440' => ['width' => 1440, 'mode' => 'fitToWidth', 'quality' => 80, 'mime' => 'webp'],
+        ],
+    ],
 ];

@@ -22,18 +22,17 @@
     {% else %}
         <ul class="actualites">
             {% for article in articles %}
-                {% set image = media_url(article.image) %}
                 <li class="actualite-resume">
 
-                    {% if image %}
+                    {% if article.image %}
+                        {# Decorative here: the title next to it says the same thing. #}
                         <a href="/actualites/{{ article.slug }}" tabindex="-1" aria-hidden="true">
-                            <img class="actualite-resume__image"
-                                 src="{{ image }}"
-                                 alt=""
-                                 {% if article.image.width %}width="{{ article.image.width }}"{% endif %}
-                                 {% if article.image.height %}height="{{ article.image.height }}"{% endif %}
-                                 loading="lazy"
-                                 decoding="async">
+                            {% include 'partials/image.html.twig' with {
+                                asset: article.image,
+                                alt: '',
+                                classe: 'actualite-resume__image',
+                                sizes: '(min-width: 40rem) 14rem, 100vw'
+                            } only %}
                         </a>
                     {% endif %}
 

@@ -8,6 +8,7 @@ use App\Cockpit\Client;
 use App\Content\Blocks;
 use App\Content\Repository;
 use App\Media\MediaUrls;
+use App\Media\Picture;
 use App\Twig\SiteExtension;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -79,7 +80,7 @@ $twig = new Environment(new FilesystemLoader("{$root}/templates"), [
     'autoescape' => 'html',
 ]);
 
-$twig->addExtension(new SiteExtension($media));
+$twig->addExtension(new SiteExtension(new Picture($media)));
 // Templates need it to link the home page at the root rather than at its slug.
 $twig->addGlobal('accueilSlug', $homePageSlug);
 
