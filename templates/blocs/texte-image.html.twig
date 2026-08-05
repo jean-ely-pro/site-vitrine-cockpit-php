@@ -1,0 +1,31 @@
+{# Text next to an illustration. Below the fold, so the image is loaded lazily.
+   Width and height are always written out: without them the page shifts as
+   images arrive. #}
+
+{% set image = media_url(bloc.image) %}
+{% set position = bloc.positionImage|default('droite') %}
+
+<section class="bloc bloc-texte-image bloc-texte-image--{{ position }}">
+
+    <div class="bloc-texte-image__texte">
+        {% if titre %}
+            <h{{ niveau }}>{{ titre }}</h{{ niveau }}>
+        {% endif %}
+
+        {% if bloc.texte %}
+            {# Rich text produced by the admin editor: intentionally not escaped. #}
+            {{ bloc.texte|raw }}
+        {% endif %}
+    </div>
+
+    {% if image %}
+        <img class="bloc-texte-image__image"
+             src="{{ image }}"
+             alt="{{ bloc.alt|default('') }}"
+             {% if bloc.image.width %}width="{{ bloc.image.width }}"{% endif %}
+             {% if bloc.image.height %}height="{{ bloc.image.height }}"{% endif %}
+             loading="lazy"
+             decoding="async">
+    {% endif %}
+
+</section>

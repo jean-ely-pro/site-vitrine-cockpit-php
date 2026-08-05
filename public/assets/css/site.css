@@ -4,9 +4,12 @@
 
 :root {
     --couleur-texte: #1f2933;
-    --couleur-lien: #8b1f5e;
+    --couleur-texte-doux: #4a5560;   /* 7.4:1 sur blanc */
+    --couleur-lien: #8b1f5e;         /* 7.9:1 sur blanc */
     --couleur-fond: #ffffff;
+    --couleur-fond-doux: #f6f3f4;
     --couleur-trait: #d6dbe0;
+    --largeur: 60rem;
 }
 
 *,
@@ -28,6 +31,19 @@ a {
     color: var(--couleur-lien);
 }
 
+a:focus-visible,
+button:focus-visible {
+    outline: 3px solid var(--couleur-lien);
+    outline-offset: 2px;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ── Lien d'évitement ─────────────────────────────────────────────────── */
+
 .lien-evitement {
     position: absolute;
     left: -9999px;
@@ -43,15 +59,17 @@ a {
     z-index: 10;
 }
 
-.en-tete,
-.pied,
-main {
-    max-width: 46rem;
-    margin: 0 auto;
-    padding: 1.5rem 1.25rem;
-}
+/* ── En-tête et menu ──────────────────────────────────────────────────── */
 
 .en-tete {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    align-items: baseline;
+    justify-content: space-between;
+    max-width: var(--largeur);
+    margin: 0 auto;
+    padding: 1.5rem 1.25rem;
     border-bottom: 1px solid var(--couleur-trait);
 }
 
@@ -68,25 +86,218 @@ main {
 
 .en-tete__slogan {
     margin: 0.25rem 0 0;
+    color: var(--couleur-texte-doux);
 }
 
-h1 {
-    font-size: 2rem;
-    line-height: 1.2;
-    margin: 0 0 1rem;
+.menu__liste {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.menu__liste a {
+    display: inline-block;
+    padding: 0.25rem 0;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+}
+
+.menu__liste a:hover,
+.menu__liste a[aria-current="page"] {
+    border-bottom-color: var(--couleur-lien);
+}
+
+/* ── Contenu ──────────────────────────────────────────────────────────── */
+
+main {
+    max-width: var(--largeur);
+    margin: 0 auto;
+    padding: 0 1.25rem 3rem;
+}
+
+h1,
+.bloc-hero__titre {
+    font-size: 2.25rem;
+    line-height: 1.15;
+    margin: 2rem 0 1rem;
 }
 
 h2 {
-    font-size: 1.375rem;
+    font-size: 1.5rem;
     line-height: 1.3;
-    margin: 2rem 0 0.5rem;
+    margin: 2.5rem 0 0.75rem;
 }
+
+h3 {
+    font-size: 1.1875rem;
+    margin: 1.75rem 0 0.5rem;
+}
+
+.bloc {
+    margin: 2.5rem 0;
+}
+
+/* ── Bandeau d'ouverture ──────────────────────────────────────────────── */
+
+.bloc-hero {
+    margin-top: 1.5rem;
+}
+
+.bloc-hero__image {
+    display: block;
+    width: 100%;
+    border-radius: 6px;
+}
+
+.bloc-hero__titre {
+    margin-top: 1.5rem;
+}
+
+.bloc-hero__accroche {
+    font-size: 1.1875rem;
+    color: var(--couleur-texte-doux);
+    max-width: 44rem;
+}
+
+.bouton {
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.6rem 1.25rem;
+    background: var(--couleur-lien);
+    color: #ffffff;          /* 7.9:1 sur la couleur de lien */
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.bouton:hover {
+    background: #6f1a4c;
+}
+
+/* ── Texte et image ───────────────────────────────────────────────────── */
+
+.bloc-texte-image {
+    display: grid;
+    gap: 1.5rem 2.5rem;
+    align-items: start;
+}
+
+@media (min-width: 48rem) {
+
+    .bloc-texte-image {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .bloc-texte-image--gauche .bloc-texte-image__texte {
+        order: 2;
+    }
+}
+
+.bloc-texte-image__image {
+    display: block;
+    width: 100%;
+    border-radius: 6px;
+}
+
+.bloc-texte-image__texte > :first-child {
+    margin-top: 0;
+}
+
+/* ── Coordonnées ──────────────────────────────────────────────────────── */
+
+.bloc-contact {
+    background: var(--couleur-fond-doux);
+    padding: 1.5rem;
+    border-radius: 6px;
+}
+
+.bloc-contact > :first-child {
+    margin-top: 0;
+}
+
+.bloc-contact__details {
+    display: grid;
+    gap: 1rem 2.5rem;
+}
+
+@media (min-width: 48rem) {
+    .bloc-contact__details {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.bloc-contact__coordonnees {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.bloc-contact__coordonnees li + li {
+    margin-top: 0.25rem;
+}
+
+.bloc-contact__horaire,
+.pied__horaire {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: space-between;
+    max-width: 20rem;
+}
+
+.bloc-contact__horaires,
+.pied__horaires {
+    margin: 0;
+}
+
+.bloc-contact__horaires dt,
+.pied__horaires dt {
+    font-weight: 600;
+}
+
+.bloc-contact__horaires dd,
+.pied__horaires dd {
+    margin: 0;
+    color: var(--couleur-texte-doux);
+}
+
+address {
+    font-style: normal;
+}
+
+/* ── Pied de page ─────────────────────────────────────────────────────── */
 
 .pied {
     border-top: 1px solid var(--couleur-trait);
+    background: var(--couleur-fond-doux);
 }
 
-img {
-    max-width: 100%;
-    height: auto;
+.pied__colonnes {
+    display: grid;
+    gap: 2rem;
+    max-width: var(--largeur);
+    margin: 0 auto;
+    padding: 2rem 1.25rem 2.5rem;
+}
+
+@media (min-width: 48rem) {
+    .pied__colonnes {
+        grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    }
+}
+
+.pied__titre {
+    font-size: 1.0625rem;
+    margin: 0 0 0.5rem;
+}
+
+.pied__liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.pied__liste li + li {
+    margin-top: 0.25rem;
 }

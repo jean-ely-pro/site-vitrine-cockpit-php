@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace App;
 
 use App\Cockpit\ContentUnavailable;
+use App\Content\Blocks;
 use App\Content\Repository;
 use App\Http\Response;
+use App\Media\MediaUrls;
+use App\Seo\LocalBusiness;
+use App\Seo\Sitemap;
 use Twig\Environment;
 
 /**
- * Turns a request path into a fully rendered HTML page.
+ * Turns a request path into a fully rendered response.
  *
  * Everything the visitor — or a crawler — needs is in this first response:
  * no content is left for JavaScript to fetch.
@@ -20,38 +24,92 @@ final class Application
     public function __construct(
         private readonly Repository $content,
         private readonly Environment $twig,
+        private readonly MediaUrls $media,
+        private readonly Blocks $blocks,
+        private readonly string $siteUrl,
         private readonly string $homePageSlug,
     ) {
     }
 
     public function handle(string $path): Response
     {
-        $slug = $this->slugFromPath($path);
-
-        if ($slug === null) {
-            return $this->notFound();
-        }
+        $route = parse_url($path, PHP_URL_PATH) ?: '/';
 
         try {
-            $page = $this->content->page($slug);
-
-            if ($page === null) {
-                return $this->notFound();
-            }
-
-            return new Response($this->twig->render('page.html.twig', [
-                'site' => $this->content->settings(),
-                'page' => $page,
-            ]));
+            return match ($route) {
+                '/sitemap.xml' => $this->sitemap(),
+                '/robots.txt' => $this->robots(),
+                default => $this->page($route),
+            };
         } catch (ContentUnavailable $e) {
             return $this->unavailable($e);
         }
     }
 
-    /** Maps "/" to the home page and rejects anything that is not a slug. */
-    private function slugFromPath(string $path): ?string
+    private function page(string $route): Response
     {
-        $slug = trim(parse_url($path, PHP_URL_PATH) ?: '/', '/');
+        $slug = $this->slugFromPath($route);
+
+        if ($slug === null) {
+            return $this->notFound();
+        }
+
+        $page = $this->content->page($slug);
+
+        if ($page === null) {
+            return $this->notFound();
+        }
+
+        $settings = $this->content->settings();
+        $page['blocs'] = $this->blocks->renderable($page['blocs'] ?? null);
+
+        return new Response($this->twig->render('page.html.twig', [
+            'site' => $settings,
+            'menu' => $this->content->menu(),
+            'page' => $page,
+            'slug' => $slug,
+            'jsonld' => $this->jsonLd($settings),
+        ]));
+    }
+
+    private function sitemap(): Response
+    {
+        return new Response(
+            Sitemap::toXml($this->content->pages(), $this->siteUrl, $this->homePageSlug),
+            200,
+            ['Content-Type' => 'application/xml; charset=utf-8'],
+        );
+    }
+
+    private function robots(): Response
+    {
+        return new Response(
+            Sitemap::robotsTxt($this->siteUrl),
+            200,
+            ['Content-Type' => 'text/plain; charset=utf-8'],
+        );
+    }
+
+    /**
+     * The LocalBusiness description, ready to be dropped into the page.
+     *
+     * @param array<string, mixed> $settings
+     */
+    private function jsonLd(array $settings): string
+    {
+        $data = LocalBusiness::fromSettings(
+            $settings,
+            $this->siteUrl,
+            $this->media->absoluteUrl($settings['logo'] ?? null),
+        );
+
+        return json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+    }
+
+    /** Maps "/" to the home page and rejects anything that is not a slug. */
+    private function slugFromPath(string $route): ?string
+    {
+        $slug = trim($route, '/');
 
         if ($slug === '') {
             return $this->homePageSlug;
@@ -63,15 +121,17 @@ final class Application
     private function notFound(): Response
     {
         $settings = [];
+        $menu = [];
 
         try {
             $settings = $this->content->settings();
+            $menu = $this->content->menu();
         } catch (ContentUnavailable) {
             // A missing page must still answer 404, even with no content service.
         }
 
         return new Response(
-            $this->twig->render('404.html.twig', ['site' => $settings]),
+            $this->twig->render('404.html.twig', ['site' => $settings, 'menu' => $menu]),
             404,
         );
     }

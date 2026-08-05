@@ -7,15 +7,34 @@
     <title>{% block title %}{{ site.nom|default('Site') }}{% endblock %}</title>
     {% block head %}{% endblock %}
     <link rel="stylesheet" href="/assets/css/site.css">
+    {% if jsonld is defined %}
+        {# Built and encoded in PHP, so it is inserted as is. #}
+        <script type="application/ld+json">{{ jsonld|raw }}</script>
+    {% endif %}
 </head>
 <body>
 
 <a class="lien-evitement" href="#contenu">Aller au contenu</a>
 
 <header class="en-tete">
-    <p class="en-tete__nom"><a href="/">{{ site.nom|default('Site') }}</a></p>
-    {% if site.slogan is defined and site.slogan %}
-        <p class="en-tete__slogan">{{ site.slogan }}</p>
+    <div class="en-tete__identite">
+        <p class="en-tete__nom"><a href="/">{{ site.nom|default('Site') }}</a></p>
+        {% if site.slogan %}
+            <p class="en-tete__slogan">{{ site.slogan }}</p>
+        {% endif %}
+    </div>
+
+    {% if menu|default([]) is not empty %}
+        <nav class="menu" aria-label="Menu principal">
+            <ul class="menu__liste">
+                {% for entree in menu %}
+                    {% set adresse = entree.slug == accueilSlug|default('accueil') ? '/' : '/' ~ entree.slug %}
+                    <li>
+                        <a href="{{ adresse }}"{% if entree.slug == slug|default(null) %} aria-current="page"{% endif %}>{{ entree.libelle }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </nav>
     {% endif %}
 </header>
 
@@ -23,9 +42,7 @@
     {% block main %}{% endblock %}
 </main>
 
-<footer class="pied">
-    <p>{{ site.nom|default('Site') }}</p>
-</footer>
+{% include 'partials/pied.html.twig' %}
 
 </body>
 </html>
