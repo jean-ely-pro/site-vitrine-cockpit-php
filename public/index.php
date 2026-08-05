@@ -80,7 +80,7 @@ $twig = new Environment(new FilesystemLoader("{$root}/templates"), [
     'autoescape' => 'html',
 ]);
 
-$twig->addExtension(new SiteExtension($media, new Picture($media)));
+$twig->addExtension(new SiteExtension(new Picture($media)));
 // Templates need it to link the home page at the root rather than at its slug.
 $twig->addGlobal('accueilSlug', $homePageSlug);
 
