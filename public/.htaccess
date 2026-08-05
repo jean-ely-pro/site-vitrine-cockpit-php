@@ -48,8 +48,10 @@ AddDefaultCharset UTF-8
 
 <IfModule mod_headers.c>
 
-    # Says who answered: the web server from disk, or PHP.
-    Header set X-Page-Cache "hit" env=PAGE_CACHE
+    # Says who answered: the web server from disk, or PHP. Apache renames the
+    # variable to REDIRECT_* once it has rewritten internally, which is
+    # precisely the case here.
+    Header set X-Page-Cache "hit" env=REDIRECT_PAGE_CACHE
 
     # Pages are revalidated on every visit, so emptying the cache takes effect
     # at once rather than waiting for a copy held by a visitor to expire.
