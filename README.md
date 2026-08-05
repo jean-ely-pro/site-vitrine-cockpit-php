@@ -65,6 +65,7 @@ La structure est **figée** : le client remplit le contenu, il ne crée ni colle
 |---|---|---|
 | `settings` | singleton | identité, couleurs, coordonnées, horaires, réseaux |
 | `pages` | collection | titre, adresse, sections, référencement |
+| `articles` | collection | titre, adresse, date, catégorie, résumé, image, texte |
 | `menu` | singleton | entrées ordonnées, chacune pointant sur une page |
 
 La publication n'est pas un champ : Cockpit la gère nativement sur chaque élément
@@ -72,6 +73,33 @@ La publication n'est pas un champ : Cockpit la gère nativement sur chaque élé
 
 Pour modifier la structure, éditer `cockpit/models/*.model.php` puis relancer
 `php bin/install-cockpit.php --force`.
+
+## Adresses du site
+
+| Adresse | Contenu |
+|---|---|
+| `/` | page dont le slug est `HOME_PAGE_SLUG` |
+| `/{slug}` | une page |
+| `/actualites` | liste des actualités, la plus récente en premier |
+| `/actualites/{slug}` | une actualité |
+| `/sitemap.xml`, `/robots.txt` | pour les moteurs de recherche |
+
+`actualites` est **réservé** : une page portant ce slug ne serait pas servie.
+
+## Édition par le client
+
+Le compte `client` porte un rôle limité au contenu : identité, pages, menu, actualités et
+images. Il ne peut ni modifier la structure, ni gérer les comptes, les rôles ou les clés.
+
+Trois **modèles de page** sont fournis, laissés non publiés — le client les duplique. C'est la
+duplication native de Cockpit : aucun mécanisme à maintenir, et les modèles évoluent comme
+n'importe quelle page.
+
+L'éditeur de texte ne propose que Titre 2, Titre 3, gras, italique, listes et liens. Un texte
+collé depuis un traitement de texte est **corrigé à l'enregistrement** : les niveaux de titre
+hors plage sont ramenés, quel que soit le chemin emprunté.
+
+Tout est détaillé dans [docs/guide-client.md](docs/guide-client.md).
 
 ## Sections de page
 
@@ -179,6 +207,8 @@ horaires structurés faux serait pire que de n'en publier aucun.
 
 ## Documentation
 
+- [Ce que le client peut faire](docs/guide-client.md) — modèles de page, menu, actualités,
+  référencement, limites de l'éditeur
 - [Sécurité de l'installation](docs/securite.md) — HTTPS, double authentification, mots de
   passe, clés d'API, en-têtes, vérifications à passer sur chaque installation
 - [Prérequis et capacités de Cockpit](docs/cockpit-prerequis.md) — version retenue, rôles,

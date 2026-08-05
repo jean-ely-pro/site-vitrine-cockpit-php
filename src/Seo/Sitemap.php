@@ -5,39 +5,30 @@ declare(strict_types=1);
 namespace App\Seo;
 
 /**
- * Lists the published pages for search engines.
+ * Lists the published addresses for search engines.
  *
- * Only pages the site actually serves are listed: the repository has already
+ * Only what the site actually serves is listed: the repository has already
  * filtered out drafts.
  */
 final class Sitemap
 {
     /**
-     * @param list<array<string, mixed>> $pages
+     * @param list<array{loc: string, lastmod?: int|null}> $entries
      */
-    public static function toXml(array $pages, string $siteUrl, string $homePageSlug): string
+    public static function toXml(array $entries): string
     {
-        $base = rtrim($siteUrl, '/');
         $lines = [
             '<?xml version="1.0" encoding="UTF-8"?>',
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
         ];
 
-        foreach ($pages as $page) {
+        foreach ($entries as $entry) {
 
-            $slug = $page['slug'] ?? null;
-
-            if (!is_string($slug) || $slug === '') {
-                continue;
-            }
-
-            // The home page is served at the root, not under its slug.
-            $location = $slug === $homePageSlug ? "{$base}/" : "{$base}/{$slug}";
             $lines[] = '    <url>';
-            $lines[] = '        <loc>'.htmlspecialchars($location, ENT_XML1).'</loc>';
+            $lines[] = '        <loc>'.htmlspecialchars($entry['loc'], ENT_XML1).'</loc>';
 
-            if (isset($page['_modified']) && is_numeric($page['_modified'])) {
-                $lines[] = '        <lastmod>'.date('Y-m-d', (int) $page['_modified']).'</lastmod>';
+            if (isset($entry['lastmod']) && $entry['lastmod'] !== null) {
+                $lines[] = '        <lastmod>'.date('Y-m-d', $entry['lastmod']).'</lastmod>';
             }
 
             $lines[] = '    </url>';

@@ -15,6 +15,10 @@
  * The public site only ever serves items with `_state` = 1.
  */
 
+// Headings only, plus links and lists: the page title is the only level-one
+// heading, and the toolbar must not offer anything that would break that.
+$toolbar = 'format | link | listBullet listOrdered';
+
 // Conditions are evaluated in the admin against the block being edited.
 $isHero = "data.type === 'hero'";
 $isTexteImage = "data.type === 'texte-image'";
@@ -113,7 +117,7 @@ return [
                         'info' => 'Le corps de la section.',
                         'width' => '1-1',
                         'condition' => $hasTexte,
-                        'opts' => [],
+                        'opts' => ['toolbar' => $toolbar],
                     ],
                     [
                         'name' => 'image',

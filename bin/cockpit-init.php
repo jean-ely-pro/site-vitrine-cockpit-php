@@ -196,6 +196,11 @@ if (!$app->dataStorage->getCollection('system/users')->count()) {
     step('Un compte administrateur existe déjà — inchangé.');
 }
 
+// 1b. Customer account ----------------------------------------------------
+//
+// Created after the role below exists, further down; the account is only
+// declared here so the password can be shown once, with the other one.
+
 // 2. Read-only role for the public site -----------------------------------
 //
 // The site only ever reads. Giving it its own role keeps the write
@@ -208,6 +213,7 @@ $readPermissions = [
     'content/settings/read' => true,
     'content/pages/read' => true,
     'content/menu/read' => true,
+    'content/articles/read' => true,
 ];
 
 if (!$role) {
@@ -237,6 +243,93 @@ if (!$role) {
     step('Rôle « Site public » complété pour les nouvelles collections.');
 } else {
     step('Le rôle « Site public » existe déjà — inchangé.');
+}
+
+// 2b. Editing role for the customer ---------------------------------------
+//
+// What the customer sees in the admin is exactly what this role allows. It
+// carries no permission over the structure of the collections, over user
+// accounts or over API keys: the site cannot be broken from here, only filled.
+
+$customerRoleId = 'client';
+
+$customerPermissions = [];
+
+foreach (['settings', 'pages', 'menu', 'articles'] as $model) {
+    $customerPermissions["content/{$model}/read"] = true;
+    $customerPermissions["content/{$model}/update"] = true;
+}
+
+// Pages and news items are created and published; identity and menu are
+// single items that only ever get updated.
+foreach (['pages', 'articles'] as $model) {
+    $customerPermissions["content/{$model}/create"] = true;
+    $customerPermissions["content/{$model}/publish"] = true;
+    $customerPermissions["content/{$model}/delete"] = true;
+}
+
+// Images, without which no page can be illustrated.
+$customerPermissions['assets/upload'] = true;
+$customerPermissions['assets/edit'] = true;
+
+$customerRole = $app->dataStorage->findOne('system/roles', ['appid' => $customerRoleId]);
+
+if (!$customerRole) {
+
+    $now = time();
+
+    $newCustomerRole = [
+        'appid' => $customerRoleId,
+        'name' => 'Client',
+        'info' => 'Rédaction du contenu : identité, pages, menu, actualités et images. '
+            .'Ne peut ni modifier la structure du site, ni gérer les comptes ou les clés.',
+        'permissions' => $customerPermissions,
+        'expressions' => [],
+        '_created' => $now,
+        '_modified' => $now,
+    ];
+
+    $app->dataStorage->save('system/roles', $newCustomerRole);
+
+    step('Rôle « Client » créé (rédaction seulement).');
+} elseif (array_diff_key($customerPermissions, $customerRole['permissions'] ?? [])) {
+
+    $customerRole['permissions'] = array_merge($customerRole['permissions'] ?? [], $customerPermissions);
+    $customerRole['_modified'] = time();
+    $app->dataStorage->save('system/roles', $customerRole);
+
+    step('Rôle « Client » complété pour les nouvelles collections.');
+} else {
+    step('Le rôle « Client » existe déjà — inchangé.');
+}
+
+// 2c. Customer account ----------------------------------------------------
+
+$customerPassword = null;
+
+if (!$app->dataStorage->findOne('system/users', ['user' => 'client'])) {
+
+    $customerPassword = option($argv, 'mot-de-passe-client') ?? randomPassword(20);
+    $now = time();
+
+    $customer = [
+        'active' => true,
+        'user' => 'client',
+        'name' => 'Client',
+        'email' => 'client@localhost',
+        'password' => $app->hash($customerPassword),
+        'i18n' => 'fr',
+        'role' => $customerRoleId,
+        'theme' => 'auto',
+        '_created' => $now,
+        '_modified' => $now,
+    ];
+
+    $app->dataStorage->save('system/users', $customer);
+
+    step('Compte « client » créé.');
+} else {
+    step('Le compte « client » existe déjà — inchangé.');
 }
 
 // 3. Read API key ---------------------------------------------------------
@@ -418,6 +511,73 @@ foreach ($pagesDemo as $slug => $data) {
     step("La page « {$data['titre']} » existe déjà — inchangée.");
 }
 
+// 4c bis. Page templates --------------------------------------------------
+//
+// Cockpit can duplicate an item, so a template is simply a page left
+// unpublished: the customer duplicates it, renames it and publishes it. No
+// mechanism to maintain, and the templates evolve like any other page.
+
+$modeles = [
+    'modele-services' => [
+        'titre' => 'Modèle — Services',
+        'sections' => [
+            ['titre' => 'Ce que nous proposons', 'texte' => 'Décrire ici la première prestation.'],
+            ['titre' => 'Comment cela se passe', 'texte' => 'Décrire ici le déroulement.'],
+        ],
+    ],
+    'modele-a-propos' => [
+        'titre' => 'Modèle — À propos',
+        'sections' => [
+            ['titre' => 'Notre histoire', 'texte' => 'Raconter ici l’origine de l’activité.'],
+            ['titre' => 'Notre façon de travailler', 'texte' => 'Décrire ici ce qui vous distingue.'],
+        ],
+    ],
+    'modele-tarifs' => [
+        'titre' => 'Modèle — Tarifs',
+        'sections' => [
+            ['titre' => 'Nos tarifs', 'texte' => 'Présenter ici les prix, par prestation.'],
+            ['titre' => 'Ce qui est compris', 'texte' => 'Préciser ici ce qu’inclut chaque tarif.'],
+        ],
+    ],
+];
+
+$modelesCrees = 0;
+
+foreach ($modeles as $slug => $modele) {
+
+    if ($content->item('pages', ['slug' => $slug]) !== null) {
+        continue;
+    }
+
+    $blocs = [];
+
+    foreach ($modele['sections'] as $index => $section) {
+        $blocs[] = [
+            'type' => 'texte-image',
+            'titre' => $section['titre'],
+            'texte' => "<p>{$section['texte']}</p>",
+            'positionImage' => $index % 2 === 0 ? 'droite' : 'gauche',
+        ];
+    }
+
+    $blocs[] = $blocContact;
+
+    $content->saveItem('pages', [
+        'titre' => $modele['titre'],
+        'slug' => $slug,
+        'blocs' => $blocs,
+        'seoDescription' => '',
+        // Left unpublished: a template is never a page of the site.
+        '_state' => 0,
+    ]);
+
+    $modelesCrees++;
+}
+
+step($modelesCrees > 0
+    ? "{$modelesCrees} modèles de page créés, non publiés."
+    : 'Les modèles de page existent déjà — inchangés.');
+
 // 4d. Menu ----------------------------------------------------------------
 
 if (empty($content->item('menu')['entrees'])) {
@@ -443,6 +603,31 @@ if (empty($content->item('menu')['entrees'])) {
     step('Le menu est déjà renseigné — inchangé.');
 }
 
+// 4d bis. Demo news item --------------------------------------------------
+
+if ($content->item('articles', ['slug' => 'portes-ouvertes-de-printemps']) === null) {
+
+    $content->saveItem('articles', [
+        'titre' => 'Portes ouvertes de printemps',
+        'slug' => 'portes-ouvertes-de-printemps',
+        'date' => date('Y-m-d'),
+        'categorie' => 'evenement',
+        'resume' => 'Deux jours pour découvrir l’atelier, rencontrer nos producteurs et repartir '
+            .'avec un bouquet composé sous vos yeux.',
+        'image' => $assets['Atelier'] ?? null,
+        'alt' => 'Bouquets préparés pour les portes ouvertes',
+        'contenu' => '<p>L’atelier ouvre ses portes le premier week-end du mois. '
+            .'Deux producteurs de Loire-Atlantique seront présents.</p>'
+            .'<h2>Au programme</h2>'
+            .'<p>Démonstrations de composition, vente de fleurs coupées et conseils d’entretien.</p>',
+        '_state' => 1,
+    ]);
+
+    step('Actualité de démonstration publiée.');
+} else {
+    step('L’actualité de démonstration existe déjà — inchangée.');
+}
+
 // 4e. Refresh caches ------------------------------------------------------
 //
 // Cockpit keeps roles and API keys in its memory store. Writing straight to
@@ -457,10 +642,19 @@ step('Caches des rôles et des clés rafraîchis.');
 
 echo "\n";
 
-if ($password !== null) {
-    echo "  Identifiant : admin\n";
-    echo "  Mot de passe : {$password}\n";
-    echo "  À noter maintenant : il n'est plus affiché ensuite.\n\n";
+if ($password !== null || $customerPassword !== null) {
+
+    if ($password !== null) {
+        echo "  Administration — identifiant : admin\n";
+        echo "                   mot de passe : {$password}\n";
+    }
+
+    if ($customerPassword !== null) {
+        echo "  Client         — identifiant : client\n";
+        echo "                   mot de passe : {$customerPassword}\n";
+    }
+
+    echo "\n  À noter maintenant : ils ne sont plus affichés ensuite.\n\n";
 }
 
 echo "  Administration : http://localhost:8090/\n";

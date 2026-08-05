@@ -22,6 +22,8 @@ final class Repository
     /** @var list<array{libelle: string, slug: string}>|null */
     private ?array $menu = null;
 
+    private ?bool $hasArticles = null;
+
     public function __construct(private readonly Client $client)
     {
     }
@@ -65,6 +67,49 @@ final class Repository
             ['_state' => self::PUBLISHED],
             ['titre' => 1],
         );
+    }
+
+    /**
+     * Published news items, most recent first.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function articles(?int $limit = null): array
+    {
+        return $this->client->items(
+            'articles',
+            ['_state' => self::PUBLISHED],
+            ['date' => -1],
+            $limit,
+        );
+    }
+
+    /**
+     * Whether anything at all has been published in the news.
+     *
+     * Decides if the menu carries a « Actualités » entry: an empty section is
+     * worse than no section.
+     */
+    public function hasArticles(): bool
+    {
+        return $this->hasArticles ??= $this->articles(1) !== [];
+    }
+
+    /**
+     * A published news item, or null when the slug is unknown or still a draft.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function article(string $slug): ?array
+    {
+        if ($slug === '') {
+            return null;
+        }
+
+        return $this->client->item('articles', [
+            'slug' => $slug,
+            '_state' => self::PUBLISHED,
+        ]);
     }
 
     /**
