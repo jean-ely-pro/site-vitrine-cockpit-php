@@ -75,6 +75,10 @@ final class PageCache
         }
 
         if (!is_dir($this->directory) && !mkdir($this->directory, 0o755, true) && !is_dir($this->directory)) {
+            // The site still works, only slower. Say so, otherwise a hosting
+            // where the folder cannot be written stays silently uncached.
+            error_log("[site] cache de pages inutilisable : {$this->directory} n'est pas inscriptible");
+
             return;
         }
 

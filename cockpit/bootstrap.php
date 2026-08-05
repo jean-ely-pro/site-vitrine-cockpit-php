@@ -15,7 +15,15 @@
 
 declare(strict_types=1);
 
-require_once dirname(APP_DIR, 2).'/src/Cache/PageCache.php';
+$pageCacheClass = dirname(APP_DIR, 2).'/src/Cache/PageCache.php';
+
+// Cockpit loads this file at start-up: a missing class here would take the
+// whole admin down. An admin installed outside the site simply gets no purge.
+if (!is_file($pageCacheClass)) {
+    return;
+}
+
+require_once $pageCacheClass;
 
 /** @var Lime\App $app */
 $cache = new App\Cache\PageCache(dirname(APP_DIR).'/cache');
