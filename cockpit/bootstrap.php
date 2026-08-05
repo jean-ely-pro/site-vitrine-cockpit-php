@@ -20,13 +20,10 @@ require_once dirname(APP_DIR, 2).'/src/Cache/PageCache.php';
 /** @var Lime\App $app */
 $cache = new App\Cache\PageCache(dirname(APP_DIR).'/cache');
 
-$emptyCache = static function () use ($cache, $app): void {
-
-    $removed = $cache->clear();
-
-    if ($removed > 0) {
-        $app->trigger('site.cache.purged', [$removed]);
-    }
+// Lime binds event handlers to the application, so this closure cannot be
+// static — it would refuse to bind and break every request that fires it.
+$emptyCache = function () use ($cache): void {
+    $cache->clear();
 };
 
 // Saving an item, and removing one, both change what visitors should see.
