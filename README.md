@@ -64,7 +64,8 @@ La structure est **figée** : le client remplit le contenu, il ne crée ni colle
 | Élément | Type | Contenu |
 |---|---|---|
 | `settings` | singleton | identité, couleurs, coordonnées, horaires, réseaux |
-| `pages` | collection | titre, adresse, contenu, référencement |
+| `pages` | collection | titre, adresse, sections, référencement |
+| `menu` | singleton | entrées ordonnées, chacune pointant sur une page |
 
 La publication n'est pas un champ : Cockpit la gère nativement sur chaque élément
 (« Publié » / « Non publié » / « Archivé »). Le site public ne sert que les éléments publiés.
@@ -72,10 +73,51 @@ La publication n'est pas un champ : Cockpit la gère nativement sur chaque élé
 Pour modifier la structure, éditer `cockpit/models/*.model.php` puis relancer
 `php bin/install-cockpit.php --force`.
 
+## Sections de page
+
+Une page est une suite de **sections**. Trois types sont fournis :
+
+| Type | Rôle | Champs propres |
+|---|---|---|
+| `hero` | bandeau d'ouverture | accroche, image, bouton |
+| `texte-image` | texte à côté d'une illustration | texte, image, position de l'image |
+| `contact` | coordonnées reprises de l'identité | texte d'introduction, horaires |
+
+### Ajouter un type de section
+
+1. Créer `templates/blocs/mon-type.html.twig`. Le partial reçoit `bloc` (les valeurs
+   saisies), `site` (l'identité), `titre`, `niveau` (1 ou 2, pour la balise de titre) et
+   `premier` (vrai pour la première section de la page).
+2. Ajouter `mon-type` à la liste du champ « Type de section » dans
+   `cockpit/models/pages.model.php`, puis les champs qui lui sont propres, chacun avec une
+   `condition` du genre `data.type === 'mon-type'` — c'est elle qui n'affiche ces champs que
+   pour ce type.
+3. `php bin/install-cockpit.php --force`
+
+Rien d'autre à déclarer : un type existe dès qu'un partial porte son nom. Une section dont le
+type n'a pas de partial n'est simplement pas affichée.
+
+### Titres
+
+La première section porte le `<h1>` quand c'est un bandeau — sinon le titre de la page est
+affiché au-dessus des sections. Il y a donc toujours **un seul `<h1>`** par page, et les
+titres de section sont des `<h2>`.
+
 ## Mise à jour de Cockpit
 
 Chaque hébergement se met à jour séparément — il n'existe pas de vue centralisée. La procédure
 est décrite dans [docs/cockpit-prerequis.md](docs/cockpit-prerequis.md).
+
+## Référencement
+
+Chaque page porte son propre `<title>` et sa méta-description, et le site publie
+`/sitemap.xml` et `/robots.txt`. L'établissement est décrit en JSON-LD `LocalBusiness` à
+partir de l'identité, des coordonnées et des horaires.
+
+**Les horaires sont saisis en texte libre** — « 9h – 12h, 14h – 18h30 » — et affichés tels
+quels. Ils ne sont convertis en données structurées que lorsqu'ils se lisent sans ambiguïté ;
+« sur rendez-vous » ou « 24h/24 » sont affichés mais laissés hors du JSON-LD. Publier des
+horaires structurés faux serait pire que de n'en publier aucun.
 
 ## Bon à savoir
 

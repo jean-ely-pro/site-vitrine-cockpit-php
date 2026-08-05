@@ -3,9 +3,11 @@
    Text opacity is never used: it silently breaks contrast ratios. */
 
 :root {
+    /* Contrastes mesurés sur blanc : 14,8:1 · 7,6:1 · 8,6:1 — le minimum
+       exigé est 4,5:1. Le blanc sur la couleur de lien atteint 8,6:1. */
     --couleur-texte: #1f2933;
-    --couleur-texte-doux: #4a5560;   /* 7.4:1 sur blanc */
-    --couleur-lien: #8b1f5e;         /* 7.9:1 sur blanc */
+    --couleur-texte-doux: #4a5560;
+    --couleur-lien: #8b1f5e;
     --couleur-fond: #ffffff;
     --couleur-fond-doux: #f6f3f4;
     --couleur-trait: #d6dbe0;
