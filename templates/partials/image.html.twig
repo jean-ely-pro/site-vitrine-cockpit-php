@@ -1,0 +1,24 @@
+{# One image, in the lightest copy that fits the space it occupies.
+
+   Expects:
+     asset   the media chosen in the admin
+     alt     its description — empty only when the image is decorative
+     sizes   how wide the image is displayed, so the browser can choose
+     classe  css class
+     eager   true above the fold, where waiting is visible
+
+   Width and height are always written out: without them the page shifts as
+   images arrive. #}
+
+{% set img = image(asset) %}
+
+{% if img %}
+    <img{% if classe is defined %} class="{{ classe }}"{% endif %}
+         src="{{ img.src }}"
+         {% if img.srcset %}srcset="{{ img.srcset }}" sizes="{{ sizes|default('100vw') }}"{% endif %}
+         alt="{{ alt|default('') }}"
+         {% if img.width %}width="{{ img.width }}"{% endif %}
+         {% if img.height %}height="{{ img.height }}"{% endif %}
+         {% if eager|default(false) %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %}
+         decoding="async">
+{% endif %}

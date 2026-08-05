@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Twig;
 
 use App\Media\MediaUrls;
+use App\Media\Picture;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -14,14 +15,17 @@ use Twig\TwigFunction;
  */
 final class SiteExtension extends AbstractExtension
 {
-    public function __construct(private readonly MediaUrls $media)
-    {
+    public function __construct(
+        private readonly MediaUrls $media,
+        private readonly Picture $picture,
+    ) {
     }
 
     public function getFunctions(): array
     {
         return [
             new TwigFunction('media_url', $this->media->url(...)),
+            new TwigFunction('image', $this->picture->from(...)),
             new TwigFunction('tel_href', $this->telHref(...)),
         ];
     }
