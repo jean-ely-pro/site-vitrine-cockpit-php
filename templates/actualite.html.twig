@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% set categories = {
+    'actualite': 'Actualité',
+    'evenement': 'Événement',
+    'conseil': 'Conseil'
+} %}
+
+{% set image = media_url(article.image) %}
+
+{% block title %}{{ article.titre }}{% if site.nom %} — {{ site.nom }}{% endif %}{% endblock %}
+
+{% block head %}
+    {% if article.resume %}<meta name="description" content="{{ article.resume }}">{% endif %}
+{% endblock %}
+
+{% block main %}
+    <article class="actualite">
+
+        <p class="actualite__meta">
+            {% if article.date %}
+                <time datetime="{{ article.date }}">{{ article.date|date('d/m/Y') }}</time>
+            {% endif %}
+            {% if article.categorie %}
+                <span class="actualite__categorie">{{ categories[article.categorie]|default(article.categorie) }}</span>
+            {% endif %}
+        </p>
+
+        <h1 class="page__titre">{{ article.titre }}</h1>
+
+        {% if image %}
+            <img class="actualite__image"
+                 src="{{ image }}"
+                 alt="{{ article.alt|default('') }}"
+                 {% if article.image.width %}width="{{ article.image.width }}"{% endif %}
+                 {% if article.image.height %}height="{{ article.image.height }}"{% endif %}
+                 loading="eager"
+                 decoding="async">
+        {% endif %}
+
+        {% if article.contenu %}
+            {# Rich text produced by the admin editor: intentionally not escaped. #}
+            <div class="actualite__contenu">{{ article.contenu|raw }}</div>
+        {% endif %}
+
+        <p class="actualite__retour"><a href="/actualites">Toutes les actualités</a></p>
+
+    </article>
+{% endblock %}
