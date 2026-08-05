@@ -211,6 +211,8 @@ step('Fichiers de Cockpit installés dans public/admin.');
 // 5. Project configuration and content model ------------------------------
 
 copyRecursive("{$root}/cockpit/config.php", "{$target}/config/config.php");
+// Loaded by Cockpit at start-up: empties the page cache on every save.
+copyRecursive("{$root}/cockpit/bootstrap.php", "{$target}/config/bootstrap.php");
 step('Configuration du projet en place.');
 
 foreach (glob("{$root}/cockpit/models/*.model.php") ?: [] as $model) {
@@ -254,7 +256,7 @@ if (!is_file($adminEnv)) {
 
 // 6. Sanity check ---------------------------------------------------------
 
-$expected = ['index.php', 'bootstrap.php', 'config/config.php', 'modules/App/bootstrap.php'];
+$expected = ['index.php', 'bootstrap.php', 'config/config.php', 'config/bootstrap.php', 'modules/App/bootstrap.php'];
 $absent = array_values(array_filter($expected, static fn (string $f): bool => !is_file("{$target}/{$f}")));
 
 foreach (['storage/cache', 'storage/tmp/thumbs', 'storage/uploads', 'storage/content'] as $dir) {
