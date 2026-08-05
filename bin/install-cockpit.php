@@ -221,6 +221,12 @@ foreach (glob("{$root}/cockpit/models/*.model.php") ?: [] as $model) {
 
 step('Modèle de contenu en place.');
 
+// Project addons, reinstalled after the core so an update never removes them.
+foreach (glob("{$root}/cockpit/addons/*", GLOB_ONLYDIR) ?: [] as $addon) {
+    copyRecursive($addon, "{$target}/addons/".basename($addon));
+    step('Extension « '.basename($addon).' » en place.');
+}
+
 // Runtime folders. Cockpit resolves #cache, #tmp and #uploads by looking them
 // up on disk: a missing one breaks the admin, so create them all up front.
 // The database itself lives in /var, outside the web root.

@@ -7,6 +7,19 @@ AddDefaultCharset UTF-8
     Options -MultiViews
     RewriteEngine On
 
+    # ── HTTPS ─────────────────────────────────────────────────────────────
+    # Everything goes through HTTPS: the admin sends a password and an API key
+    # travels with every read. X-Forwarded-Proto covers hostings that terminate
+    # TLS ahead of Apache. Local names are left alone so development works
+    # without a certificate.
+
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+    RewriteCond %{HTTP_HOST} !^localhost [NC]
+    RewriteCond %{HTTP_HOST} !^127\.0\.0\.1 [NC]
+    RewriteCond %{HTTP_HOST} !\.(local|test)$ [NC]
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
     # The admin and its API ship their own rules: never rewrite them here, and
     # never serve them from the cache.
     RewriteRule ^admin(/|$) - [L]
@@ -59,7 +72,29 @@ AddDefaultCharset UTF-8
         Header set Cache-Control "public, max-age=0, must-revalidate"
     </FilesMatch>
 
-    Header set X-Content-Type-Options "nosniff"
+    # ── Sécurité ──────────────────────────────────────────────────────────
+
+    # Marks the admin so the rules below can leave it out.
+    SetEnvIf Request_URI "^/admin(/|$)" ADMIN_AREA
+
+    # Cockpit already sets this one on the admin; setting it again there would
+    # simply send it twice.
+    Header always set X-Content-Type-Options "nosniff" env=!ADMIN_AREA
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+
+    # Only sent over HTTPS: announcing it on a plain connection is meaningless
+    # and would lock out a site not yet served over TLS.
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
+
+    # The public site loads nothing from anywhere else — no remote font, no
+    # image from a third party, no analytics. Saying so out loud turns any
+    # future slip into a blocked request instead of a silent leak.
+    #
+    # The admin is left out: Cockpit's own interface relies on inline scripts
+    # and styles, and hardening it belongs to Cockpit, not to this file.
+    Header always set Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; font-src 'self'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'" env=!ADMIN_AREA
+    Header always set X-Frame-Options "DENY" env=!ADMIN_AREA
 
 </IfModule>
 
