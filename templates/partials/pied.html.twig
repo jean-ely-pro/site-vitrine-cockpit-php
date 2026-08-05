@@ -1,0 +1,66 @@
+{# Contact details, clickable. Opening hours come from the identity settings. #}
+{% set jours = {
+    'lundi': 'Lundi',
+    'mardi': 'Mardi',
+    'mercredi': 'Mercredi',
+    'jeudi': 'Jeudi',
+    'vendredi': 'Vendredi',
+    'samedi': 'Samedi',
+    'dimanche': 'Dimanche'
+} %}
+
+<footer class="pied">
+    <div class="pied__colonnes">
+
+        <div class="pied__bloc">
+            <h2 class="pied__titre">{{ site.nom|default('Site') }}</h2>
+            {% if site.adresse %}
+                <address class="pied__adresse">{{ site.adresse|nl2br }}</address>
+            {% endif %}
+        </div>
+
+        {% if site.telephone or site.email %}
+            <div class="pied__bloc">
+                <h2 class="pied__titre">Nous contacter</h2>
+                <ul class="pied__liste">
+                    {% if site.telephone %}
+                        <li><a href="tel:{{ tel_href(site.telephone) }}">{{ site.telephone }}</a></li>
+                    {% endif %}
+                    {% if site.email %}
+                        <li><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {% if site.horaires %}
+            <div class="pied__bloc">
+                <h2 class="pied__titre">Horaires</h2>
+                <dl class="pied__horaires">
+                    {% for cle, libelle in jours %}
+                        {% if site.horaires[cle] %}
+                            <div class="pied__horaire">
+                                <dt>{{ libelle }}</dt>
+                                <dd>{{ site.horaires[cle] }}</dd>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </dl>
+            </div>
+        {% endif %}
+
+        {% if site.reseaux is not empty %}
+            <div class="pied__bloc">
+                <h2 class="pied__titre">Nous suivre</h2>
+                <ul class="pied__liste">
+                    {% for reseau in site.reseaux %}
+                        {% if reseau.url %}
+                            <li><a href="{{ reseau.url }}" rel="noopener">{{ reseau.nom|default(reseau.url) }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+    </div>
+</footer>
