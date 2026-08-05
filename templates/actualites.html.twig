@@ -10,6 +10,8 @@
 
 {% block head %}
     <meta name="description" content="Les dernières actualités{% if site.nom %} de {{ site.nom }}{% endif %}.">
+    {# Nothing published yet: the page stays reachable, but has nothing to index. #}
+    {% if articles is empty %}<meta name="robots" content="noindex">{% endif %}
 {% endblock %}
 
 {% block main %}

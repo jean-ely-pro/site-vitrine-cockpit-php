@@ -84,7 +84,7 @@ Pour modifier la structure, éditer `cockpit/models/*.model.php` puis relancer
 | `/actualites/{slug}` | une actualité |
 | `/sitemap.xml`, `/robots.txt` | pour les moteurs de recherche |
 
-`actualites` est **réservé** : une page portant ce slug ne serait pas servie.
+`actualites` est **réservé** : l’administration refuse une page portant ce slug, en le disant.
 
 ## Édition par le client
 

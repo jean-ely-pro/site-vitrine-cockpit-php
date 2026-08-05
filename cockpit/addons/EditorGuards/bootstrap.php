@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Guards on what the text editor may produce.
+ * Guards applied to what is typed in the admin.
  *
  * The page title is the only level-one heading of a page. The editor offers
  * levels one to six all the same, and text pasted from a word processor
@@ -17,9 +17,24 @@ require_once __DIR__.'/Headings.php';
 
 use EditorGuards\Headings;
 
+/**
+ * Addresses the site serves itself. A page taking one of them would simply
+ * never be shown, which nothing on screen would explain.
+ *
+ * Kept in step with App\Application::NEWS on the site side — two separate
+ * applications, so the value is stated in both.
+ */
+const RESERVED_PAGE_SLUGS = ['actualites'];
+
 /** @var Lime\App $this */
 
 $this->on('content.item.save.before', function (string $modelName, array &$item) {
+
+    if ($modelName === 'pages' && in_array($item['slug'] ?? '', RESERVED_PAGE_SLUGS, true)) {
+        throw new \App\Exception\AppNotification(
+            'L’adresse « '.$item['slug'].' » est réservée à la liste des actualités. En choisir une autre.'
+        );
+    }
 
     $model = $this->module('content')->model($modelName);
 
