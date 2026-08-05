@@ -19,6 +19,9 @@ final class Repository
     /** @var array<string, mixed>|null */
     private ?array $settings = null;
 
+    /** @var list<array{libelle: string, slug: string}>|null */
+    private ?array $menu = null;
+
     public function __construct(private readonly Client $client)
     {
     }
@@ -62,5 +65,43 @@ final class Repository
             ['_state' => self::PUBLISHED],
             ['titre' => 1],
         );
+    }
+
+    /**
+     * Menu entries, in order, reduced to what a link needs.
+     *
+     * Entries whose page was deleted or unpublished are dropped: a menu never
+     * points at a page the visitor cannot reach.
+     *
+     * @return list<array{libelle: string, slug: string}>
+     */
+    public function menu(): array
+    {
+        if ($this->menu !== null) {
+            return $this->menu;
+        }
+
+        $singleton = $this->client->singleton('menu', populate: true) ?? [];
+        $published = array_column($this->pages(), null, 'slug');
+        $entries = [];
+
+        foreach ($singleton['entrees'] ?? [] as $entry) {
+
+            $page = $entry['page'] ?? null;
+            $slug = is_array($page) ? ($page['slug'] ?? null) : null;
+
+            if (!is_string($slug) || !isset($published[$slug])) {
+                continue;
+            }
+
+            $label = trim((string) ($entry['libelle'] ?? ''));
+
+            $entries[] = [
+                'libelle' => $label !== '' ? $label : (string) ($page['titre'] ?? $slug),
+                'slug' => $slug,
+            ];
+        }
+
+        return $this->menu = $entries;
     }
 }

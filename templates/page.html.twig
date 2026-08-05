@@ -3,6 +3,11 @@
 {% set titreOnglet = page.seoTitre ?: page.titre %}
 {% set resume = page.seoDescription ?: site.description|default('') %}
 
+{# When the page opens on a banner, that banner carries the only <h1>; the page
+   title would otherwise be said twice, once as a heading and once as a banner. #}
+{% set premierBloc = page.blocs|first %}
+{% set titreDansBandeau = premierBloc and premierBloc.type == 'hero' %}
+
 {# The site name is appended only when the title does not already carry it,
    so a hand-written SEO title never reads « … Bloom — Bloom ». #}
 {% block title %}{{ titreOnglet }}{% if site.nom and site.nom not in titreOnglet %} — {{ site.nom }}{% endif %}{% endblock %}
@@ -12,12 +17,17 @@
 {% endblock %}
 
 {% block main %}
-    <article class="page">
-        <h1>{{ page.titre }}</h1>
+    {% if not titreDansBandeau %}
+        <h1 class="page__titre">{{ page.titre }}</h1>
+    {% endif %}
 
-        {% if page.contenu %}
-            {# Rich text produced by the admin editor: intentionally not escaped. #}
-            <div class="page__contenu">{{ page.contenu|raw }}</div>
-        {% endif %}
-    </article>
+    {% for bloc in page.blocs %}
+        {% include 'blocs/' ~ bloc.type ~ '.html.twig' with {
+            bloc: bloc,
+            site: site,
+            titre: titreDansBandeau and loop.first ? page.titre : bloc.titre,
+            niveau: titreDansBandeau and loop.first ? 1 : 2,
+            premier: loop.first
+        } only %}
+    {% endfor %}
 {% endblock %}

@@ -1,0 +1,54 @@
+{# Contact details, taken from the site identity so they are typed once and
+   stay in step everywhere. Phone and e-mail are clickable. #}
+
+{% set jours = {
+    'lundi': 'Lundi',
+    'mardi': 'Mardi',
+    'mercredi': 'Mercredi',
+    'jeudi': 'Jeudi',
+    'vendredi': 'Vendredi',
+    'samedi': 'Samedi',
+    'dimanche': 'Dimanche'
+} %}
+
+<section class="bloc bloc-contact">
+
+    {% if titre %}
+        <h{{ niveau }}>{{ titre }}</h{{ niveau }}>
+    {% endif %}
+
+    {% if bloc.texte %}
+        {# Rich text produced by the admin editor: intentionally not escaped. #}
+        {{ bloc.texte|raw }}
+    {% endif %}
+
+    <div class="bloc-contact__details">
+
+        <ul class="bloc-contact__coordonnees">
+            {% if site.telephone %}
+                <li><a href="tel:{{ tel_href(site.telephone) }}">{{ site.telephone }}</a></li>
+            {% endif %}
+            {% if site.email %}
+                <li><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
+            {% endif %}
+            {% if site.adresse %}
+                <li><address>{{ site.adresse|nl2br }}</address></li>
+            {% endif %}
+        </ul>
+
+        {% if bloc.afficherHoraires and site.horaires %}
+            <dl class="bloc-contact__horaires">
+                {% for cle, libelle in jours %}
+                    {% if site.horaires[cle] %}
+                        <div class="bloc-contact__horaire">
+                            <dt>{{ libelle }}</dt>
+                            <dd>{{ site.horaires[cle] }}</dd>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </dl>
+        {% endif %}
+
+    </div>
+
+</section>
