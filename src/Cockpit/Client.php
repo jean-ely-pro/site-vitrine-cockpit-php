@@ -22,11 +22,12 @@ final class Client
     /**
      * Fetches a singleton.
      *
+     * @param bool $populate Resolve links to other content items.
      * @return array<string, mixed>|null
      */
-    public function singleton(string $model): ?array
+    public function singleton(string $model, bool $populate = false): ?array
     {
-        $item = $this->get("/content/item/{$model}");
+        $item = $this->get("/content/item/{$model}", $populate ? ['populate' => '1'] : []);
 
         return is_array($item) && $item !== [] ? $item : null;
     }

@@ -1,0 +1,35 @@
+{# Opening banner.
+
+   The illustration is an <img>, never a CSS background: a background image is
+   invisible to search engines, cannot carry a description, and is fetched late.
+   Above the fold, it is loaded eagerly and given priority. #}
+
+{% set image = media_url(bloc.image) %}
+
+<section class="bloc bloc-hero">
+
+    {% if image %}
+        <img class="bloc-hero__image"
+             src="{{ image }}"
+             alt="{{ bloc.alt|default('') }}"
+             {% if bloc.image.width %}width="{{ bloc.image.width }}"{% endif %}
+             {% if bloc.image.height %}height="{{ bloc.image.height }}"{% endif %}
+             {% if premier %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %}
+             decoding="async">
+    {% endif %}
+
+    <div class="bloc-hero__texte">
+        {% if titre %}
+            <h{{ niveau }} class="bloc-hero__titre">{{ titre }}</h{{ niveau }}>
+        {% endif %}
+
+        {% if bloc.accroche %}
+            <p class="bloc-hero__accroche">{{ bloc.accroche }}</p>
+        {% endif %}
+
+        {% if bloc.boutonTexte and bloc.boutonLien %}
+            <p><a class="bouton" href="{{ bloc.boutonLien }}">{{ bloc.boutonTexte }}</a></p>
+        {% endif %}
+    </div>
+
+</section>

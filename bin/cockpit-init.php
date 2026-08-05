@@ -8,7 +8,7 @@ declare(strict_types=1);
  *
  * Safe to run twice — anything that already exists is left untouched.
  *
- * Usage: php bin/cockpit-init.php [--password=…] [--demo]
+ * Usage: php bin/cockpit-init.php [--password=…]
  */
 
 if (PHP_SAPI !== 'cli') {
@@ -84,6 +84,84 @@ function writeEnv(string $root, string $key, string $value): void
     file_put_contents($file, $content);
 }
 
+/**
+ * Draws a plain illustration for the demo content.
+ *
+ * Demo images are generated rather than downloaded: the site must never depend
+ * on a third-party host, not even for a placeholder.
+ *
+ * @param array{int, int, int} $from
+ * @param array{int, int, int} $to
+ */
+function drawDemoImage(string $file, int $width, int $height, array $from, array $to): void
+{
+    $image = imagecreatetruecolor($width, $height);
+
+    // Vertical gradient.
+    for ($y = 0; $y < $height; $y++) {
+
+        $ratio = $y / max(1, $height - 1);
+        $colour = imagecolorallocate(
+            $image,
+            (int) round($from[0] + ($to[0] - $from[0]) * $ratio),
+            (int) round($from[1] + ($to[1] - $from[1]) * $ratio),
+            (int) round($from[2] + ($to[2] - $from[2]) * $ratio),
+        );
+
+        imageline($image, 0, $y, $width, $y, $colour);
+    }
+
+    // A few soft discs, for something other than a flat wash.
+    imagealphablending($image, true);
+
+    foreach ([[0.24, 0.34, 0.26], [0.68, 0.58, 0.34], [0.86, 0.24, 0.16]] as [$x, $y, $size]) {
+        $colour = imagecolorallocatealpha($image, 255, 255, 255, 100);
+        imagefilledellipse(
+            $image,
+            (int) round($width * $x),
+            (int) round($height * $y),
+            (int) round($width * $size),
+            (int) round($width * $size),
+            $colour,
+        );
+    }
+
+    imagewebp($image, $file, 82);
+    imagedestroy($image);
+}
+
+/**
+ * Registers a file as a Cockpit media, through Cockpit's own upload routine.
+ *
+ * @return array<string, mixed>|null The stored asset.
+ */
+function addAsset(Lime\App $app, string $file, string $title): ?array
+{
+    // Cockpit's upload moves the file, so hand it a copy.
+    $temporary = $app->path('#tmp:').'/'.basename($file);
+    copy($file, $temporary);
+
+    $result = $app->module('assets')->upload([
+        'name' => [basename($file)],
+        'full_path' => [basename($file)],
+        'type' => [mime_content_type($temporary) ?: 'image/webp'],
+        'tmp_name' => [$temporary],
+        'error' => [0],
+        'size' => [filesize($temporary)],
+    ], [], false);
+
+    $asset = $result['assets'][0] ?? null;
+
+    if (!is_array($asset)) {
+        return null;
+    }
+
+    $asset['title'] = $title;
+    $app->dataStorage->save('assets', $asset);
+
+    return $asset;
+}
+
 echo "\nInitialisation de Cockpit\n\n";
 
 // 1. Administrator account ------------------------------------------------
@@ -126,6 +204,12 @@ if (!$app->dataStorage->getCollection('system/users')->count()) {
 $roleId = 'site-public';
 $role = $app->dataStorage->findOne('system/roles', ['appid' => $roleId]);
 
+$readPermissions = [
+    'content/settings/read' => true,
+    'content/pages/read' => true,
+    'content/menu/read' => true,
+];
+
 if (!$role) {
 
     $now = time();
@@ -134,10 +218,7 @@ if (!$role) {
         'appid' => $roleId,
         'name' => 'Site public',
         'info' => 'Lecture seule du contenu affiché par le site. Aucune écriture.',
-        'permissions' => [
-            'content/settings/read' => true,
-            'content/pages/read' => true,
-        ],
+        'permissions' => $readPermissions,
         'expressions' => [],
         '_created' => $now,
         '_modified' => $now,
@@ -146,6 +227,14 @@ if (!$role) {
     $app->dataStorage->save('system/roles', $newRole);
 
     step('Rôle « Site public » créé (lecture seule).');
+} elseif (array_diff_key($readPermissions, $role['permissions'] ?? [])) {
+
+    // A collection added after the role was created must become readable too.
+    $role['permissions'] = array_merge($role['permissions'] ?? [], $readPermissions);
+    $role['_modified'] = time();
+    $app->dataStorage->save('system/roles', $role);
+
+    step('Rôle « Site public » complété pour les nouvelles collections.');
 } else {
     step('Le rôle « Site public » existe déjà — inchangé.');
 }
@@ -207,30 +296,162 @@ if (empty($content->item('settings')['nom'])) {
         'reseaux' => [],
     ]);
 
-    step('Identité du site renseignée.');
+    step("Identité du site renseignée.");
 } else {
     step("L'identité du site est déjà renseignée — inchangée.");
 }
 
-if (!$content->item('pages', ['slug' => 'accueil'])) {
+// 4b. Demo images ---------------------------------------------------------
 
-    $content->saveItem('pages', [
+$existingAssets = $app->dataStorage->find('assets', ['filter' => ['title' => ['$in' => ['Bandeau', 'Atelier']]]])->toArray();
+$assets = array_column($existingAssets, null, 'title');
+
+if (!isset($assets['Bandeau'], $assets['Atelier'])) {
+
+    $tmp = "{$root}/var/tmp/demo";
+
+    if (!is_dir($tmp)) {
+        mkdir($tmp, 0o755, true);
+    }
+
+    if (!isset($assets['Bandeau'])) {
+        drawDemoImage("{$tmp}/bandeau.webp", 1600, 900, [139, 31, 94], [242, 214, 228]);
+        $assets['Bandeau'] = addAsset($app, "{$tmp}/bandeau.webp", 'Bandeau');
+    }
+
+    if (!isset($assets['Atelier'])) {
+        drawDemoImage("{$tmp}/atelier.webp", 1200, 800, [70, 96, 84], [226, 236, 224]);
+        $assets['Atelier'] = addAsset($app, "{$tmp}/atelier.webp", 'Atelier');
+    }
+
+    step('Images de démonstration créées, en WebP et auto-hébergées.');
+} else {
+    step('Les images de démonstration existent déjà — inchangées.');
+}
+
+// 4c. Demo pages ----------------------------------------------------------
+
+$blocContact = [
+    'type' => 'contact',
+    'titre' => 'Nous trouver',
+    'texte' => '<p>La boutique est ouverte du mardi au samedi. Les commandes peuvent être '
+        .'passées par téléphone ou par courriel.</p>',
+    'afficherHoraires' => true,
+];
+
+$pagesDemo = [
+    'accueil' => [
         'titre' => 'Bienvenue à l’Atelier Bloom',
         'slug' => 'accueil',
-        'contenu' => '<p>Nous composons des bouquets à la main, avec des fleurs de saison '
-            .'achetées chaque matin auprès de producteurs de Loire-Atlantique.</p>'
-            .'<h2>Nos compositions</h2>'
-            .'<p>Bouquets du jour, compositions pour mariages et abonnements pour les entreprises.</p>',
         'seoTitre' => 'Atelier Bloom, fleuriste artisanal à Nantes',
         'seoDescription' => 'Bouquets de saison composés à la main à Nantes. Compositions pour mariages, '
             .'abonnements pour les entreprises et livraison en centre-ville.',
         '_state' => 1,
-    ]);
+        'blocs' => [
+            [
+                'type' => 'hero',
+                'titre' => '',
+                'accroche' => 'Des fleurs de saison, achetées chaque matin auprès de producteurs '
+                    .'de Loire-Atlantique.',
+                'image' => $assets['Bandeau'] ?? null,
+                'alt' => 'Composition de fleurs de saison dans les tons roses',
+                'boutonTexte' => 'Voir nos services',
+                'boutonLien' => '/services',
+            ],
+            [
+                'type' => 'texte-image',
+                'titre' => 'Un atelier, pas une chaîne',
+                'texte' => '<p>Chaque bouquet est composé à la main, à la commande. Nous travaillons '
+                    .'avec six producteurs situés à moins de quarante kilomètres de la boutique.</p>'
+                    .'<h3>Ce que cela change</h3>'
+                    .'<p>Les fleurs tiennent plus longtemps et les variétés suivent réellement '
+                    .'les saisons.</p>',
+                'image' => $assets['Atelier'] ?? null,
+                'alt' => 'Plan de travail de l’atelier, avec tiges et sécateur',
+                'positionImage' => 'droite',
+            ],
+            $blocContact,
+        ],
+    ],
+    'services' => [
+        'titre' => 'Nos services',
+        'slug' => 'services',
+        'seoTitre' => 'Services : bouquets, mariages et abonnements',
+        'seoDescription' => 'Bouquets du jour, compositions pour mariages et abonnements floraux '
+            .'pour les entreprises, préparés à Nantes.',
+        '_state' => 1,
+        'blocs' => [
+            [
+                'type' => 'texte-image',
+                'titre' => 'Bouquets et compositions',
+                'texte' => '<p>Bouquets du jour composés selon les arrivages, compositions sur mesure '
+                    .'pour les mariages et abonnements hebdomadaires pour les entreprises.</p>'
+                    .'<h3>Sur commande</h3>'
+                    .'<p>Prévoir deux jours pour les compositions de plus de trente tiges.</p>',
+                'image' => $assets['Atelier'] ?? null,
+                'alt' => 'Fleurs préparées sur le plan de travail de l’atelier',
+                'positionImage' => 'gauche',
+            ],
+            $blocContact,
+        ],
+    ],
+];
 
-    step('Page d’accueil de démonstration créée.');
-} else {
-    step('La page d’accueil existe déjà — inchangée.');
+foreach ($pagesDemo as $slug => $data) {
+
+    $existing = $content->item('pages', ['slug' => $slug]);
+
+    if ($existing === null) {
+        $content->saveItem('pages', $data);
+        step("Page « {$data['titre']} » créée.");
+        continue;
+    }
+
+    // A page from an earlier version carries no blocks yet: bring it up to
+    // date rather than leaving it blank on screen.
+    if (empty($existing['blocs'])) {
+        $content->saveItem('pages', array_merge($existing, ['blocs' => $data['blocs']]));
+        step("Page « {$data['titre']} » complétée avec ses sections.");
+        continue;
+    }
+
+    step("La page « {$data['titre']} » existe déjà — inchangée.");
 }
+
+// 4d. Menu ----------------------------------------------------------------
+
+if (empty($content->item('menu')['entrees'])) {
+
+    $entries = [];
+
+    foreach (['accueil' => 'Accueil', 'services' => 'Services'] as $slug => $label) {
+
+        $page = $content->item('pages', ['slug' => $slug]);
+
+        if ($page !== null) {
+            $entries[] = [
+                'libelle' => $label,
+                'page' => ['_model' => 'pages', '_id' => $page['_id']],
+            ];
+        }
+    }
+
+    $content->saveItem('menu', ['entrees' => $entries]);
+
+    step('Menu renseigné.');
+} else {
+    step('Le menu est déjà renseigné — inchangé.');
+}
+
+// 4e. Refresh caches ------------------------------------------------------
+//
+// Cockpit keeps roles and API keys in its memory store. Writing straight to
+// the database leaves that copy stale, and the site would keep being refused.
+
+$app->helper('acl')->cache();
+$app->helper('api')->cache();
+
+step('Caches des rôles et des clés rafraîchis.');
 
 // 5. Summary --------------------------------------------------------------
 
