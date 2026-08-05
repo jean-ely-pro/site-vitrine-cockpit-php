@@ -108,6 +108,40 @@ titres de section sont des `<h2>`.
 Chaque hébergement se met à jour séparément — il n'existe pas de vue centralisée. La procédure
 est décrite dans [docs/cockpit-prerequis.md](docs/cockpit-prerequis.md).
 
+## Cache de pages
+
+Chaque page rendue est écrite en fichier statique dans `public/cache`. À la visite suivante,
+**Apache sert ce fichier seul — PHP n'est pas démarré.** C'est ce qui rend le site tenable sur
+un hébergement mutualisé, où démarrer PHP à chaque visite coûte cher.
+
+L'en-tête `X-Page-Cache` dit qui a répondu : `hit` pour le serveur web, `miss` pour PHP.
+
+```bash
+curl -sI https://domaine.tld/services | grep -i x-page-cache
+```
+
+**Le cache est vidé dès qu'un contenu est enregistré dans l'administration** : un fichier
+d'amorçage chargé par Cockpit s'en charge. La purge est totale — l'identité du site, le menu
+et les titres de pages figurent sur toutes les pages, une purge partielle laisserait des
+copies périmées. Chaque page est simplement rendue à nouveau à sa prochaine visite.
+
+Ne sont jamais mis en cache : l'administration et son API, les réponses en erreur, et toute
+adresse portant des paramètres.
+
+### Purger à la main
+
+Après un déploiement de gabarits ou d'une nouvelle feuille de style — dont l'adresse est déjà
+inscrite dans les pages stockées :
+
+```bash
+php bin/purge-cache.php
+```
+
+### En développement
+
+Le cache est **inactif** quand `APP_ENV=dev`, pour voir ses modifications immédiatement.
+`PAGE_CACHE=true` dans `.env` permet de le tester en local.
+
 ## Référencement
 
 Chaque page porte son propre `<title>` et sa méta-description, et le site publie
