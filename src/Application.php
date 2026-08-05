@@ -63,13 +63,17 @@ final class Application
         $settings = $this->content->settings();
         $page['blocs'] = $this->blocks->renderable($page['blocs'] ?? null);
 
-        return new Response($this->twig->render('page.html.twig', [
-            'site' => $settings,
-            'menu' => $this->content->menu(),
-            'page' => $page,
-            'slug' => $slug,
-            'jsonld' => $this->jsonLd($settings),
-        ]));
+        return new Response(
+            $this->twig->render('page.html.twig', [
+                'site' => $settings,
+                'menu' => $this->content->menu(),
+                'page' => $page,
+                'slug' => $slug,
+                'jsonld' => $this->jsonLd($settings),
+            ]),
+            200,
+            self::cacheHeaders('text/html; charset=utf-8'),
+        );
     }
 
     private function sitemap(): Response
@@ -77,7 +81,7 @@ final class Application
         return new Response(
             Sitemap::toXml($this->content->pages(), $this->siteUrl, $this->homePageSlug),
             200,
-            ['Content-Type' => 'application/xml; charset=utf-8'],
+            self::cacheHeaders('application/xml; charset=utf-8'),
         );
     }
 
@@ -86,8 +90,26 @@ final class Application
         return new Response(
             Sitemap::robotsTxt($this->siteUrl),
             200,
-            ['Content-Type' => 'text/plain; charset=utf-8'],
+            self::cacheHeaders('text/plain; charset=utf-8'),
         );
+    }
+
+    /**
+     * Headers for a response that will also be stored on disk.
+     *
+     * Browsers revalidate on every visit, so emptying the cache takes effect
+     * at once instead of waiting for a copy held by the visitor to expire.
+     * `X-Page-Cache` says who answered: PHP, or the web server from disk.
+     *
+     * @return array<string, string>
+     */
+    private static function cacheHeaders(string $contentType): array
+    {
+        return [
+            'Content-Type' => $contentType,
+            'Cache-Control' => 'public, max-age=0, must-revalidate',
+            'X-Page-Cache' => 'miss',
+        ];
     }
 
     /**
