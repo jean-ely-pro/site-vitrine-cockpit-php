@@ -24,7 +24,7 @@
         {% endif %}
     </div>
 
-    {% if menu|default([]) is not empty %}
+    {% if menu|default([]) is not empty or afficherActualites|default(false) %}
         <nav class="menu" aria-label="Menu principal">
             <ul class="menu__liste">
                 {% for entree in menu %}
@@ -33,6 +33,14 @@
                         <a href="{{ adresse }}"{% if entree.slug == slug|default(null) %} aria-current="page"{% endif %}>{{ entree.libelle }}</a>
                     </li>
                 {% endfor %}
+
+                {# Added on its own as soon as something is published there:
+                   an empty news section would be worse than none. #}
+                {% if afficherActualites|default(false) %}
+                    <li>
+                        <a href="/actualites"{% if slug|default(null) == 'actualites' %} aria-current="page"{% endif %}>Actualités</a>
+                    </li>
+                {% endif %}
             </ul>
         </nav>
     {% endif %}

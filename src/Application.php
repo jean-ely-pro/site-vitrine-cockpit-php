@@ -21,6 +21,11 @@ use Twig\Environment;
  */
 final class Application
 {
+    /** Reserved by the news list and its items; no page may use this slug. */
+    public const NEWS = '/actualites';
+
+    private const SLUG = '/^[a-z0-9]+(?:-[a-z0-9]+)*$/';
+
     public function __construct(
         private readonly Repository $content,
         private readonly Environment $twig,
@@ -36,14 +41,53 @@ final class Application
         $route = parse_url($path, PHP_URL_PATH) ?: '/';
 
         try {
-            return match ($route) {
-                '/sitemap.xml' => $this->sitemap(),
-                '/robots.txt' => $this->robots(),
+            return match (true) {
+                $route === '/sitemap.xml' => $this->sitemap(),
+                $route === '/robots.txt' => $this->robots(),
+                $route === self::NEWS || $route === self::NEWS.'/' => $this->newsList(),
+                str_starts_with($route, self::NEWS.'/') => $this->newsItem(substr($route, strlen(self::NEWS) + 1)),
                 default => $this->page($route),
             };
         } catch (ContentUnavailable $e) {
             return $this->unavailable($e);
         }
+    }
+
+    /**
+     * The news list, most recent first.
+     */
+    private function newsList(): Response
+    {
+        return new Response(
+            $this->twig->render(
+                'actualites.html.twig',
+                $this->shared(trim(self::NEWS, '/')) + ['articles' => $this->content->articles()],
+            ),
+            200,
+            self::cacheHeaders('text/html; charset=utf-8'),
+        );
+    }
+
+    private function newsItem(string $slug): Response
+    {
+        if (preg_match(self::SLUG, $slug) !== 1) {
+            return $this->notFound();
+        }
+
+        $article = $this->content->article($slug);
+
+        if ($article === null) {
+            return $this->notFound();
+        }
+
+        return new Response(
+            $this->twig->render(
+                'actualite.html.twig',
+                $this->shared(trim(self::NEWS, '/')) + ['article' => $article],
+            ),
+            200,
+            self::cacheHeaders('text/html; charset=utf-8'),
+        );
     }
 
     private function page(string $route): Response
@@ -60,26 +104,79 @@ final class Application
             return $this->notFound();
         }
 
-        $settings = $this->content->settings();
         $page['blocs'] = $this->blocks->renderable($page['blocs'] ?? null);
 
         return new Response(
-            $this->twig->render('page.html.twig', [
-                'site' => $settings,
-                'menu' => $this->content->menu(),
-                'page' => $page,
-                'slug' => $slug,
-                'jsonld' => $this->jsonLd($settings),
-            ]),
+            $this->twig->render('page.html.twig', $this->shared($slug) + ['page' => $page]),
             200,
             self::cacheHeaders('text/html; charset=utf-8'),
         );
     }
 
+    /**
+     * What every page needs: identity, menu, structured data.
+     *
+     * @return array<string, mixed>
+     */
+    private function shared(string $slug): array
+    {
+        $settings = $this->content->settings();
+
+        return [
+            'site' => $settings,
+            'menu' => $this->content->menu(),
+            'afficherActualites' => $this->content->hasArticles(),
+            'slug' => $slug,
+            'jsonld' => $this->jsonLd($settings),
+        ];
+    }
+
     private function sitemap(): Response
     {
+        $base = rtrim($this->siteUrl, '/');
+        $entries = [];
+
+        foreach ($this->content->pages() as $page) {
+
+            $slug = $page['slug'] ?? null;
+
+            if (!is_string($slug) || $slug === '') {
+                continue;
+            }
+
+            $entries[] = [
+                // The home page is served at the root, not under its slug.
+                'loc' => $slug === $this->homePageSlug ? "{$base}/" : "{$base}/{$slug}",
+                'lastmod' => isset($page['_modified']) && is_numeric($page['_modified'])
+                    ? (int) $page['_modified']
+                    : null,
+            ];
+        }
+
+        $articles = $this->content->articles();
+
+        if ($articles !== []) {
+            $entries[] = ['loc' => $base.self::NEWS];
+        }
+
+        foreach ($articles as $article) {
+
+            $slug = $article['slug'] ?? null;
+
+            if (!is_string($slug) || $slug === '') {
+                continue;
+            }
+
+            $entries[] = [
+                'loc' => $base.self::NEWS.'/'.$slug,
+                'lastmod' => isset($article['_modified']) && is_numeric($article['_modified'])
+                    ? (int) $article['_modified']
+                    : null,
+            ];
+        }
+
         return new Response(
-            Sitemap::toXml($this->content->pages(), $this->siteUrl, $this->homePageSlug),
+            Sitemap::toXml($entries),
             200,
             self::cacheHeaders('application/xml; charset=utf-8'),
         );
@@ -144,7 +241,7 @@ final class Application
             return $this->homePageSlug;
         }
 
-        return preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slug) === 1 ? $slug : null;
+        return preg_match(self::SLUG, $slug) === 1 ? $slug : null;
     }
 
     private function notFound(): Response
