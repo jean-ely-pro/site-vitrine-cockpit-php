@@ -7,7 +7,7 @@
     <title>{% block title %}{{ site.nom|default('Site') }}{% endblock %}</title>
     {% block head %}{% endblock %}
     <link rel="stylesheet" href="/assets/css/site.css">
-    {% if jsonld is defined %}
+    {% if jsonld|default('') is not empty %}
         {# Built and encoded in PHP, so it is inserted as is. #}
         <script type="application/ld+json">{{ jsonld|raw }}</script>
     {% endif %}
