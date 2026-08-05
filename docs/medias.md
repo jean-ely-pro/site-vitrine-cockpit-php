@@ -72,6 +72,21 @@ public/admin/storage/uploads/variantes/…    copies allégées
 Les deux sont servis directement par le serveur web. Le reste du dossier `storage` — modèle de
 contenu, fichiers temporaires, caches — reste fermé à la consultation.
 
+## Temps de traitement
+
+Les copies sont fabriquées pendant l'envoi. Mesuré sur ce poste : **2,3 s** pour une image de
+4000 × 3000 px et ses trois copies. Sur un hébergement mutualisé lent, compter davantage.
+
+Si un envoi devait échouer par dépassement du temps d'exécution, l'image reste en place —
+seules les copies manquent, et le site sert l'original. Il suffit alors de lancer :
+
+```bash
+php bin/generer-variantes.php
+```
+
+C'est aussi la raison de conseiller au client des images d'environ 2000 px de large plutôt que
+les fichiers bruts d'un appareil photo.
+
 ## Régénérer les copies
 
 Après un changement de largeurs, ou pour des images antérieures à ce mécanisme :
