@@ -2,7 +2,6 @@
    Width and height are always written out: without them the page shifts as
    images arrive. #}
 
-{% set image = media_url(bloc.image) %}
 {% set position = bloc.positionImage|default('droite') %}
 
 <section class="bloc bloc-texte-image bloc-texte-image--{{ position }}">
@@ -18,14 +17,11 @@
         {% endif %}
     </div>
 
-    {% if image %}
-        <img class="bloc-texte-image__image"
-             src="{{ image }}"
-             alt="{{ bloc.alt|default('') }}"
-             {% if bloc.image.width %}width="{{ bloc.image.width }}"{% endif %}
-             {% if bloc.image.height %}height="{{ bloc.image.height }}"{% endif %}
-             loading="lazy"
-             decoding="async">
-    {% endif %}
+    {% include 'partials/image.html.twig' with {
+        asset: bloc.image,
+        alt: bloc.alt,
+        classe: 'bloc-texte-image__image',
+        sizes: '(min-width: 48rem) 30rem, 100vw'
+    } only %}
 
 </section>
