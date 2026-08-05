@@ -7,12 +7,79 @@ AddDefaultCharset UTF-8
     Options -MultiViews
     RewriteEngine On
 
-    # The admin and its API ship their own rules: never rewrite them here.
+    # The admin and its API ship their own rules: never rewrite them here, and
+    # never serve them from the cache.
     RewriteRule ^admin(/|$) - [L]
 
+    # The cache is not a public address of its own: it is only ever reached
+    # through the rewrites below. REDIRECT_STATUS is empty on a request coming
+    # from outside, and set once Apache has rewritten internally.
+    RewriteCond %{ENV:REDIRECT_STATUS} ^$
+    RewriteRule ^cache/ - [F,L]
+
+    # ── Cache de pages ────────────────────────────────────────────────────
+    # A page already rendered is served by Apache alone: PHP is not started.
+    # Only plain GET requests qualify — a query string means something the
+    # stored copy cannot answer.
+
+    RewriteCond %{REQUEST_METHOD} =GET
+    RewriteCond %{QUERY_STRING} ^$
+    RewriteCond %{DOCUMENT_ROOT}/cache/index.html -f
+    RewriteRule ^$ cache/index.html [L,E=PAGE_CACHE:hit]
+
+    RewriteCond %{REQUEST_METHOD} =GET
+    RewriteCond %{QUERY_STRING} ^$
+    RewriteCond %{DOCUMENT_ROOT}/cache/$1.html -f
+    RewriteRule ^([a-z0-9]+(?:-[a-z0-9]+)*)$ cache/$1.html [L,E=PAGE_CACHE:hit]
+
+    RewriteCond %{REQUEST_METHOD} =GET
+    RewriteCond %{QUERY_STRING} ^$
+    RewriteCond %{DOCUMENT_ROOT}/cache/$1 -f
+    RewriteRule ^(sitemap\.xml|robots\.txt)$ cache/$1 [L,E=PAGE_CACHE:hit]
+
+    # ── Rendu ─────────────────────────────────────────────────────────────
     # Anything that exists on disk is served as is; everything else is a page.
+
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule . index.php [L]
 
+</IfModule>
+
+<IfModule mod_headers.c>
+
+    # Says who answered: the web server from disk, or PHP. Apache renames the
+    # variable to REDIRECT_* once it has rewritten internally, which is
+    # precisely the case here.
+    Header set X-Page-Cache "hit" env=REDIRECT_PAGE_CACHE
+
+    # Pages are revalidated on every visit, so emptying the cache takes effect
+    # at once rather than waiting for a copy held by a visitor to expire.
+    <FilesMatch "\.(html|xml|txt)$">
+        Header set Cache-Control "public, max-age=0, must-revalidate"
+    </FilesMatch>
+
+    Header set X-Content-Type-Options "nosniff"
+
+</IfModule>
+
+<IfModule mod_expires.c>
+
+    ExpiresActive On
+
+    # Media carry a unique name, so they never change behind their address.
+    ExpiresByType image/webp "access plus 30 days"
+    ExpiresByType image/avif "access plus 30 days"
+    ExpiresByType image/jpeg "access plus 30 days"
+    ExpiresByType image/png "access plus 30 days"
+    ExpiresByType image/svg+xml "access plus 30 days"
+
+    # The stylesheet keeps the same address across deployments: an hour is the
+    # longest a visitor should keep an outdated copy.
+    ExpiresByType text/css "access plus 1 hour"
+
+</IfModule>
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/plain application/xml application/json image/svg+xml
 </IfModule>

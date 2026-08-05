@@ -14,8 +14,11 @@ SPEC.md
 # dans /public/admin à l'installation.
 /public/admin/
 
-# ─── Données d'exécution : base SQLite, index, cache des pages ───
+# ─── Données d'exécution : base SQLite, index, gabarits compilés ───
 /var/
+
+# ─── Cache de pages : HTML rendu, servi directement par Apache ───
+/public/cache/
 
 # ─── Médias envoyés depuis l'administration ───
 /public/media/

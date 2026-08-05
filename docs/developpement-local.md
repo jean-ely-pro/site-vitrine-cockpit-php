@@ -62,6 +62,26 @@ php bin/cockpit-init.php
 Le contenu déjà saisi n'est pas perdu : seule la définition des champs est remplacée. Renommer
 un champ rend en revanche les valeurs existantes inaccessibles sous l'ancien nom.
 
+## Vérifier le cache de pages
+
+Le serveur intégré de PHP ne lit pas `.htaccess` : il ne peut donc pas servir le cache. Il le
+**produit** (les fichiers apparaissent dans `public/cache`), mais c'est Apache qui le **sert**.
+Pour vérifier la chaîne complète en local, il faut un Apache pointant sur `public/`, avec
+`AllowOverride All` et `mod_rewrite`, `mod_headers`, `mod_expires` chargés.
+
+```bash
+# 1. produire le cache (PAGE_CACHE=true dans .env)
+curl -s -o /dev/null http://localhost:8080/services
+ls public/cache/
+
+# 2. le faire servir par Apache : « hit » et aucun X-Powered-By
+curl -sI http://localhost/services | grep -iE 'x-page-cache|x-powered-by'
+```
+
+Le cache fige la page : modifier le contenu directement en base ne change rien à ce qui est
+servi. Enregistrer depuis l'administration vide le cache, et la page suivante est rendue à
+nouveau.
+
 ## Dépannage
 
 **Le site répond 503.** L'API n'est pas joignable ou la clé est refusée. Vérifier que

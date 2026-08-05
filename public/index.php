@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Application;
+use App\Cache\PageCache;
 use App\Cockpit\Client;
 use App\Content\Blocks;
 use App\Content\Repository;
@@ -55,6 +56,16 @@ if ($siteUrl === '') {
 
 $homePageSlug = $_ENV['HOME_PAGE_SLUG'] ?? 'accueil';
 
+// Disabled in development so an edit shows up on the next reload; in
+// production the cache is what keeps the site fast on shared hosting.
+// An unset — or empty — PAGE_CACHE follows APP_ENV.
+$pageCache = $_ENV['PAGE_CACHE'] ?? '';
+
+$cache = new PageCache(
+    __DIR__.'/cache',
+    $pageCache === '' ? $env === 'prod' : filter_var($pageCache, FILTER_VALIDATE_BOOL),
+);
+
 $media = new MediaUrls(
     $_ENV['MEDIA_BASE_URL'] ?? '/admin/storage/uploads',
     $siteUrl,
@@ -81,4 +92,16 @@ $application = new Application(
     $homePageSlug,
 );
 
-$application->handle($_SERVER['REQUEST_URI'] ?? '/')->send();
+$requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+$response = $application->handle($requestUri);
+
+// Store before sending: the next visitor is served by the web server alone,
+// without starting PHP at all.
+$cache->store(
+    parse_url($requestUri, PHP_URL_PATH) ?: '/',
+    $response->body,
+    $response->status,
+    $_SERVER,
+);
+
+$response->send();
