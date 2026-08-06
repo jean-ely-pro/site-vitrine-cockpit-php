@@ -268,6 +268,70 @@ address {
     font-style: normal;
 }
 
+/* ── Témoignages ──────────────────────────────────────────────────────────
+   Exemple : les styles d'un type de section vivent ici, sous un nom qui
+   reprend celui du partial. Voir docs/guide-integration.md. */
+
+.bloc-temoignages__introduction {
+    max-width: 44rem;
+    color: var(--couleur-texte-doux);
+}
+
+.temoignages {
+    display: grid;
+    gap: 1.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+@media (min-width: 48rem) {
+    .temoignages {
+        grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    }
+}
+
+.temoignage {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1.25rem;
+    background: var(--couleur-fond-doux);
+    border-radius: 6px;
+}
+
+.temoignage__portrait {
+    flex: 0 0 auto;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.temoignage__contenu {
+    margin: 0;
+}
+
+.temoignage blockquote {
+    margin: 0;
+}
+
+.temoignage blockquote p {
+    margin: 0;
+}
+
+.temoignage figcaption {
+    margin-top: 0.75rem;
+    font-weight: 600;
+}
+
+.temoignage__fonction {
+    display: block;
+    font-weight: 400;
+    color: var(--couleur-texte-doux);
+    font-size: 0.9375rem;
+}
+
 /* ── Actualités ───────────────────────────────────────────────────────── */
 
 .actualites {

@@ -536,6 +536,24 @@ $pagesDemo = [
                 'alt' => 'Fleurs préparées sur le plan de travail de l’atelier',
                 'positionImage' => 'gauche',
             ],
+            [
+                // Exemple de type de section — voir docs/guide-integration.md
+                'type' => 'temoignages',
+                'titre' => 'Ce qu’en disent nos clients',
+                'introduction' => 'Quelques retours reçus après une commande.',
+                'temoignages' => [
+                    [
+                        'citation' => 'Le bouquet est arrivé le matin même, exactement comme sur la photo.',
+                        'auteur' => 'Hélène M.',
+                        'fonction' => 'Nantes',
+                    ],
+                    [
+                        'citation' => 'Nous faisons appel à l’atelier chaque semaine pour l’accueil de nos bureaux.',
+                        'auteur' => 'Sofiane B.',
+                        'fonction' => 'Responsable de site',
+                    ],
+                ],
+            ],
             $blocContact,
         ],
     ],
