@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{# Built from the site identity and the legal notices, never typed twice:
+   a SIRET that appears in two places is a SIRET that ends up wrong in one. #}
+
+{% block title %}Mentions légales{% if site.nom %} — {{ site.nom }}{% endif %}{% endblock %}
+
+{% block head %}
+    <meta name="description" content="Éditeur, hébergeur et informations légales{% if site.nom %} de {{ site.nom }}{% endif %}.">
+{% endblock %}
+
+{% block main %}
+    <article class="page page--legale">
+
+        <h1 class="page__titre">Mentions légales</h1>
+
+        <h2>Éditeur du site</h2>
+        <p>
+            {% if site.nom %}<strong>{{ site.nom }}</strong><br>{% endif %}
+            {% if legal.formeJuridique %}{{ legal.formeJuridique }}<br>{% endif %}
+            {% if site.adresse %}{{ site.adresse|nl2br }}<br>{% endif %}
+            {% if site.telephone %}Téléphone : <a href="tel:{{ tel_href(site.telephone) }}">{{ site.telephone }}</a><br>{% endif %}
+            {% if site.email %}Courriel : <a href="mailto:{{ site.email }}">{{ site.email }}</a>{% endif %}
+        </p>
+
+        {% if site.siret or legal.tva or legal.directeurPublication %}
+            <ul>
+                {% if site.siret %}<li>SIRET : {{ site.siret }}</li>{% endif %}
+                {% if legal.tva %}<li>TVA intracommunautaire : {{ legal.tva }}</li>{% endif %}
+                {% if legal.directeurPublication %}
+                    <li>Directeur de la publication : {{ legal.directeurPublication }}</li>
+                {% endif %}
+            </ul>
+        {% endif %}
+
+        <h2>Hébergement</h2>
+        {% if legal.hebergeurNom or legal.hebergeurAdresse %}
+            <p>
+                {% if legal.hebergeurNom %}<strong>{{ legal.hebergeurNom }}</strong><br>{% endif %}
+                {% if legal.hebergeurAdresse %}{{ legal.hebergeurAdresse|nl2br }}{% endif %}
+            </p>
+        {% else %}
+            <p>Les informations sur l’hébergeur du site n’ont pas encore été renseignées.</p>
+        {% endif %}
+
+        <h2>Propriété intellectuelle</h2>
+        <p>
+            L’ensemble des textes et des images de ce site est protégé. Toute reproduction, même
+            partielle, est soumise à l’autorisation préalable de l’éditeur.
+        </p>
+
+        {% if legal.complementMentions %}
+            {# Rich text produced by the admin editor: intentionally not escaped. #}
+            {{ legal.complementMentions|raw }}
+        {% endif %}
+
+    </article>
+{% endblock %}

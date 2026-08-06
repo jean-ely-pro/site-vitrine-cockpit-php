@@ -24,7 +24,7 @@ use EditorGuards\Headings;
  * Kept in step with App\Application::NEWS on the site side — two separate
  * applications, so the value is stated in both.
  */
-const RESERVED_PAGE_SLUGS = ['actualites'];
+const RESERVED_PAGE_SLUGS = ['actualites', 'contact', 'mentions-legales', 'confidentialite'];
 
 /** @var Lime\App $this */
 
@@ -32,7 +32,7 @@ $this->on('content.item.save.before', function (string $modelName, array &$item)
 
     if ($modelName === 'pages' && in_array($item['slug'] ?? '', RESERVED_PAGE_SLUGS, true)) {
         throw new \App\Exception\AppNotification(
-            'L’adresse « '.$item['slug'].' » est réservée à la liste des actualités. En choisir une autre.'
+            'L’adresse « '.$item['slug'].' » est déjà utilisée par le site lui-même. En choisir une autre.'
         );
     }
 
@@ -46,10 +46,13 @@ $this->on('content.item.save.before', function (string $modelName, array &$item)
 $this->on('app.layout.assets', function (&$assets, $context) {
 
     if ($context === 'app:footer') {
-        $assets[] = [
-            'src' => 'editorguards:assets/heading-levels.js',
-            'type' => 'module',
-            'position' => 'footer',
-        ];
+
+        foreach (['heading-levels.js', 'contraste-couleurs.js'] as $script) {
+            $assets[] = [
+                'src' => "editorguards:assets/{$script}",
+                'type' => 'module',
+                'position' => 'footer',
+            ];
+        }
     }
 });
