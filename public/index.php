@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\Application;
 use App\Cache\PageCache;
 use App\Cockpit\Client;
+use App\Contact\ContactForm;
+use App\Contact\SpamGuard;
 use App\Content\Blocks;
 use App\Content\Repository;
 use App\Media\MediaUrls;
@@ -84,17 +86,32 @@ $twig->addExtension(new SiteExtension(new Picture($media)));
 // Templates need it to link the home page at the root rather than at its slug.
 $twig->addGlobal('accueilSlug', $homePageSlug);
 
+// The contact form writes with a key of its own, allowed on that collection
+// and nothing else. Without it, the form is simply not offered.
+$writeKey = $_ENV['COCKPIT_WRITE_KEY'] ?? '';
+
+$contactForm = new ContactForm(
+    $writeKey === '' ? null : new Client($apiUrl, $writeKey),
+    new SpamGuard("{$root}/var/contact", hash('sha256', $apiKey)),
+);
+
 $application = new Application(
     new Repository(new Client($apiUrl, $apiKey)),
     $twig,
     $media,
     new Blocks("{$root}/templates/blocs"),
+    $contactForm,
     $siteUrl,
     $homePageSlug,
 );
 
 $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
-$response = $application->handle($requestUri);
+
+$response = $application->handle(
+    $requestUri,
+    ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' ? $_POST : [],
+    (string) ($_SERVER['REMOTE_ADDR'] ?? ''),
+);
 
 // Store before sending: the next visitor is served by the web server alone,
 // without starting PHP at all.

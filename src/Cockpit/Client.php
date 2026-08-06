@@ -38,11 +38,15 @@ final class Client
      * @param array<string, mixed> $filter
      * @return array<string, mixed>|null
      */
-    public function item(string $model, array $filter): ?array
+    public function item(string $model, array $filter, bool $populate = false): ?array
     {
-        $item = $this->get("/content/item/{$model}", [
-            'filter' => json_encode($filter, JSON_THROW_ON_ERROR),
-        ]);
+        $params = ['filter' => json_encode($filter, JSON_THROW_ON_ERROR)];
+
+        if ($populate) {
+            $params['populate'] = '1';
+        }
+
+        $item = $this->get("/content/item/{$model}", $params);
 
         return is_array($item) && $item !== [] ? $item : null;
     }
@@ -69,6 +73,23 @@ final class Client
         $items = $this->get("/content/items/{$model}", $params);
 
         return is_array($items) ? array_values($items) : [];
+    }
+
+    /**
+     * Creates an item.
+     *
+     * Only ever called with a key allowed to write that one collection — the
+     * key the site reads with cannot do this.
+     *
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>|null The stored item.
+     */
+    public function create(string $model, array $data): ?array
+    {
+        $body = json_encode(['data' => $data], JSON_THROW_ON_ERROR);
+        $item = $this->send("/content/item/{$model}", $body);
+
+        return is_array($item) && $item !== [] ? $item : null;
     }
 
     /**
@@ -120,6 +141,52 @@ final class Client
         }
 
         $decoded = json_decode((string) $body, true);
+
+        return is_array($decoded) ? $decoded : null;
+    }
+
+    /**
+     * @return array<mixed>|null
+     */
+    private function send(string $endpoint, string $body): ?array
+    {
+        $url = rtrim($this->baseUrl, '/').$endpoint;
+        $curl = curl_init($url);
+
+        if ($curl === false) {
+            throw new ContentUnavailable("Requête impossible vers {$url}.");
+        }
+
+        curl_setopt_array($curl, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $body,
+            CURLOPT_HTTPHEADER => [
+                "api-key: {$this->apiKey}",
+                'Content-Type: application/json',
+            ],
+            CURLOPT_TIMEOUT => $this->timeout,
+            CURLOPT_CONNECTTIMEOUT => $this->timeout,
+        ]);
+
+        $response = curl_exec($curl);
+        $status = (int) curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
+        $error = curl_error($curl);
+        curl_close($curl);
+
+        if ($response === false) {
+            throw new ContentUnavailable("Enregistrement impossible : {$error}");
+        }
+
+        if ($status === 401 || $status === 403 || $status === 412) {
+            throw new ContentUnavailable("Clé d'écriture refusée par Cockpit.");
+        }
+
+        if ($status >= 400) {
+            throw new ContentUnavailable("Cockpit a répondu {$status} pour {$endpoint}.");
+        }
+
+        $decoded = json_decode((string) $response, true);
 
         return is_array($decoded) ? $decoded : null;
     }

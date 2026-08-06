@@ -45,6 +45,16 @@ return [
         'options' => [],
     ],
 
+    // Notification of a contact message. « mail » is PHP's own function, which
+    // is what shared hosting provides; the address it is sent from is the one
+    // in the site identity, so it belongs to the customer's domain and passes
+    // the checks a receiving server makes.
+    'mailer' => [
+        'default' => [
+            'transport' => 'mail',
+        ],
+    ],
+
     'assets' => [
 
         // Generated variants go next to the uploads, which the web server
