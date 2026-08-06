@@ -30,7 +30,7 @@ final class RenduTest extends TestCase
     {
         $disponibles = $this->blocks()->available();
 
-        foreach (['hero', 'texte-image', 'contact', 'formulaire'] as $type) {
+        foreach (['hero', 'texte-image', 'contact', 'formulaire', 'temoignages'] as $type) {
             $this->assertContains($type, $disponibles);
         }
     }

@@ -145,6 +145,11 @@ Une page est une suite de **sections**. Trois types sont fournis :
 | `texte-image` | texte à côté d'une illustration | texte, image, position de l'image |
 | `contact` | coordonnées reprises de l'identité | texte d'introduction, horaires |
 | `formulaire` | formulaire de contact | texte d'introduction, page de confidentialité |
+| `temoignages` | liste de témoignages | introduction, citations, portraits |
+
+`temoignages` sert de **modèle commenté** pour créer un type de section : partial, champs
+Cockpit et styles, avec les règles à respecter. Voir
+[docs/guide-integration.md](docs/guide-integration.md).
 
 ### Ajouter un type de section
 
@@ -159,6 +164,9 @@ Une page est une suite de **sections**. Trois types sont fournis :
 
 Rien d'autre à déclarer : un type existe dès qu'un partial porte son nom. Une section dont le
 type n'a pas de partial n'est simplement pas affichée.
+
+Marche à suivre détaillée, contrat du partial, règles et pièges :
+[docs/guide-integration.md](docs/guide-integration.md).
 
 ### Titres
 
@@ -292,6 +300,8 @@ horaires structurés faux serait pire que de n'en publier aucun.
 
 ## Documentation
 
+- [Intégrer une maquette](docs/guide-integration.md) — pour le développeur : types de section,
+  contrat du partial, images, CSS, vérifications, pièges
 - [Ce que le client peut faire](docs/guide-client.md) — modèles de page, menu, actualités,
   référencement, limites de l'éditeur
 - [Médias](docs/medias.md) — copies allégées, point focal, description obligatoire, poids

@@ -1,0 +1,77 @@
+{# ─────────────────────────────────────────────────────────────────────────
+   EXEMPLE COMMENTÉ — à recopier pour créer un nouveau type de section.
+
+   Un type existe dès qu'un fichier porte son nom dans ce dossier. Celui-ci
+   s'appelle temoignages.html.twig, donc le type s'appelle « temoignages ».
+
+   Ce partial reçoit exactement ces variables, et rien d'autre :
+
+     bloc     les valeurs saisies dans l'administration
+     site     l'identité du site : coordonnées, horaires, couleurs
+     titre    le titre de la section
+     niveau   1 ou 2 — le niveau de la balise de titre à écrire
+     premier  vrai s'il s'agit de la première section de la page
+
+   Trois règles à respecter, vérifiées automatiquement :
+
+     1. écrire <h{{ niveau }}> et jamais <h2> en dur : c'est ce qui garantit
+        un seul titre principal par page ;
+     2. passer toute image par partials/image.html.twig, jamais une balise
+        <img> à la main — sinon les copies allégées et les dimensions sont
+        perdues ;
+     3. ne charger aucune ressource extérieure au site.
+
+   Les champs correspondants sont déclarés dans cockpit/models/pages.model.php,
+   chacun avec une condition « data.type === 'temoignages' ».
+   ───────────────────────────────────────────────────────────────────────── #}
+
+<section class="bloc bloc-temoignages">
+
+    {% if titre %}
+        <h{{ niveau }}>{{ titre }}</h{{ niveau }}>
+    {% endif %}
+
+    {% if bloc.introduction %}
+        <p class="bloc-temoignages__introduction">{{ bloc.introduction }}</p>
+    {% endif %}
+
+    {# Le champ « temoignages » est une liste : chaque entrée porte les mêmes
+       sous-champs. C'est le mécanisme à utiliser pour tout contenu répétable. #}
+    {% if bloc.temoignages is not empty %}
+        <ul class="temoignages">
+            {% for temoignage in bloc.temoignages %}
+                <li class="temoignage">
+
+                    {# Une image optionnelle. Dès qu'un champ image existe, un
+                       champ « alt » doit l'accompagner : l'administration
+                       refuse l'enregistrement d'une image sans description. #}
+                    {% if temoignage.portrait %}
+                        {% include 'partials/image.html.twig' with {
+                            asset: temoignage.portrait,
+                            alt: temoignage.alt,
+                            classe: 'temoignage__portrait',
+                            sizes: '96px'
+                        } only %}
+                    {% endif %}
+
+                    <figure class="temoignage__contenu">
+                        {# Twig échappe tout par défaut : rien à faire pour se
+                           protéger de ce qui est saisi dans l'administration. #}
+                        <blockquote><p>{{ temoignage.citation }}</p></blockquote>
+
+                        {% if temoignage.auteur %}
+                            <figcaption>
+                                {{ temoignage.auteur }}
+                                {% if temoignage.fonction %}
+                                    <span class="temoignage__fonction">{{ temoignage.fonction }}</span>
+                                {% endif %}
+                            </figcaption>
+                        {% endif %}
+                    </figure>
+
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+</section>
