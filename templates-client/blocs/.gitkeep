@@ -1,0 +1,13 @@
+Les sections propres à ce site vont ici.
+
+Un fichier « galerie.html.twig » déposé dans ce dossier crée le type de section
+« galerie ». Rien d'autre à déclarer côté gabarits ; les champs se déclarent
+dans cockpit/models/pages.model.php, puis « php bin/install-cockpit.php --force ».
+
+Modèle à recopier : templates/blocs/temoignages.html.twig, commenté.
+
+Pour remplacer un gabarit livré avec le site — base.html.twig, page.html.twig,
+un partial — le copier dans templates-client/ en gardant le même chemin : la
+copie l'emporte, et l'original reste intact pour les mises à jour.
+
+Marche à suivre complète : docs/guide-integration.md

@@ -7,9 +7,13 @@ namespace App\Content;
 /**
  * Decides which blocks a page can render.
  *
- * A block type exists when a partial of that name sits in templates/blocs.
- * Adding a type therefore means adding a partial and an entry in the Cockpit
- * field — nothing else to declare here.
+ * A block type exists when a partial of that name sits in one of the block
+ * folders. Adding a type therefore means adding a partial and an entry in the
+ * Cockpit field — nothing else to declare here.
+ *
+ * Two folders are searched: the ones delivered with the site, and the ones
+ * belonging to this particular site. Keeping them apart is what allows an
+ * update to be merged without touching a single file of the design.
  *
  * Filtering also keeps a stored type from ever reaching an include path: only
  * names that match a real partial get through.
@@ -19,8 +23,17 @@ final class Blocks
     /** @var list<string>|null */
     private ?array $available = null;
 
-    public function __construct(private readonly string $templateDir)
+    /** @var list<string> */
+    private readonly array $directories;
+
+    /**
+     * @param string ...$directories Where to look for block partials. The site
+     *                               keeps its own next to the ones delivered
+     *                               with it, so an update never touches them.
+     */
+    public function __construct(string ...$directories)
     {
+        $this->directories = array_values($directories);
     }
 
     /**
@@ -59,10 +72,12 @@ final class Blocks
 
         $types = [];
 
-        foreach (glob("{$this->templateDir}/*.html.twig") ?: [] as $template) {
-            $types[] = basename($template, '.html.twig');
+        foreach ($this->directories as $directory) {
+            foreach (glob("{$directory}/*.html.twig") ?: [] as $template) {
+                $types[] = basename($template, '.html.twig');
+            }
         }
 
-        return $this->available = $types;
+        return $this->available = array_values(array_unique($types));
     }
 }
