@@ -15,6 +15,14 @@
             "App\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/",
+            "PasswordPolicy\\": "cockpit/addons/PasswordPolicy/",
+            "EditorGuards\\": "cockpit/addons/EditorGuards/",
+            "Media\\": "cockpit/addons/Media/"
+        }
+    },
     "config": {
         "sort-packages": true,
         "optimize-autoloader": true
@@ -23,6 +31,11 @@
         "install-cockpit": "@php bin/install-cockpit.php",
         "init-cockpit": "@php bin/cockpit-init.php",
         "serve": "@php -S localhost:8080 -t public public/index.php",
-        "serve-admin": "@php -S localhost:8090 -t public/admin public/admin/index.php"
+        "serve-admin": "@php -S localhost:8090 -t public/admin public/admin/index.php",
+        "test": "phpunit",
+        "verifier": "@php bin/verifier-accessibilite.php"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.5.50"
     }
 }

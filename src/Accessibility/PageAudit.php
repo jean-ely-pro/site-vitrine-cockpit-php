@@ -74,8 +74,10 @@ final class PageAudit
 
         $h1 = $xpath->query('//h1')->length;
 
-        if ($h1 !== 1) {
-            $problems[] = "la page a {$h1} titre(s) principal(aux) au lieu d’un seul";
+        if ($h1 === 0) {
+            $problems[] = 'la page n’a aucun titre principal';
+        } elseif ($h1 > 1) {
+            $problems[] = "la page a {$h1} titres principaux au lieu d’un seul";
         }
 
         // A jump — h2 then h4 — leaves a hole in the outline a screen reader

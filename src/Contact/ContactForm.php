@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Contact;
 
-use App\Cockpit\Client;
+use App\Cockpit\ContentSource;
 use App\Cockpit\ContentUnavailable;
 
 /**
@@ -17,7 +17,7 @@ use App\Cockpit\ContentUnavailable;
 final class ContactForm
 {
     public function __construct(
-        private readonly ?Client $writer,
+        private readonly ?ContentSource $writer,
         private readonly SpamGuard $guard,
     ) {
     }

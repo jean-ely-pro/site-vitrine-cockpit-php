@@ -14,8 +14,9 @@ SPEC.md
 # dans /public/admin à l'installation.
 /public/admin/
 
-# ─── Données d'exécution : base SQLite, index, gabarits compilés ───
+# ─── Données d'exécution : base SQLite, index, gabarits compilés, tests ───
 /var/
+.phpunit.result.cache
 
 # ─── Cache de pages : HTML rendu, servi directement par Apache ───
 /public/cache/
