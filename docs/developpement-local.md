@@ -82,6 +82,22 @@ Le cache fige la page : modifier le contenu directement en base ne change rien �
 servi. Enregistrer depuis l'administration vide le cache, et la page suivante est rendue à
 nouveau.
 
+## Les e-mails en développement
+
+Aucune notification n'est envoyée tant que l'identité du site porte une adresse de
+démonstration (`@example.test` et les autres domaines réservés aux tests). Le message est
+enregistré, seule la notification est retenue.
+
+**À vérifier avant de renseigner une vraie adresse en local** : sur beaucoup de postes, l'envoi
+de courrier de PHP est relié à un vrai compte SMTP — sur Laragon, `bin/sendmail/sendmail.ini`
+— souvent avec un expéditeur imposé. Un message adressé à un domaine inexistant revient alors
+dans cette boîte. Une série de tests suffit à y déverser des dizaines de messages.
+
+```bash
+# ce que PHP utilise pour envoyer
+php -i | grep -i "sendmail_path\|SMTP"
+```
+
 ## Dépannage
 
 **Le site répond 503.** L'API n'est pas joignable ou la clé est refusée. Vérifier que

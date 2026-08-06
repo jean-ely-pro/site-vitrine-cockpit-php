@@ -43,6 +43,30 @@ $this->on('content.item.save', function (string $modelName, array $item, bool $i
 $this->module('contact')->extend([
 
     /**
+     * Whether an address belongs to a domain reserved for testing.
+     *
+     * These are set aside by RFC 2606 and RFC 6761 precisely so that nothing
+     * addressed to them ever reaches a real recipient. The demo identity uses
+     * one; a site being installed usually still does.
+     */
+    'isTestAddress' => function (string $address): bool {
+
+        $domain = strtolower(trim(substr(strrchr($address, '@') ?: '', 1)));
+
+        if ($domain === '') {
+            return true;
+        }
+
+        foreach (['test', 'example', 'invalid', 'localhost', 'local'] as $reserved) {
+            if ($domain === $reserved || str_ends_with($domain, ".{$reserved}")) {
+                return true;
+            }
+        }
+
+        return in_array($domain, ['example.com', 'example.net', 'example.org'], true);
+    },
+
+    /**
      * Sends the customer the message that was just received.
      *
      * @param array<string, mixed> $message
@@ -55,6 +79,21 @@ $this->module('contact')->extend([
 
         if ($to === '') {
             return ['envoye' => false, 'erreur' => 'Aucune adresse e-mail dans l’identité du site.', 'destinataire' => null];
+        }
+
+        // Nothing leaves towards a domain reserved for documentation and
+        // testing. A machine sending mail is often wired to a real account,
+        // and a message aimed at a domain that does not exist comes back to
+        // whoever sent it — filling a real mailbox with test traffic.
+        // Inside a module method, $this is the module — the application is
+        // reached through $this->app.
+        if ($this->app->module('contact')->isTestAddress($to)) {
+            return [
+                'envoye' => false,
+                'erreur' => "« {$to} » est une adresse de démonstration : aucun e-mail n’a été envoyé. "
+                    .'Renseigner une vraie adresse dans « Identité du site » pour recevoir les notifications.',
+                'destinataire' => $to,
+            ];
         }
 
         $nom = (string) ($message['nom'] ?? '');
