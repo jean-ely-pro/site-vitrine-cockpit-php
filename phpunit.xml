@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         cacheDirectory="var/tests"
+         failOnWarning="true"
+         failOnNotice="true">
+
+    <testsuites>
+        <!-- Le site : ce qui décide de ce qu'un visiteur reçoit. -->
+        <testsuite name="site">
+            <directory>tests/Site</directory>
+        </testsuite>
+
+        <!-- Les garde-fous posés dans l'administration, sous forme d'extensions. -->
+        <testsuite name="garde-fous">
+            <directory>tests/GardeFous</directory>
+        </testsuite>
+    </testsuites>
+
+    <source>
+        <include>
+            <directory>src</directory>
+            <directory>cockpit/addons</directory>
+        </include>
+    </source>
+</phpunit>

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Content;
 
-use App\Cockpit\Client;
+use App\Cockpit\ContentSource;
 
 /**
  * Reads what the public site is allowed to show.
@@ -27,7 +27,7 @@ final class Repository
     /** @var array<string, mixed>|null */
     private ?array $legal = null;
 
-    public function __construct(private readonly Client $client)
+    public function __construct(private readonly ContentSource $client)
     {
     }
 
