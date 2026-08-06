@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App;
 
 use App\Cockpit\ContentUnavailable;
+use App\Contact\ContactForm;
 use App\Content\Blocks;
 use App\Content\Repository;
 use App\Http\Response;
@@ -24,6 +25,9 @@ final class Application
     /** Reserved by the news list and its items; no page may use this slug. */
     public const NEWS = '/actualites';
 
+    /** Where the contact form posts; no page may use this slug either. */
+    public const CONTACT = '/contact';
+
     private const SLUG = '/^[a-z0-9]+(?:-[a-z0-9]+)*$/';
 
     public function __construct(
@@ -31,22 +35,32 @@ final class Application
         private readonly Environment $twig,
         private readonly MediaUrls $media,
         private readonly Blocks $blocks,
+        private readonly ContactForm $contactForm,
         private readonly string $siteUrl,
         private readonly string $homePageSlug,
     ) {
     }
 
-    public function handle(string $path): Response
+    /**
+     * @param array<string, mixed> $post Contents of a form submission, if any.
+     */
+    public function handle(string $path, array $post = [], string $ip = ''): Response
     {
         $route = parse_url($path, PHP_URL_PATH) ?: '/';
+        parse_str(parse_url($path, PHP_URL_QUERY) ?? '', $query);
+
+        // Only set when there is something to say, so an ordinary page keeps
+        // its usual cache headers.
+        $notice = ($query['message'] ?? '') === 'envoye' ? ['envoye' => true] : [];
 
         try {
             return match (true) {
+                $route === self::CONTACT => $this->contact($post, $ip),
                 $route === '/sitemap.xml' => $this->sitemap(),
                 $route === '/robots.txt' => $this->robots(),
                 $route === self::NEWS || $route === self::NEWS.'/' => $this->newsList(),
                 str_starts_with($route, self::NEWS.'/') => $this->newsItem(substr($route, strlen(self::NEWS) + 1)),
-                default => $this->page($route),
+                default => $this->page($route, $notice),
             };
         } catch (ContentUnavailable $e) {
             return $this->unavailable($e);
@@ -61,7 +75,7 @@ final class Application
         return new Response(
             $this->twig->render(
                 'actualites.html.twig',
-                $this->shared(trim(self::NEWS, '/')) + ['articles' => $this->content->articles()],
+                array_merge($this->shared(trim(self::NEWS, '/')), ['articles' => $this->content->articles()]),
             ),
             200,
             self::cacheHeaders('text/html; charset=utf-8'),
@@ -83,14 +97,18 @@ final class Application
         return new Response(
             $this->twig->render(
                 'actualite.html.twig',
-                $this->shared(trim(self::NEWS, '/')) + ['article' => $article],
+                array_merge($this->shared(trim(self::NEWS, '/')), ['article' => $article]),
             ),
             200,
             self::cacheHeaders('text/html; charset=utf-8'),
         );
     }
 
-    private function page(string $route): Response
+    /**
+     * @param array<string, mixed> $envoi
+     * @param array<string, mixed> $formulaire What to show back on the form.
+     */
+    private function page(string $route, array $formulaire = []): Response
     {
         $slug = $this->slugFromPath($route);
 
@@ -107,10 +125,50 @@ final class Application
         $page['blocs'] = $this->blocks->renderable($page['blocs'] ?? null);
 
         return new Response(
-            $this->twig->render('page.html.twig', $this->shared($slug) + ['page' => $page]),
+            // array_merge, not «+»: what is passed here must win over the
+            // defaults, and «+» keeps the left-hand value.
+            $this->twig->render('page.html.twig', array_merge($this->shared($slug), [
+                'page' => $page,
+                'formulaire' => $formulaire,
+            ])),
             200,
-            self::cacheHeaders('text/html; charset=utf-8'),
+            // A page showing the result of a submission is personal to that
+            // visitor and must never be stored for the next one.
+            $formulaire === []
+                ? self::cacheHeaders('text/html; charset=utf-8')
+                : ['Content-Type' => 'text/html; charset=utf-8', 'Cache-Control' => 'no-store'],
         );
+    }
+
+    /**
+     * Receives the contact form.
+     *
+     * On success the visitor is sent back with a plain address, so reloading
+     * the page cannot send the message a second time.
+     *
+     * @param array<string, mixed> $post
+     */
+    private function contact(array $post, string $ip): Response
+    {
+        if ($post === []) {
+            return $this->notFound();
+        }
+
+        $outcome = $this->contactForm->handle($post, $ip);
+        $origine = $outcome->submission->origine;
+
+        if ($outcome->accepted) {
+            return new Response('', 303, [
+                'Location' => $origine.'?message=envoye#formulaire',
+                'Cache-Control' => 'no-store',
+            ]);
+        }
+
+        return $this->page($origine, [
+            'erreur' => $outcome->message(),
+            'champs' => $outcome->submission->errors,
+            'valeurs' => $outcome->submission->values(),
+        ]);
     }
 
     /**
@@ -128,6 +186,9 @@ final class Application
             'afficherActualites' => $this->content->hasArticles(),
             'slug' => $slug,
             'jsonld' => $this->jsonLd($settings),
+            'contactActif' => $this->contactForm->isConfigured(),
+            'jetonContact' => $this->contactForm->stamp(),
+            'formulaire' => [],
         ];
     }
 
