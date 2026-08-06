@@ -44,14 +44,21 @@ En production, un seul hôte suffit : Apache sert le site et route `/admin` vers
 ## Structure du dépôt
 
 ```
-bin/          scripts d'installation et d'initialisation
-cockpit/      configuration Cockpit et modèle de contenu du projet (versionnés)
-docs/         documentation technique
-public/       racine web : point d'entrée, ressources, administration installée
-src/          code du site public
-templates/    gabarits Twig
-var/          données d'exécution : base SQLite, caches (hors dépôt, hors racine web)
+bin/               scripts d'installation et d'initialisation
+cockpit/           configuration Cockpit et modèle de contenu (versionnés)
+docs/              documentation technique
+public/            racine web : point d'entrée, ressources, administration installée
+src/               code du site public
+templates/         gabarits livrés avec le socle
+templates-client/  gabarits propres à ce site — prioritaires sur les précédents
+tests/             suite de tests
+var/               données d'exécution : base SQLite, caches (hors dépôt, hors racine web)
 ```
+
+**Socle et personnalisation sont séparés.** Un gabarit placé dans `templates-client/` remplace
+celui de `templates/` sans le modifier, et `client.css` est chargé après `site.css`. Une
+correction du socle se récupère alors par `git merge upstream/main` sans conflit sur la
+maquette — voir [docs/guide-integration.md](docs/guide-integration.md).
 
 Cockpit n'est **pas versionné** : `bin/install-cockpit.php` télécharge l'archive officielle
 d'une version épinglée et en vérifie l'empreinte SHA-256. La configuration et le modèle de
@@ -234,7 +241,7 @@ que de devenir illisible, et l'administration le signale au moment de la saisie.
 composer test
 ```
 
-149 tests couvrent les garde-fous du produit : ce qui décide de ce qu'un visiteur reçoit, et
+156 tests couvrent les garde-fous du produit : ce qui décide de ce qu'un visiteur reçoit, et
 ce qui empêche le site d'être cassé depuis l'administration.
 
 | Ce qui est protégé | Exemples |

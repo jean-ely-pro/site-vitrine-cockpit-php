@@ -75,7 +75,16 @@ $media = new MediaUrls(
     $siteUrl,
 );
 
-$twig = new Environment(new FilesystemLoader("{$root}/templates"), [
+// Two folders, the site's own first: a template placed there is used instead
+// of the one delivered with the site, without the delivered one being touched.
+// That is what lets an update be merged without a single conflict on the
+// design. Nothing to configure — an absent folder is simply skipped.
+$templateDirs = array_values(array_filter([
+    "{$root}/templates-client",
+    "{$root}/templates",
+], 'is_dir'));
+
+$twig = new Environment(new FilesystemLoader($templateDirs), [
     // Compiled templates live outside the web root, next to the rest of /var.
     'cache' => $env === 'prod' ? "{$root}/var/cache/twig" : false,
     'debug' => $env !== 'prod',
@@ -100,7 +109,7 @@ $application = new Application(
     new Repository(new Client($apiUrl, $apiKey)),
     $twig,
     $media,
-    new Blocks("{$root}/templates/blocs"),
+    new Blocks("{$root}/templates/blocs", "{$root}/templates-client/blocs"),
     $contactForm,
     new Colours(__DIR__.'/assets/css/couleurs.css'),
     $siteUrl,

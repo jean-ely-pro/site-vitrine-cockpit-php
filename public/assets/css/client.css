@@ -1,0 +1,21 @@
+/* Styles propres à ce site.
+   ─────────────────────────────────────────────────────────────────────────
+   Écrire ici, jamais dans site.css : ce fichier n'est jamais modifié par une
+   mise à jour, site.css l'est. Il est chargé après, donc il l'emporte.
+
+   Variables disponibles, déjà définies par site.css :
+
+     --couleur-texte        --couleur-texte-doux    --couleur-lien
+     --couleur-fond         --couleur-fond-doux     --couleur-trait
+     --largeur
+
+   --couleur-lien et --couleur-texte sont écrasées par les couleurs saisies
+   dans l'administration : ne pas les fixer ici.
+
+   Interdits, vérifiés par « php bin/verifier-accessibilite.php » :
+     · opacity sur du texte
+     · polices ou images chargées depuis un autre site
+     · contraste inférieur à 4,5:1
+
+   Après toute modification : php bin/purge-cache.php
+   ───────────────────────────────────────────────────────────────────────── */
