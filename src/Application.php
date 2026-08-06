@@ -12,6 +12,7 @@ use App\Http\Response;
 use App\Media\MediaUrls;
 use App\Seo\LocalBusiness;
 use App\Seo\Sitemap;
+use App\Theme\Colours;
 use Twig\Environment;
 
 /**
@@ -28,6 +29,17 @@ final class Application
     /** Where the contact form posts; no page may use this slug either. */
     public const CONTACT = '/contact';
 
+    /**
+     * Pages the site writes itself, from the identity and the legal notices.
+     *
+     * Kept out of the pages collection on purpose: a SIRET or a host that had
+     * to be typed a second time is one that ends up wrong in one of the two.
+     */
+    public const LEGAL = [
+        '/mentions-legales' => 'mentions-legales.html.twig',
+        '/confidentialite' => 'confidentialite.html.twig',
+    ];
+
     private const SLUG = '/^[a-z0-9]+(?:-[a-z0-9]+)*$/';
 
     public function __construct(
@@ -36,6 +48,7 @@ final class Application
         private readonly MediaUrls $media,
         private readonly Blocks $blocks,
         private readonly ContactForm $contactForm,
+        private readonly Colours $colours,
         private readonly string $siteUrl,
         private readonly string $homePageSlug,
     ) {
@@ -56,6 +69,7 @@ final class Application
         try {
             return match (true) {
                 $route === self::CONTACT => $this->contact($post, $ip),
+                isset(self::LEGAL[$route]) => $this->legalPage($route),
                 $route === '/sitemap.xml' => $this->sitemap(),
                 $route === '/robots.txt' => $this->robots(),
                 $route === self::NEWS || $route === self::NEWS.'/' => $this->newsList(),
@@ -140,6 +154,18 @@ final class Application
         );
     }
 
+    private function legalPage(string $route): Response
+    {
+        return new Response(
+            $this->twig->render(self::LEGAL[$route], array_merge(
+                $this->shared(trim($route, '/')),
+                ['legal' => $this->content->legal()],
+            )),
+            200,
+            self::cacheHeaders('text/html; charset=utf-8'),
+        );
+    }
+
     /**
      * Receives the contact form.
      *
@@ -180,6 +206,9 @@ final class Application
     {
         $settings = $this->content->settings();
 
+        // Written on the first render after a purge, exactly like a page.
+        $this->colours->ensure($settings);
+
         return [
             'site' => $settings,
             'menu' => $this->content->menu(),
@@ -212,6 +241,12 @@ final class Application
                     ? (int) $page['_modified']
                     : null,
             ];
+        }
+
+        // Written by the site rather than held in the pages collection, but
+        // indexable all the same.
+        foreach (array_keys(self::LEGAL) as $legal) {
+            $entries[] = ['loc' => $base.$legal];
         }
 
         $articles = $this->content->articles();

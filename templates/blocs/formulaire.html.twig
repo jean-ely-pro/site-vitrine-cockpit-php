@@ -95,9 +95,9 @@
                 <label for="contact-consentement">
                     J’accepte que mon nom et mon adresse e-mail soient conservés pour répondre à ce
                     message.
-                    {% if bloc.pageConfidentialite.slug is defined %}
-                        <a href="/{{ bloc.pageConfidentialite.slug }}">Politique de confidentialité</a>.
-                    {% endif %}
+                    {# The privacy page is written by the site itself, so the link can never
+                       point at a page that was deleted or never created. #}
+                    <a href="/confidentialite">Politique de confidentialité</a>.
                 </label>
                 {% if champs.consentement is defined %}
                     <span class="formulaire__erreur" id="erreur-consentement">{{ champs.consentement }}</span>

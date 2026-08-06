@@ -15,23 +15,31 @@
 
 declare(strict_types=1);
 
-$pageCacheClass = dirname(APP_DIR, 2).'/src/Cache/PageCache.php';
+$root = dirname(APP_DIR, 2);
+$pageCacheClass = "{$root}/src/Cache/PageCache.php";
+$coloursClass = "{$root}/src/Theme/Colours.php";
 
 // Cockpit loads this file at start-up: a missing class here would take the
 // whole admin down. An admin installed outside the site simply gets no purge.
-if (!is_file($pageCacheClass)) {
+if (!is_file($pageCacheClass) || !is_file($coloursClass)) {
     return;
 }
 
 require_once $pageCacheClass;
+require_once $coloursClass;
 
 /** @var Lime\App $app */
 $cache = new App\Cache\PageCache(dirname(APP_DIR).'/cache');
 
+// The colours are written from the site identity, so they go with the pages
+// that used them.
+$colours = new App\Theme\Colours(dirname(APP_DIR).'/assets/css/couleurs.css');
+
 // Lime binds event handlers to the application, so this closure cannot be
 // static — it would refuse to bind and break every request that fires it.
-$emptyCache = function () use ($cache): void {
+$emptyCache = function () use ($cache, $colours): void {
     $cache->clear();
+    $colours->forget();
 };
 
 // Saving an item, and removing one, both change what visitors should see.

@@ -67,6 +67,8 @@ La structure est **figée** : le client remplit le contenu, il ne crée ni colle
 | `pages` | collection | titre, adresse, sections, référencement |
 | `articles` | collection | titre, adresse, date, catégorie, résumé, image, texte |
 | `menu` | singleton | entrées ordonnées, chacune pointant sur une page |
+| `legal` | singleton | éditeur, hébergeur, compléments aux pages légales |
+| `messages` | collection | messages reçus par le formulaire de contact |
 
 La publication n'est pas un champ : Cockpit la gère nativement sur chaque élément
 (« Publié » / « Non publié » / « Archivé »). Le site public ne sert que les éléments publiés.
@@ -83,6 +85,7 @@ Pour modifier la structure, éditer `cockpit/models/*.model.php` puis relancer
 | `/actualites` | liste des actualités, la plus récente en premier |
 | `/actualites/{slug}` | une actualité |
 | `/contact` | réception du formulaire de contact |
+| `/mentions-legales`, `/confidentialite` | écrites par le site depuis l'identité |
 | `/sitemap.xml`, `/robots.txt` | pour les moteurs de recherche |
 
 `actualites` est **réservé** : l’administration refuse une page portant ce slug, en le disant.
@@ -163,10 +166,14 @@ La première section porte le `<h1>` quand c'est un bandeau — sinon le titre d
 affiché au-dessus des sections. Il y a donc toujours **un seul `<h1>`** par page, et les
 titres de section sont des `<h2>`.
 
-## Mise à jour de Cockpit
+## Mise en ligne et mise à jour
 
-Chaque hébergement se met à jour séparément — il n'existe pas de vue centralisée. La procédure
-est décrite dans [docs/cockpit-prerequis.md](docs/cockpit-prerequis.md).
+L'installation sur un hébergement mutualisé, les droits d'écriture, la mise en service et les
+procédures de mise à jour de Cockpit et de PHP sont décrites dans
+[docs/installation-mutualise.md](docs/installation-mutualise.md).
+
+Chaque hébergement se met à jour séparément — il n'existe pas de vue centralisée. C'est le coût
+principal de cette architecture.
 
 ## Cache de pages
 
@@ -201,6 +208,28 @@ php bin/purge-cache.php
 
 Le cache est **inactif** quand `APP_ENV=dev`, pour voir ses modifications immédiatement.
 `PAGE_CACHE=true` dans `.env` permet de le tester en local.
+
+## Pages légales et couleurs
+
+Les **mentions légales** et la **politique de confidentialité** sont écrites par le site
+lui-même, à partir de l'identité et du singleton *Mentions légales* : le SIRET, l'adresse et
+l'hébergeur ne sont saisis qu'une fois. Le client complète ce qui lui est propre, sans
+recopier.
+
+Les **couleurs** saisies dans l'identité sont appliquées au site — mais seulement si elles
+atteignent le contraste exigé de 4,5:1. En dessous, le site garde sa couleur par défaut plutôt
+que de devenir illisible, et l'administration le signale au moment de la saisie.
+
+## Vérifier une mise en ligne
+
+```bash
+php bin/verifier-accessibilite.php https://domaine-du-client.tld
+```
+
+Le script lit **le HTML réellement servi** — cache compris — sur toutes les adresses du plan du
+site : langue, titre unique, hiérarchie des titres, descriptions d'images, dimensions,
+intitulés de formulaire, ressources tierces, transparence sur du texte et contraste des
+couleurs. Aucune dépendance à installer.
 
 ## Sécurité
 
@@ -243,6 +272,8 @@ horaires structurés faux serait pire que de n'en publier aucun.
   référencement, limites de l'éditeur
 - [Médias](docs/medias.md) — copies allégées, point focal, description obligatoire, poids
 - [Formulaire de contact](docs/formulaire-contact.md) — anti-spam, consentement, clés, e-mail
+- [Installation sur mutualisé](docs/installation-mutualise.md) — envoi des fichiers, mise en
+  service, mise à jour de Cockpit et de PHP
 - [Sécurité de l'installation](docs/securite.md) — HTTPS, double authentification, mots de
   passe, clés d'API, en-têtes, vérifications à passer sur chaque installation
 - [Prérequis et capacités de Cockpit](docs/cockpit-prerequis.md) — version retenue, rôles,

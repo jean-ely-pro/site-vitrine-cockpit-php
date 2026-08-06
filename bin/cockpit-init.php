@@ -214,6 +214,7 @@ $readPermissions = [
     'content/pages/read' => true,
     'content/menu/read' => true,
     'content/articles/read' => true,
+    'content/legal/read' => true,
 ];
 
 if (!$role) {
@@ -255,7 +256,7 @@ $customerRoleId = 'client';
 
 $customerPermissions = [];
 
-foreach (['settings', 'pages', 'menu', 'articles'] as $model) {
+foreach (['settings', 'pages', 'menu', 'articles', 'legal'] as $model) {
     $customerPermissions["content/{$model}/read"] = true;
     $customerPermissions["content/{$model}/update"] = true;
 }
@@ -567,35 +568,15 @@ foreach ($pagesDemo as $slug => $data) {
 // short page is created here; generating it from the site identity comes
 // later.
 
-if ($content->item('pages', ['slug' => 'confidentialite']) === null) {
-
-    $content->saveItem('pages', [
-        'titre' => 'Politique de confidentialité',
-        'slug' => 'confidentialite',
-        'seoDescription' => 'Ce que deviennent les informations transmises par le formulaire de contact.',
-        '_state' => 1,
-        'blocs' => [[
-            'type' => 'texte-image',
-            'titre' => 'Vos informations',
-            'texte' => '<p>Les informations saisies dans le formulaire de contact — nom, adresse '
-                .'e-mail et message — servent uniquement à répondre à votre demande. Elles ne sont '
-                .'ni cédées ni utilisées à d’autres fins.</p>'
-                .'<h2>Durée de conservation</h2>'
-                .'<p>Les messages sont conservés le temps de traiter la demande, puis supprimés.</p>'
-                .'<h2>Vos droits</h2>'
-                .'<p>Vous pouvez demander à consulter, corriger ou supprimer les informations vous '
-                .'concernant en écrivant à l’adresse indiquée en pied de page.</p>',
-        ]],
-    ]);
-
-    step('Page « Politique de confidentialité » créée.');
-} else {
-    step('La page « Politique de confidentialité » existe déjà — inchangée.');
+// The privacy page is written by the site itself now; an earlier version of
+// this script created it as an ordinary page, which would shadow nothing but
+// would show up twice in the site map.
+if ($content->item('pages', ['slug' => 'confidentialite']) !== null) {
+    $content->remove('pages', ['slug' => 'confidentialite']);
+    step('Ancienne page « Politique de confidentialité » retirée : le site l’écrit désormais lui-même.');
 }
 
 if ($content->item('pages', ['slug' => 'nous-ecrire']) === null) {
-
-    $confidentialite = $content->item('pages', ['slug' => 'confidentialite']);
 
     $content->saveItem('pages', [
         'titre' => 'Nous écrire',
@@ -608,7 +589,6 @@ if ($content->item('pages', ['slug' => 'nous-ecrire']) === null) {
                 'titre' => 'Votre message',
                 'texte' => '<p>Une question, une commande particulière ? Écrivez-nous, nous '
                     .'répondons sous deux jours ouvrés.</p>',
-                'pageConfidentialite' => ['_model' => 'pages', '_id' => $confidentialite['_id']],
             ],
             $blocContact,
         ],
@@ -709,6 +689,25 @@ if (empty($content->item('menu')['entrees'])) {
     step('Menu renseigné.');
 } else {
     step('Le menu est déjà renseigné — inchangé.');
+}
+
+// 4d ter. Legal notices ---------------------------------------------------
+
+if (empty($content->item('legal')['hebergeurNom'])) {
+
+    $content->saveItem('legal', [
+        'directeurPublication' => 'Camille Bloom',
+        'formeJuridique' => 'Entreprise individuelle',
+        'tva' => '',
+        'hebergeurNom' => 'À renseigner',
+        'hebergeurAdresse' => "Nom, adresse postale et téléphone de l’hébergeur,\n"
+            ."tels qu’il les communique.",
+        'dureeConservation' => '12 mois',
+    ]);
+
+    step('Mentions légales pré-remplies — hébergeur à compléter.');
+} else {
+    step('Les mentions légales sont déjà renseignées — inchangées.');
 }
 
 // 4d bis. Demo news item --------------------------------------------------

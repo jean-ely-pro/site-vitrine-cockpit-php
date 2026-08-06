@@ -20,6 +20,9 @@ SPEC.md
 # ─── Cache de pages : HTML rendu, servi directement par Apache ───
 /public/cache/
 
+# ─── Couleurs du client, écrites depuis l'identité du site ───
+/public/assets/css/couleurs.css
+
 # ─── Médias envoyés depuis l'administration ───
 /public/media/
 

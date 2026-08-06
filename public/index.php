@@ -11,6 +11,7 @@ use App\Content\Blocks;
 use App\Content\Repository;
 use App\Media\MediaUrls;
 use App\Media\Picture;
+use App\Theme\Colours;
 use App\Twig\SiteExtension;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -101,6 +102,7 @@ $application = new Application(
     $media,
     new Blocks("{$root}/templates/blocs"),
     $contactForm,
+    new Colours(__DIR__.'/assets/css/couleurs.css'),
     $siteUrl,
     $homePageSlug,
 );
