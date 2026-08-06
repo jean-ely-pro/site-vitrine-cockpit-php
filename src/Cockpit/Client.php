@@ -10,7 +10,7 @@ namespace App\Cockpit;
  * The API key it carries is a read-only one: it cannot write, whatever
  * happens to the front end.
  */
-final class Client
+final class Client implements ContentSource
 {
     public function __construct(
         private readonly string $baseUrl,
