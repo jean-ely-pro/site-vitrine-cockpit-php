@@ -27,7 +27,12 @@
             site: site,
             titre: titreDansBandeau and loop.first ? page.titre : bloc.titre,
             niveau: titreDansBandeau and loop.first ? 1 : 2,
-            premier: loop.first
+            premier: loop.first,
+            slug: slug,
+            accueilSlug: accueilSlug,
+            contactActif: contactActif|default(false),
+            jetonContact: jetonContact|default(''),
+            formulaire: formulaire|default({})
         } only %}
     {% endfor %}
 {% endblock %}

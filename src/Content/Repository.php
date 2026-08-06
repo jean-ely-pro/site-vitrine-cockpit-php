@@ -49,10 +49,12 @@ final class Repository
             return null;
         }
 
+        // Populated: a section may point at another page — the contact form
+        // links to the privacy policy — and a bare reference has no address.
         return $this->client->item('pages', [
             'slug' => $slug,
             '_state' => self::PUBLISHED,
-        ]);
+        ], populate: true);
     }
 
     /**

@@ -82,6 +82,7 @@ Pour modifier la structure, éditer `cockpit/models/*.model.php` puis relancer
 | `/{slug}` | une page |
 | `/actualites` | liste des actualités, la plus récente en premier |
 | `/actualites/{slug}` | une actualité |
+| `/contact` | réception du formulaire de contact |
 | `/sitemap.xml`, `/robots.txt` | pour les moteurs de recherche |
 
 `actualites` est **réservé** : l’administration refuse une page portant ce slug, en le disant.
@@ -100,6 +101,23 @@ collé depuis un traitement de texte est **corrigé à l'enregistrement** : les 
 hors plage sont ramenés, quel que soit le chemin emprunté.
 
 Tout est détaillé dans [docs/guide-client.md](docs/guide-client.md).
+
+## Formulaire de contact
+
+Le formulaire poste **sur le site lui-même** et dépose le message dans l'administration, avec
+une notification par e-mail. Aucun service tiers n'intervient : ni captcha, ni script distant.
+
+Trois contrôles le protègent — un champ invisible, le temps passé à le remplir, une limite de
+cinq messages par heure et par adresse. La case de consentement **n'est jamais cochée d'avance**
+et un lien vers la politique de confidentialité est obligatoire.
+
+Le point qui échoue en silence est l'e-mail. Pour le vérifier :
+
+```bash
+php bin/message-test.php     # ou le bouton « Envoyer un message test » dans l'administration
+```
+
+Détails dans [docs/formulaire-contact.md](docs/formulaire-contact.md).
 
 ## Médias
 
@@ -123,6 +141,7 @@ Une page est une suite de **sections**. Trois types sont fournis :
 | `hero` | bandeau d'ouverture | accroche, image, bouton |
 | `texte-image` | texte à côté d'une illustration | texte, image, position de l'image |
 | `contact` | coordonnées reprises de l'identité | texte d'introduction, horaires |
+| `formulaire` | formulaire de contact | texte d'introduction, page de confidentialité |
 
 ### Ajouter un type de section
 
@@ -223,6 +242,7 @@ horaires structurés faux serait pire que de n'en publier aucun.
 - [Ce que le client peut faire](docs/guide-client.md) — modèles de page, menu, actualités,
   référencement, limites de l'éditeur
 - [Médias](docs/medias.md) — copies allégées, point focal, description obligatoire, poids
+- [Formulaire de contact](docs/formulaire-contact.md) — anti-spam, consentement, clés, e-mail
 - [Sécurité de l'installation](docs/securite.md) — HTTPS, double authentification, mots de
   passe, clés d'API, en-têtes, vérifications à passer sur chaque installation
 - [Prérequis et capacités de Cockpit](docs/cockpit-prerequis.md) — version retenue, rôles,
