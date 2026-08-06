@@ -171,17 +171,6 @@ return [
                         'opts' => ['placeholder' => '/services'],
                     ],
                     [
-                        'name' => 'pageConfidentialite',
-                        'type' => 'content-item-link',
-                        'label' => 'Page de la politique de confidentialité',
-                        'info' => 'Le formulaire y renvoie, à côté de la case de consentement. '
-                            .'Obligatoire : sans ce lien, le formulaire n’est pas conforme.',
-                        'required' => true,
-                        'width' => '1-1',
-                        'condition' => $isFormulaire,
-                        'opts' => ['link' => 'pages', 'display' => '{{ data.titre }}'],
-                    ],
-                    [
                         'name' => 'afficherHoraires',
                         'type' => 'boolean',
                         'label' => 'Afficher les horaires',

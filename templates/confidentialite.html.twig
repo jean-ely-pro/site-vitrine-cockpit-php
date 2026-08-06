@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{# What the contact form links to. Describes what actually happens on this
+   site — a message stored in the admin, an e-mail to the owner — and nothing
+   else, since nothing else is collected. #}
+
+{% set duree = legal.dureeConservation|default('12 mois') %}
+
+{% block title %}Politique de confidentialité{% if site.nom %} — {{ site.nom }}{% endif %}{% endblock %}
+
+{% block head %}
+    <meta name="description" content="Ce que deviennent les informations transmises par le formulaire de contact.">
+{% endblock %}
+
+{% block main %}
+    <article class="page page--legale">
+
+        <h1 class="page__titre">Politique de confidentialité</h1>
+
+        <h2>Ce qui est collecté</h2>
+        <p>
+            Seul le formulaire de contact collecte des informations : votre nom, votre adresse
+            e-mail et le message que vous écrivez. Rien d’autre n’est recueilli — ce site
+            n’utilise ni mesure d’audience, ni traceur publicitaire, et ne dépose aucun cookie.
+        </p>
+
+        <h2>À quoi elles servent</h2>
+        <p>
+            Uniquement à répondre à votre demande. Elles ne sont ni vendues, ni cédées, ni
+            utilisées pour vous envoyer autre chose que cette réponse.
+        </p>
+
+        <h2>Combien de temps</h2>
+        <p>Les messages sont conservés {{ duree }}, puis supprimés.</p>
+
+        <h2>Vos droits</h2>
+        <p>
+            Vous pouvez demander à consulter, corriger ou supprimer les informations vous
+            concernant{% if site.email %}, en écrivant à
+            <a href="mailto:{{ site.email }}">{{ site.email }}</a>{% endif %}. La demande est
+            traitée dans un délai d’un mois.
+        </p>
+
+        <h2>Qui les détient</h2>
+        <p>
+            {% if site.nom %}{{ site.nom }}{% else %}L’éditeur du site{% endif %}{% if site.adresse %},
+            {{ site.adresse|replace({"\n": ", "}) }}{% endif %}. Les informations sont conservées
+            sur l’hébergement du site{% if legal.hebergeurNom %}, chez {{ legal.hebergeurNom }}{% endif %},
+            et ne sont transmises à personne d’autre.
+        </p>
+
+        {% if legal.complementConfidentialite %}
+            {# Rich text produced by the admin editor: intentionally not escaped. #}
+            {{ legal.complementConfidentialite|raw }}
+        {% endif %}
+
+        <p class="page__retour"><a href="/mentions-legales">Mentions légales</a></p>
+
+    </article>
+{% endblock %}
