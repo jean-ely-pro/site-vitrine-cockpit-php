@@ -89,6 +89,20 @@ passer par un SMTP, compléter `mailer` dans `cockpit/config.php`.
 Si l'identité du site n'a pas d'adresse e-mail, aucune notification n'est envoyée — les
 messages restent consultables dans l'administration.
 
+### Rien ne part vers une adresse de démonstration
+
+Aucun e-mail n'est envoyé vers un domaine réservé aux tests : `.test`, `.example`, `.invalid`,
+`.localhost`, `.local`, ainsi que `example.com`, `.net` et `.org`. Le message est enregistré
+normalement, seule la notification est retenue, et le motif est affiché.
+
+Ce n'est pas un détail de confort. Un poste de développement a souvent un envoi de courrier
+relié à un vrai compte, avec un expéditeur imposé : un message adressé à un domaine qui
+n'existe pas **revient alors dans la boîte de celui qui l'a envoyé**. Une série de tests
+suffit à y déverser des dizaines de messages.
+
+Concrètement : tant que l'identité du site porte l'adresse de démonstration, aucun e-mail ne
+sort. Renseigner une vraie adresse suffit à activer les notifications.
+
 ## Ajouter le formulaire à une page
 
 *Contenu → Pages*, ouvrir la page, ajouter une section **Formulaire de contact**, puis
