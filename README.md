@@ -226,7 +226,7 @@ que de devenir illisible, et l'administration le signale au moment de la saisie.
 composer test
 ```
 
-136 tests couvrent les garde-fous du produit : ce qui décide de ce qu'un visiteur reçoit, et
+149 tests couvrent les garde-fous du produit : ce qui décide de ce qu'un visiteur reçoit, et
 ce qui empêche le site d'être cassé depuis l'administration.
 
 | Ce qui est protégé | Exemples |
@@ -238,7 +238,8 @@ ce qui empêche le site d'être cassé depuis l'administration.
 | Accessibilité | chaque défaut détectable est vérifié sur une page fautive |
 | Mots de passe | longueur, variété, mots courants, nom du compte |
 | Niveaux de titre | corrigés à l'enregistrement, sections imbriquées comprises |
-| Descriptions d'images | exigées dès qu'une image est posée, jamais sans image |
+| Descriptions d’images | exigées dès qu’une image est posée, jamais sans image |
+| Brouillons | jamais demandés au service de contenu : seul l’état publié l’est |
 
 Les tests ne touchent ni au réseau ni à Cockpit : ils s'exécutent en moins d'une seconde, sans
 rien installer d'autre. Ils ne remplacent pas la vérification ci-dessous, qui lit le site réel.
