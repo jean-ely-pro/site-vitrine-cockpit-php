@@ -243,6 +243,12 @@ final class Application
             ];
         }
 
+        // Written by the site rather than held in the pages collection, but
+        // indexable all the same.
+        foreach (array_keys(self::LEGAL) as $legal) {
+            $entries[] = ['loc' => $base.$legal];
+        }
+
         $articles = $this->content->articles();
 
         if ($articles !== []) {
