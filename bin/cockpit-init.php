@@ -268,6 +268,12 @@ foreach (['pages', 'articles'] as $model) {
     $customerPermissions["content/{$model}/delete"] = true;
 }
 
+// Received messages: read them, tick them as handled, remove them. Never
+// create — only the site does that, through its own key.
+$customerPermissions['content/messages/read'] = true;
+$customerPermissions['content/messages/update'] = true;
+$customerPermissions['content/messages/delete'] = true;
+
 // Images, without which no page can be illustrated.
 $customerPermissions['assets/upload'] = true;
 $customerPermissions['assets/edit'] = true;
@@ -357,6 +363,50 @@ if (!$key) {
     step('Clé de lecture créée et inscrite dans .env.');
 } else {
     step('La clé de lecture existe déjà — inchangée.');
+}
+
+// 3b. Write key for the contact form --------------------------------------
+//
+// The form is open to anyone, so its key may do exactly one thing: file a
+// message. It cannot read them back, nor touch any other collection.
+
+$writeKey = $app->dataStorage->findOne('system/api_keys', ['name' => 'Formulaire de contact']);
+
+if (!$writeKey) {
+
+    $now = time();
+    $writeRoleId = 'formulaire-contact';
+
+    $writeRole = [
+        'appid' => $writeRoleId,
+        'name' => 'Formulaire de contact',
+        'info' => 'Dépose un message reçu. Ne peut rien lire ni rien modifier d’autre.',
+        'permissions' => ['content/messages/create' => true],
+        'expressions' => [],
+        '_created' => $now,
+        '_modified' => $now,
+    ];
+
+    $app->dataStorage->save('system/roles', $writeRole);
+
+    $token = 'API-'.bin2hex(random_bytes(20));
+
+    $newWriteKey = [
+        'key' => $token,
+        'name' => 'Formulaire de contact',
+        'role' => $writeRoleId,
+        'meta' => [],
+        '_created' => $now,
+        '_modified' => $now,
+    ];
+
+    $app->dataStorage->save('system/api_keys', $newWriteKey);
+
+    writeEnv($root, 'COCKPIT_WRITE_KEY', $token);
+
+    step('Clé d’écriture du formulaire créée et inscrite dans .env.');
+} else {
+    step('La clé d’écriture du formulaire existe déjà — inchangée.');
 }
 
 // 4. Demo content ---------------------------------------------------------
@@ -511,6 +561,64 @@ foreach ($pagesDemo as $slug => $data) {
     step("La page « {$data['titre']} » existe déjà — inchangée.");
 }
 
+// 4c ter. Privacy page and contact page -----------------------------------
+//
+// The form must link to a privacy policy — without it, it is not lawful. A
+// short page is created here; generating it from the site identity comes
+// later.
+
+if ($content->item('pages', ['slug' => 'confidentialite']) === null) {
+
+    $content->saveItem('pages', [
+        'titre' => 'Politique de confidentialité',
+        'slug' => 'confidentialite',
+        'seoDescription' => 'Ce que deviennent les informations transmises par le formulaire de contact.',
+        '_state' => 1,
+        'blocs' => [[
+            'type' => 'texte-image',
+            'titre' => 'Vos informations',
+            'texte' => '<p>Les informations saisies dans le formulaire de contact — nom, adresse '
+                .'e-mail et message — servent uniquement à répondre à votre demande. Elles ne sont '
+                .'ni cédées ni utilisées à d’autres fins.</p>'
+                .'<h2>Durée de conservation</h2>'
+                .'<p>Les messages sont conservés le temps de traiter la demande, puis supprimés.</p>'
+                .'<h2>Vos droits</h2>'
+                .'<p>Vous pouvez demander à consulter, corriger ou supprimer les informations vous '
+                .'concernant en écrivant à l’adresse indiquée en pied de page.</p>',
+        ]],
+    ]);
+
+    step('Page « Politique de confidentialité » créée.');
+} else {
+    step('La page « Politique de confidentialité » existe déjà — inchangée.');
+}
+
+if ($content->item('pages', ['slug' => 'nous-ecrire']) === null) {
+
+    $confidentialite = $content->item('pages', ['slug' => 'confidentialite']);
+
+    $content->saveItem('pages', [
+        'titre' => 'Nous écrire',
+        'slug' => 'nous-ecrire',
+        'seoDescription' => 'Poser une question ou demander un devis en quelques lignes.',
+        '_state' => 1,
+        'blocs' => [
+            [
+                'type' => 'formulaire',
+                'titre' => 'Votre message',
+                'texte' => '<p>Une question, une commande particulière ? Écrivez-nous, nous '
+                    .'répondons sous deux jours ouvrés.</p>',
+                'pageConfidentialite' => ['_model' => 'pages', '_id' => $confidentialite['_id']],
+            ],
+            $blocContact,
+        ],
+    ]);
+
+    step('Page « Nous écrire » créée, avec son formulaire.');
+} else {
+    step('La page « Nous écrire » existe déjà — inchangée.');
+}
+
 // 4c bis. Page templates --------------------------------------------------
 //
 // Cockpit can duplicate an item, so a template is simply a page left
@@ -584,7 +692,7 @@ if (empty($content->item('menu')['entrees'])) {
 
     $entries = [];
 
-    foreach (['accueil' => 'Accueil', 'services' => 'Services'] as $slug => $label) {
+    foreach (['accueil' => 'Accueil', 'services' => 'Services', 'nous-ecrire' => 'Nous écrire'] as $slug => $label) {
 
         $page = $content->item('pages', ['slug' => $slug]);
 
