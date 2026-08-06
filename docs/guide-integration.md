@@ -27,6 +27,17 @@ touchez ne sont pas ceux qu'une mise à jour modifie.
 Un fichier présent dans `templates-client/` remplace celui de `templates/` sans que l'original
 soit touché. `client.css` est chargé après `site.css`, donc il l'emporte.
 
+**Contrepartie à connaître** : un gabarit recopié ne reçoit plus les corrections du socle. Si
+`templates/partials/pied.html.twig` est corrigé en amont, votre copie garde l'ancienne version.
+Ne recopier que ce que vous modifiez réellement, et relire ce qui a changé en amont après une
+mise à jour :
+
+```bash
+git log --oneline upstream/main -- templates/
+```
+
+Pour du CSS, la question ne se pose pas : `client.css` s'ajoute, il ne remplace rien.
+
 Seule exception : `cockpit/models/pages.model.php`, qui décrit le modèle éditorial du site. Il
 se modifie sur place — c'est le seul fichier partagé, et les conflits y sont rares et lisibles.
 
