@@ -7,6 +7,9 @@
     <title>{% block title %}{{ site.nom|default('Site') }}{% endblock %}</title>
     {% block head %}{% endblock %}
     <link rel="stylesheet" href="/assets/css/site.css">
+    {# The customer's colours, written to a file so the content policy can
+       keep refusing inline styles. #}
+    <link rel="stylesheet" href="/assets/css/couleurs.css">
     {% if jsonld|default('') is not empty %}
         {# Built and encoded in PHP, so it is inserted as is. #}
         <script type="application/ld+json">{{ jsonld|raw }}</script>

@@ -24,6 +24,9 @@ final class Repository
 
     private ?bool $hasArticles = null;
 
+    /** @var array<string, mixed>|null */
+    private ?array $legal = null;
+
     public function __construct(private readonly Client $client)
     {
     }
@@ -84,6 +87,16 @@ final class Repository
             ['date' => -1],
             $limit,
         );
+    }
+
+    /**
+     * Legal notices: publisher and host, everything else comes from settings.
+     *
+     * @return array<string, mixed>
+     */
+    public function legal(): array
+    {
+        return $this->legal ??= $this->client->singleton('legal') ?? [];
     }
 
     /**
