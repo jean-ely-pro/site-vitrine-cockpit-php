@@ -4,11 +4,51 @@ Pour un développeur qui reçoit une maquette et doit produire le site d'un clie
 
 ## Principe
 
-Une installation = un client. Chaque client a son clone du dépôt, ses gabarits, sa feuille de
-style. Les couleurs et le contenu viennent de l'administration, pas du code.
+Une installation = un client. Chaque site a son dépôt, ses gabarits, sa feuille de style. Les
+couleurs et le contenu viennent de l'administration, pas du code.
 
 Ce qui se code : les gabarits Twig, le CSS, les types de section.
 Ce qui ne se code pas : textes, images, coordonnées, horaires, couleurs, menu.
+
+## La règle
+
+> **Tout ce que vous créez va dans `templates-client/` et `client.css`.
+> Vous ne modifiez jamais `templates/` ni `site.css`.**
+
+C'est ce qui permet de récupérer une correction du socle sans conflit : les fichiers que vous
+touchez ne sont pas ceux qu'une mise à jour modifie.
+
+| Vous voulez | Où |
+|---|---|
+| Ajouter un type de section | `templates-client/blocs/mon-type.html.twig` |
+| Styler quoi que ce soit | `public/assets/css/client.css` |
+| Refaire l'en-tête, le pied de page, une page | copier le fichier de `templates/` vers `templates-client/`, **même chemin**, et modifier la copie |
+
+Un fichier présent dans `templates-client/` remplace celui de `templates/` sans que l'original
+soit touché. `client.css` est chargé après `site.css`, donc il l'emporte.
+
+Seule exception : `cockpit/models/pages.model.php`, qui décrit le modèle éditorial du site. Il
+se modifie sur place — c'est le seul fichier partagé, et les conflits y sont rares et lisibles.
+
+## Récupérer une correction du socle
+
+À la première installation du site :
+
+```bash
+git remote add upstream https://github.com/jean-ely-pro/site-vitrine-cockpit-php.git
+```
+
+Puis à chaque correction à récupérer :
+
+```bash
+git fetch upstream
+git merge upstream/main
+composer test
+php bin/purge-cache.php
+```
+
+Si un conflit apparaît sur un fichier de `templates/` ou sur `site.css`, c'est que la règle
+ci-dessus n'a pas été suivie : déplacer la personnalisation du côté `templates-client/`.
 
 ## Mise en route
 
@@ -32,6 +72,8 @@ processus.
 
 ## Où se trouve quoi
 
+Livré avec le socle — **ne pas modifier** :
+
 | Chemin | Contenu |
 |---|---|
 | `templates/base.html.twig` | en-tête, menu, pied de page, structure commune |
@@ -39,14 +81,22 @@ processus.
 | `templates/blocs/*.html.twig` | un fichier = un type de section |
 | `templates/partials/image.html.twig` | rendu d'une image — passage obligé |
 | `templates/partials/pied.html.twig` | pied de page |
-| `public/assets/css/site.css` | toute la feuille de style |
-| `cockpit/models/pages.model.php` | champs des sections |
+| `public/assets/css/site.css` | base : structure, typographie, accessibilité |
+
+Propre à ce site — **c'est là que vous écrivez** :
+
+| Chemin | Contenu |
+|---|---|
+| `templates-client/blocs/*.html.twig` | vos types de section |
+| `templates-client/…` | vos remplacements de gabarits livrés |
+| `public/assets/css/client.css` | vos styles |
+| `cockpit/models/pages.model.php` | champs des sections — seul fichier partagé |
 
 ## Démarche
 
 1. Découper la maquette en sections réutilisables.
-2. Pour chaque section : un fichier dans `templates/blocs/`, ses champs dans
-   `cockpit/models/pages.model.php`, ses styles dans `site.css`.
+2. Pour chaque section : un fichier dans `templates-client/blocs/`, ses champs dans
+   `cockpit/models/pages.model.php`, ses styles dans `client.css`.
 3. `php bin/install-cockpit.php --force`
 4. Composer les pages dans l'administration.
 5. `composer test` et `php bin/verifier-accessibilite.php`
@@ -57,7 +107,7 @@ Modèle à recopier : `templates/blocs/temoignages.html.twig`, commenté ligne �
 
 ### 1. Le partial
 
-`templates/blocs/mon-type.html.twig`. Le nom du fichier devient le nom du type.
+`templates-client/blocs/mon-type.html.twig`. Le nom du fichier devient le nom du type.
 
 Variables reçues, et uniquement celles-ci :
 
@@ -132,7 +182,7 @@ Copies produites : 480, 960 et 1440 px en WebP, jamais plus larges que l'origina
 
 ## CSS
 
-Tout dans `public/assets/css/site.css`. Nommer les classes d'après le partial :
+Tout dans `public/assets/css/client.css`. Nommer les classes d'après le partial :
 `bloc-mon-type`, `bloc-mon-type__element`.
 
 Variables disponibles :
@@ -151,7 +201,7 @@ Interdits : `opacity` sur du texte, polices distantes, contraste inférieur à 4
 ## Vérifier
 
 ```bash
-composer test                          # 149 tests, moins d'une seconde
+composer test                          # 156 tests, moins d'une seconde
 php bin/verifier-accessibilite.php     # sur le HTML réellement servi
 php bin/purge-cache.php                # après toute modification de gabarit ou de CSS
 ```
@@ -175,18 +225,22 @@ Pages écrites par le site, non modifiables depuis l'administration :
 | Symptôme | Cause |
 |---|---|
 | Modification invisible | cache non purgé |
-| Section absente de la page | pas de partial du même nom dans `templates/blocs/` |
+| Conflit git sur `site.css` ou `templates/` | styles ou gabarits écrits du mauvais côté |
+| Section absente de la page | pas de partial du même nom dans `templates-client/blocs/` ni `templates/blocs/` |
 | Champs absents dans l'administration | `install-cockpit.php --force` non lancé |
 | Enregistrement refusé | image sans description, ou adresse réservée |
 | Image sans `srcset` | balise `<img>` écrite à la main |
 | `composer test` échoue sur les titres | `<h2>` en dur au lieu de `<h{{ niveau }}>` |
 | Le site affiche celui d'un autre dossier | port déjà occupé, serveur non démarré |
 
-## Plusieurs clients
+## Plusieurs sites
 
-Un client = un clone. Pour répercuter une correction commune sur des sites déjà personnalisés,
-choisir une méthode **avant** le troisième client : branche par client, ou tronc commun plus
-surcouche. Le dépôt n'impose rien.
+Un site = un dépôt, avec ce socle en `upstream`. Voir « Récupérer une correction du socle »
+plus haut.
+
+Un type de section qui revient sur plusieurs sites a sa place dans le socle : déplacer le
+fichier de `templates-client/blocs/` vers `templates/blocs/`, avec ses champs et ses styles.
+Les sites suivants en héritent.
 
 ## Hors du champ du développeur
 
