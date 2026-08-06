@@ -30,7 +30,11 @@ servie depuis le cache, l'horodatage qu'elle porte est celui de sa mise en cache
 mesuré ne veut plus rien dire — il passera toujours. Les deux autres ne dépendent pas du cache.
 
 L'adresse du visiteur n'est jamais conservée : seule une empreinte sert à compter, et elle ne
-dit rien de qui a écrit quoi.
+dit rien de qui a écrit quoi. Ces compteurs sont effacés d'eux-mêmes passé une heure.
+
+La limite vaut **par adresse**. Depuis un réseau d'entreprise, où plusieurs personnes sortent
+par la même adresse, cinq messages en une heure peuvent donc être atteints à plusieurs. C'est
+assumé pour un site vitrine ; la valeur se change dans `src/Contact/SpamGuard.php`.
 
 ## Consentement
 

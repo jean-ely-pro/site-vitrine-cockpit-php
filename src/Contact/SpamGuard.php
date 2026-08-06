@@ -118,6 +118,26 @@ final class SpamGuard
         $times[] = $now;
 
         file_put_contents($file, implode("\n", $times), LOCK_EX);
+
+        // One file per address would otherwise pile up for good. Swept now and
+        // then rather than on every message: the work is pointless most of the
+        // time, and nothing depends on it being done at any precise moment.
+        if (random_int(1, 50) === 1) {
+            $this->sweep($now);
+        }
+    }
+
+    /** Removes counters nobody can still be counted by. */
+    private function sweep(int $now): void
+    {
+        foreach (glob($this->directory.'/*.txt') ?: [] as $file) {
+
+            $modified = @filemtime($file);
+
+            if ($modified !== false && $now - $modified > 3600) {
+                @unlink($file);
+            }
+        }
     }
 
     private function countRecent(string $ip, int $now): int
