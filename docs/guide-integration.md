@@ -20,9 +20,28 @@ touchez ne sont pas ceux qu'une mise à jour modifie.
 
 | Vous voulez | Où |
 |---|---|
-| Ajouter un type de section | `templates-client/blocs/mon-type.html.twig` |
+| Créer un type de section | `templates-client/blocs/mon-type.html.twig` |
 | Styler quoi que ce soit | `public/assets/css/client.css` |
 | Refaire l'en-tête, le pied de page, une page | copier le fichier de `templates/` vers `templates-client/`, **même chemin**, et modifier la copie |
+
+### Les sections livrées ne se copient pas
+
+`hero`, `texte-image`, `contact`, `formulaire` et `temoignages` sont disponibles telles quelles.
+Rien à copier pour les utiliser.
+
+| Vous voulez | Vous faites |
+|---|---|
+| Utiliser une section livrée | **rien** |
+| Créer une section propre au site | un nouveau fichier dans `templates-client/blocs/` |
+| Changer le rendu d'une section livrée | copier son fichier dans `templates-client/blocs/`, même nom |
+
+**Le CSS d'abord, la copie en dernier recours.** Les sections livrées produisent des classes
+stables — `bloc-hero`, `bloc-hero__image`, `bloc-texte-image__texte` — qu'une maquette
+différente traite dans `client.css` sans toucher au moindre gabarit.
+
+On copie une section uniquement quand la **structure HTML** doit changer : un ordre différent,
+une balise en plus, un élément en moins. Jamais pour une couleur, un espacement ou une
+disposition.
 
 Un fichier présent dans `templates-client/` remplace celui de `templates/` sans que l'original
 soit touché. `client.css` est chargé après `site.css`, donc il l'emporte.
@@ -203,6 +222,24 @@ Variables disponibles :
 --couleur-fond         --couleur-fond-doux     --couleur-trait
 --largeur
 ```
+
+### Classes des sections livrées
+
+De quoi styler sans copier aucun gabarit.
+
+| Section | Classes |
+|---|---|
+| toutes | `bloc` |
+| `hero` | `bloc-hero`, `__image`, `__texte`, `__titre`, `__accroche` |
+| `texte-image` | `bloc-texte-image`, `--gauche`, `--droite`, `__texte`, `__image` |
+| `contact` | `bloc-contact`, `__details`, `__coordonnees`, `__horaires`, `__horaire` |
+| `formulaire` | `bloc-formulaire`, `formulaire`, `__champ`, `__consentement`, `__erreur` |
+| `temoignages` | `bloc-temoignages`, `__introduction`, `temoignage`, `__contenu`, `__fonction` |
+| commun | `bouton`, `message`, `message--succes`, `message--erreur` |
+
+Structure du site : `en-tete`, `en-tete__nom`, `en-tete__slogan`, `menu`, `menu__liste`,
+`pied`, `pied__colonnes`, `pied__titre`, `pied__liens-legaux`, `lien-evitement`,
+`page__titre`, `actualites`, `actualite-resume`, `actualite__meta`.
 
 `--couleur-lien` et `--couleur-texte` sont écrasées par les couleurs saisies dans
 l'administration, via `couleurs.css` chargé après. Ne pas les coder en dur.
