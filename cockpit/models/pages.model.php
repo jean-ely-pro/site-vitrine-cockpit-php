@@ -24,6 +24,7 @@ $isHero = "data.type === 'hero'";
 $isTexteImage = "data.type === 'texte-image'";
 $isContact = "data.type === 'contact'";
 $isFormulaire = "data.type === 'formulaire'";
+$isTemoignages = "data.type === 'temoignages'";
 $hasImage = "['hero', 'texte-image'].includes(data.type)";
 $hasTexte = "['texte-image', 'contact', 'formulaire'].includes(data.type)";
 
@@ -92,6 +93,7 @@ return [
                                 ['value' => 'texte-image', 'label' => 'Texte et image'],
                                 ['value' => 'contact', 'label' => 'Coordonnées'],
                                 ['value' => 'formulaire', 'label' => 'Formulaire de contact'],
+                                ['value' => 'temoignages', 'label' => 'Témoignages'],
                             ],
                         ],
                     ],
@@ -170,6 +172,73 @@ return [
                         'condition' => $isHero,
                         'opts' => ['placeholder' => '/services'],
                     ],
+                    // ── Témoignages ─────────────────────────────────────
+                    // Exemple commenté d'un type de section : voir le partial
+                    // templates/blocs/temoignages.html.twig et
+                    // docs/guide-integration.md.
+                    [
+                        'name' => 'introduction',
+                        'type' => 'text',
+                        'label' => 'Phrase d’introduction',
+                        'info' => 'Apparaît sous le titre, avant les témoignages.',
+                        'width' => '1-1',
+                        'condition' => $isTemoignages,
+                        'opts' => ['multiline' => true, 'maxlength' => 200],
+                    ],
+                    [
+                        'name' => 'temoignages',
+                        'type' => 'set',
+                        'label' => 'Témoignages',
+                        'info' => 'Chaque entrée devient un témoignage affiché dans la section.',
+                        'multiple' => true,
+                        'width' => '1-1',
+                        'condition' => $isTemoignages,
+                        'opts' => [
+                            'display' => '{{ data.auteur }}',
+                            'fields' => [
+                                [
+                                    'name' => 'citation',
+                                    'type' => 'text',
+                                    'label' => 'Ce que dit la personne',
+                                    'required' => true,
+                                    'width' => '1-1',
+                                    'opts' => ['multiline' => true, 'maxlength' => 400],
+                                ],
+                                [
+                                    'name' => 'auteur',
+                                    'type' => 'text',
+                                    'label' => 'Nom',
+                                    'width' => '1-2',
+                                    'opts' => [],
+                                ],
+                                [
+                                    'name' => 'fonction',
+                                    'type' => 'text',
+                                    'label' => 'Fonction ou ville',
+                                    'info' => 'Affichée sous le nom, en plus discret.',
+                                    'width' => '1-2',
+                                    'opts' => [],
+                                ],
+                                [
+                                    'name' => 'portrait',
+                                    'type' => 'asset',
+                                    'label' => 'Portrait',
+                                    'info' => 'Facultatif. Image carrée conseillée.',
+                                    'width' => '1-2',
+                                    'opts' => ['filter' => ['type' => 'image']],
+                                ],
+                                [
+                                    'name' => 'alt',
+                                    'type' => 'text',
+                                    'label' => 'Description du portrait',
+                                    'info' => 'Obligatoire dès qu’un portrait est choisi.',
+                                    'width' => '1-2',
+                                    'opts' => ['maxlength' => 150],
+                                ],
+                            ],
+                        ],
+                    ],
+
                     [
                         'name' => 'afficherHoraires',
                         'type' => 'boolean',
