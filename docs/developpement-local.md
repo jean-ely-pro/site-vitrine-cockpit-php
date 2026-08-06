@@ -82,6 +82,30 @@ Le cache fige la page : modifier le contenu directement en base ne change rien �
 servi. Enregistrer depuis l'administration vide le cache, et la page suivante est rendue à
 nouveau.
 
+## Tests
+
+```bash
+composer test                       # tout
+vendor/bin/phpunit --testsuite site # ce que reçoit le visiteur
+vendor/bin/phpunit --testsuite garde-fous  # ce qui protège l'administration
+```
+
+Ils s'exécutent sans serveur, sans Cockpit et sans réseau : moins d'une seconde. Ce sont les
+règles du produit qui sont vérifiées, pas l'intégration — celle-ci se contrôle avec
+`bin/verifier-accessibilite.php`, qui lit le site réellement servi.
+
+**À lancer avant chaque envoi de fichiers**, et après toute modification dans `src/` ou
+`cockpit/addons/`.
+
+### Ajouter un test
+
+Un garde-fou sans test finit par disparaître à la faveur d'une modification. La règle simple :
+tout ce qui protège le visiteur ou empêche le client de casser son site doit avoir un test qui
+échoue si on le retire.
+
+Les tests portent des noms de phrases françaises — `une_couleur_trop_pale_est_ecartee` — pour
+que la liste des échecs se lise comme un constat, pas comme une trace technique.
+
 ## Les e-mails en développement
 
 Aucune notification n'est envoyée tant que l'identité du site porte une adresse de
