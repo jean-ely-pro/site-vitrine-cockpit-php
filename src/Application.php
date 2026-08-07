@@ -78,7 +78,10 @@ final class Application
         $variables = ['site' => [], 'menu' => []];
 
         try {
-            $variables = $this->context->forPage('');
+            // No structured data on an error page: describing the business on
+            // a page that does not exist tells a search engine nothing useful,
+            // and the page is marked as not to be indexed anyway.
+            $variables = $this->context->forPage('', ['jsonld' => '']);
         } catch (ContentUnavailable) {
             // A missing page must still answer 404, even with no content service.
         }
