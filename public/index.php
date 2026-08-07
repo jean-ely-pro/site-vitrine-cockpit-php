@@ -2,8 +2,14 @@
 
 declare(strict_types=1);
 
+use App\Action\ContactAction;
+use App\Action\LegalAction;
+use App\Action\NewsAction;
+use App\Action\PageAction;
+use App\Action\SitemapAction;
 use App\Application;
 use App\Cache\PageCache;
+use App\Http\ViewContext;
 use App\Cockpit\Client;
 use App\Contact\ContactForm;
 use App\Contact\SpamGuard;
@@ -105,15 +111,32 @@ $contactForm = new ContactForm(
     new SpamGuard("{$root}/var/contact", hash('sha256', $apiKey)),
 );
 
-$application = new Application(
-    new Repository(new Client($apiUrl, $apiKey)),
-    $twig,
-    $media,
-    new Blocks("{$root}/templates/blocs", "{$root}/templates-client/blocs"),
+$content = new Repository(new Client($apiUrl, $apiKey));
+
+$context = new ViewContext(
+    $content,
     $contactForm,
+    $media,
     new Colours(__DIR__.'/assets/css/couleurs.css'),
     $siteUrl,
+);
+
+$page = new PageAction(
+    $content,
+    $twig,
+    $context,
+    new Blocks("{$root}/templates/blocs", "{$root}/templates-client/blocs"),
     $homePageSlug,
+);
+
+$application = new Application(
+    $page,
+    new NewsAction($content, $twig, $context),
+    new LegalAction($content, $twig, $context),
+    new ContactAction($contactForm, $page),
+    new SitemapAction($content, $siteUrl, $homePageSlug),
+    $twig,
+    $context,
 );
 
 $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
