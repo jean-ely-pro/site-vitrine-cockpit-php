@@ -21,7 +21,7 @@ use EditorGuards\Headings;
  * Addresses the site serves itself. A page taking one of them would simply
  * never be shown, which nothing on screen would explain.
  *
- * Kept in step with App\Application::NEWS on the site side — two separate
+ * Kept in step with App\Http\Route on the site side — two separate
  * applications, so the value is stated in both.
  */
 const RESERVED_PAGE_SLUGS = ['actualites', 'contact', 'mentions-legales', 'confidentialite'];

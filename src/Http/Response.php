@@ -18,6 +18,24 @@ final class Response
     ) {
     }
 
+    /**
+     * Headers for a response that will also be stored on disk.
+     *
+     * Browsers revalidate on every visit, so emptying the cache takes effect
+     * at once instead of waiting for a copy held by the visitor to expire.
+     * `X-Page-Cache` says who answered: PHP, or the web server from disk.
+     *
+     * @return array<string, string>
+     */
+    public static function cacheable(string $contentType): array
+    {
+        return [
+            'Content-Type' => $contentType,
+            'Cache-Control' => 'public, max-age=0, must-revalidate',
+            'X-Page-Cache' => 'miss',
+        ];
+    }
+
     public function send(): void
     {
         http_response_code($this->status);
