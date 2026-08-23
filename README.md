@@ -105,9 +105,8 @@ Pour modifier la structure, éditer `cockpit/models/*.model.php` puis relancer
 Le compte `client` porte un rôle limité au contenu : identité, pages, menu, actualités et
 images. Il ne peut ni modifier la structure, ni gérer les comptes, les rôles ou les clés.
 
-Trois **modèles de page** sont fournis, laissés non publiés — le client les duplique. C'est la
-duplication native de Cockpit : aucun mécanisme à maintenir, et les modèles évoluent comme
-n'importe quelle page.
+Trois **modèles de page** sont fournis, laissés non publiés — le client les duplique avec la
+fonction de duplication de Cockpit.
 
 L'éditeur de texte ne propose que Titre 2, Titre 3, gras, italique, listes et liens. Un texte
 collé depuis un traitement de texte est **corrigé à l'enregistrement** : les niveaux de titre
@@ -190,14 +189,13 @@ L'installation sur un hébergement mutualisé, les droits d'écriture, la mise e
 procédures de mise à jour de Cockpit et de PHP sont décrites dans
 [docs/installation-mutualise.md](docs/installation-mutualise.md).
 
-Chaque hébergement se met à jour séparément — il n'existe pas de vue centralisée. C'est le coût
-principal de cette architecture.
+Chaque installation se met à jour séparément. Tenir la liste des sites livrés, avec pour chacun
+la version de Cockpit installée et la date de la dernière mise à jour.
 
 ## Cache de pages
 
 Chaque page rendue est écrite en fichier statique dans `public/cache`. À la visite suivante,
-**Apache sert ce fichier seul — PHP n'est pas démarré.** C'est ce qui rend le site tenable sur
-un hébergement mutualisé, où démarrer PHP à chaque visite coûte cher.
+**Apache sert ce fichier seul — PHP n'est pas démarré.**
 
 L'en-tête `X-Page-Cache` dit qui a répondu : `hit` pour le serveur web, `miss` pour PHP.
 
@@ -206,9 +204,8 @@ curl -sI https://domaine.tld/services | grep -i x-page-cache
 ```
 
 **Le cache est vidé dès qu'un contenu est enregistré dans l'administration** : un fichier
-d'amorçage chargé par Cockpit s'en charge. La purge est totale — l'identité du site, le menu
-et les titres de pages figurent sur toutes les pages, une purge partielle laisserait des
-copies périmées. Chaque page est simplement rendue à nouveau à sa prochaine visite.
+d'amorçage chargé par Cockpit s'en charge. La purge est totale ; chaque page est rendue à
+nouveau à sa prochaine visite.
 
 Ne sont jamais mis en cache : l'administration et son API, les réponses en erreur, et toute
 adresse portant des paramètres.
@@ -298,8 +295,7 @@ partir de l'identité, des coordonnées et des horaires.
 
 **Les horaires sont saisis en texte libre** — « 9h – 12h, 14h – 18h30 » — et affichés tels
 quels. Ils ne sont convertis en données structurées que lorsqu'ils se lisent sans ambiguïté ;
-« sur rendez-vous » ou « 24h/24 » sont affichés mais laissés hors du JSON-LD. Publier des
-horaires structurés faux serait pire que de n'en publier aucun.
+« sur rendez-vous » ou « 24h/24 » sont affichés mais laissés hors du JSON-LD.
 
 ## Bon à savoir
 
