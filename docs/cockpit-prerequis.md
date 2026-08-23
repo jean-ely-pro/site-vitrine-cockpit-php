@@ -75,9 +75,8 @@ La double authentification par code à usage unique est intégrée au socle de C
 (`modules/App/Helper/TWFA.php`, appuyée sur la bibliothèque `robthree/twofactorauth`). Elle est
 exposée dans la fiche utilisateur et dans le contrôleur d'authentification.
 
-Aucune couche d'authentification serveur supplémentaire n'est donc nécessaire pour atteindre
-l'objectif de protection de l'administration. Le durcissement serveur (HTTPS forcé, en-têtes de
-sécurité, exclusion du cache) reste requis par ailleurs.
+Aucune couche d'authentification serveur supplémentaire n'est à ajouter. Le durcissement serveur
+(HTTPS forcé, en-têtes de sécurité, exclusion du cache) reste requis.
 
 ### API de contenu — **REST, avec clés porteuses d'un rôle**
 
@@ -116,7 +115,7 @@ ces comptes.
 
 ## Procédure de mise à jour
 
-Il n'existe pas de vue centralisée : chaque hébergement client se met à jour séparément.
+À reprendre sur chaque installation :
 
 1. Relever la version installée dans l'administration.
 2. Récupérer l'archive de la nouvelle version.

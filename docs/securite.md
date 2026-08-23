@@ -1,8 +1,7 @@
 # Sécurité de l'installation
 
-Le site et son administration vivent sur l'hébergement du client. Il n'existe **aucune
-supervision centralisée** : ce qui suit doit être vérifié sur chaque installation, et la mise
-à jour de Cockpit reste le principal travail récurrent (voir
+Le site et son administration vivent sur l'hébergement du client. **Ce qui suit est à vérifier
+sur chaque installation** : à la livraison, puis après chaque mise à jour de Cockpit (voir
 [cockpit-prerequis.md](cockpit-prerequis.md)).
 
 ## Ce qui est exposé
