@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App;
 
-use App\Action\ContactAction;
-use App\Action\LegalAction;
-use App\Action\NewsAction;
-use App\Action\PageAction;
-use App\Action\SitemapAction;
+use App\Controller\ContactAction;
+use App\Controller\LegalAction;
+use App\Controller\NewsAction;
+use App\Controller\PageAction;
+use App\Controller\SitemapAction;
 use App\Cockpit\ContentUnavailable;
 use App\Http\Response;
 use App\Http\Route;
-use App\Http\ViewContext;
+use App\View\ViewContext;
 use Twig\Environment;
 
 /**
