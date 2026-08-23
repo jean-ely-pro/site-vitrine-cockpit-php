@@ -81,5 +81,4 @@ sans délai ni manipulation.
 - Créer un compte, changer un rôle, créer une clé d'API
 - Mettre Cockpit et PHP à jour
 
-Ce n'est pas une limite d'outil, c'est le garde-fou : ces gestes engagent la structure ou la
-sécurité du site.
+Ces gestes engagent la structure ou la sécurité du site. Les demander au prestataire.

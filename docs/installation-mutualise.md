@@ -155,8 +155,8 @@ la notification par e-mail part réellement.
 
 ### Cockpit
 
-Il n'existe **pas de vue centralisée** : chaque hébergement se met à jour séparément. C'est le
-coût principal de cette architecture, et il se paie par client.
+Chaque installation se met à jour séparément. Tenir la liste des sites livrés, avec pour chacun
+la version de Cockpit installée et la date de la dernière mise à jour.
 
 1. **Sauvegarder** `var/` et `public/admin/storage/` — base de données et médias.
 2. En local, changer la version et l'empreinte dans `bin/install-cockpit.php`, puis
