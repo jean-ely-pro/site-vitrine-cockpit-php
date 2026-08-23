@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use App\Action\ContactAction;
-use App\Action\LegalAction;
-use App\Action\NewsAction;
-use App\Action\PageAction;
-use App\Action\SitemapAction;
+use App\Controller\ContactAction;
+use App\Controller\LegalAction;
+use App\Controller\NewsAction;
+use App\Controller\PageAction;
+use App\Controller\SitemapAction;
 use App\Application;
 use App\Cache\PageCache;
-use App\Http\ViewContext;
+use App\View\ViewContext;
 use App\Cockpit\Client;
 use App\Contact\ContactForm;
 use App\Contact\SpamGuard;
@@ -17,8 +17,8 @@ use App\Content\Blocks;
 use App\Content\Repository;
 use App\Media\MediaUrls;
 use App\Media\Picture;
-use App\Theme\Colours;
-use App\Twig\SiteExtension;
+use App\View\Colours;
+use App\View\SiteExtension;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 

@@ -6,7 +6,7 @@ namespace Tests\Site;
 
 use App\Media\MediaUrls;
 use App\Media\Picture;
-use App\Twig\SiteExtension;
+use App\View\SiteExtension;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Twig\Environment;
