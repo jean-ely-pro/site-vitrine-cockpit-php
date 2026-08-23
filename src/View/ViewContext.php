@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Http;
+namespace App\View;
 
 use App\Contact\ContactForm;
 use App\Content\Repository;
 use App\Media\MediaUrls;
 use App\Seo\LocalBusiness;
-use App\Theme\Colours;
+use App\View\Colours;
 
 /**
  * What every page needs, whatever it shows: identity, menu, structured data.

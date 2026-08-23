@@ -19,10 +19,10 @@ if (PHP_SAPI !== 'cli') {
 $root = dirname(__DIR__);
 
 require_once "{$root}/src/Accessibility/PageAudit.php";
-require_once "{$root}/src/Theme/Colours.php";
+require_once "{$root}/src/View/Colours.php";
 
 use App\Accessibility\PageAudit;
-use App\Theme\Colours;
+use App\View\Colours;
 
 $base = rtrim($argv[1] ?? 'http://localhost:8080', '/');
 

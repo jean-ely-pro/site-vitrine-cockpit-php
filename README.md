@@ -55,6 +55,9 @@ tests/             suite de tests
 var/               données d'exécution : base SQLite, caches (hors dépôt, hors racine web)
 ```
 
+Le trajet d'une requête, le rôle de chaque dossier de `src/` et les décisions qui ont fixé
+cette structure sont décrits dans [docs/architecture.md](docs/architecture.md).
+
 **Socle et personnalisation sont séparés.** Un gabarit placé dans `templates-client/` remplace
 celui de `templates/` sans le modifier, et `client.css` est chargé après `site.css`. Une
 correction du socle se récupère alors par `git merge upstream/main` sans conflit sur la
@@ -241,7 +244,7 @@ que de devenir illisible, et l'administration le signale au moment de la saisie.
 composer test
 ```
 
-166 tests couvrent les garde-fous du produit : ce qui décide de ce qu'un visiteur reçoit, et
+179 tests couvrent les garde-fous du produit : ce qui décide de ce qu'un visiteur reçoit, et
 ce qui empêche le site d'être cassé depuis l'administration.
 
 | Ce qui est protégé | Exemples |
@@ -255,6 +258,7 @@ ce qui empêche le site d'être cassé depuis l'administration.
 | Niveaux de titre | corrigés à l'enregistrement, sections imbriquées comprises |
 | Descriptions d’images | exigées dès qu’une image est posée, jamais sans image |
 | Brouillons | jamais demandés au service de contenu : seul l’état publié l’est |
+| Amorçage de l’administration | les classes et chemins cités par les addons existent bien |
 
 Les tests ne touchent ni au réseau ni à Cockpit : ils s'exécutent en moins d'une seconde, sans
 rien installer d'autre. Ils ne remplacent pas la vérification ci-dessous, qui lit le site réel.
@@ -307,6 +311,8 @@ horaires structurés faux serait pire que de n'en publier aucun.
 
 ## Documentation
 
+- [Architecture du site public](docs/architecture.md) — trajet d'une requête, rôle de chaque
+  dossier, où intervenir, décisions structurantes
 - [Intégrer une maquette](docs/guide-integration.md) — pour le développeur : types de section,
   contrat du partial, images, CSS, vérifications, pièges
 - [Ce que le client peut faire](docs/guide-client.md) — modèles de page, menu, actualités,
