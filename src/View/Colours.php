@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Theme;
+namespace App\View;
 
 /**
  * The customer's colours, turned into a stylesheet the browser can load.

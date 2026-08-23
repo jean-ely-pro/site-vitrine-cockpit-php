@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Twig;
+namespace App\View;
 
 use App\Media\Picture;
 use Twig\Extension\AbstractExtension;

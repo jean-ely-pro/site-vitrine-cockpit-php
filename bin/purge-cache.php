@@ -17,13 +17,13 @@ if (PHP_SAPI !== 'cli') {
 }
 
 require_once __DIR__.'/../src/Cache/PageCache.php';
-require_once __DIR__.'/../src/Theme/Colours.php';
+require_once __DIR__.'/../src/View/Colours.php';
 
 $cache = new App\Cache\PageCache(dirname(__DIR__).'/public/cache');
 $removed = $cache->clear();
 
 // The colours are written from the site identity, like the pages themselves.
-(new App\Theme\Colours(dirname(__DIR__).'/public/assets/css/couleurs.css'))->forget();
+(new App\View\Colours(dirname(__DIR__).'/public/assets/css/couleurs.css'))->forget();
 
 echo match (true) {
     $removed === 0 => "\n  Le cache était déjà vide.\n\n",
