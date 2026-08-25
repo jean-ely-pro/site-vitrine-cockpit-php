@@ -52,7 +52,7 @@ final class HeadingsTest extends TestCase
     {
         $champs = [
             ['name' => 'blocs', 'type' => 'set', 'multiple' => true, 'opts' => [
-                'fields' => [['name' => 'texte', 'type' => 'richtext']],
+                'fields' => [['name' => 'texte', 'type' => 'wysiwyg']],
             ]],
         ];
 
@@ -70,7 +70,7 @@ final class HeadingsTest extends TestCase
     #[Test]
     public function un_champ_absent_ne_provoque_rien(): void
     {
-        $champs = [['name' => 'texte', 'type' => 'richtext']];
+        $champs = [['name' => 'texte', 'type' => 'wysiwyg']];
 
         $this->assertSame(['autre' => 'valeur'], Headings::inFields($champs, ['autre' => 'valeur']));
     }

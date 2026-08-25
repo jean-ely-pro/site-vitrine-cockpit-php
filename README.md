@@ -241,7 +241,7 @@ que de devenir illisible, et l'administration le signale au moment de la saisie.
 composer test
 ```
 
-188 tests couvrent les garde-fous du produit : ce qui décide de ce qu'un visiteur reçoit, et
+189 tests couvrent les garde-fous du produit : ce qui décide de ce qu'un visiteur reçoit, et
 ce qui empêche le site d'être cassé depuis l'administration.
 
 | Ce qui est protégé | Exemples |
@@ -256,10 +256,13 @@ ce qui empêche le site d'être cassé depuis l'administration.
 | Descriptions d’images | exigées dès qu’une image est posée, jamais sans image |
 | Brouillons | jamais demandés au service de contenu : seul l’état publié l’est |
 | Amorçage de l’administration | les classes et chemins cités par les addons existent bien |
-| Modèles de l’administration | libellés des listes réellement interpolés, jamais affichés bruts |
+| Modèles de l’administration | types de champ réellement enregistrés, libellés de listes interpolés |
 
-Les tests ne touchent ni au réseau ni à Cockpit : ils s'exécutent en moins d'une seconde, sans
-rien installer d'autre. Ils ne remplacent pas la vérification ci-dessous, qui lit le site réel.
+Les tests ne touchent pas au réseau et ne démarrent pas Cockpit : ils s'exécutent en moins
+d'une seconde. Un seul lit les fichiers de l'administration installée, pour confronter les
+types de champ aux composants que Cockpit enregistre ; il est ignoré tant que
+`bin/install-cockpit.php` n'a pas tourné. Ils ne remplacent pas la vérification ci-dessous, qui
+lit le site réel.
 
 ## Vérifier une mise en ligne
 

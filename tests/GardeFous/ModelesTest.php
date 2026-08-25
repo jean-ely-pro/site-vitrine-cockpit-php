@@ -8,16 +8,17 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Les gabarits d’affichage des modèles Cockpit.
+ * Les modèles de contenu de Cockpit.
  *
- * L’administration évalue « opts.display » comme un gabarit JavaScript, pas
- * comme du Twig. Une chaîne écrite en {{ }} ne produit ni erreur ni
- * avertissement : elle s’affiche telle quelle dans les listes du client.
+ * Deux erreurs de configuration ne produisent ici ni exception, ni
+ * avertissement : un type de champ que Cockpit ne connaît pas, et un gabarit
+ * d’affichage écrit en Twig. L’administration dégrade silencieusement son
+ * affichage, et c’est le client qui découvre l’écran incompréhensible.
  */
 final class ModelesTest extends TestCase
 {
-    /** @return array<string, string> chemin du champ => gabarit d’affichage */
-    private function gabarits(): array
+    /** @return array<string, array<string, mixed>> chemin du champ => sa déclaration */
+    private function champs(): array
     {
         $trouves = [];
 
@@ -28,10 +29,7 @@ final class ModelesTest extends TestCase
                 }
 
                 $ici = $chemin.'/'.$champ['name'];
-
-                if (isset($champ['opts']['display']) && is_string($champ['opts']['display'])) {
-                    $trouves[$ici] = $champ['opts']['display'];
-                }
+                $trouves[$ici] = $champ;
 
                 if (is_array($champ['opts']['fields'] ?? null)) {
                     $parcourir($champ['opts']['fields'], $ici);
@@ -50,12 +48,96 @@ final class ModelesTest extends TestCase
         return $trouves;
     }
 
+    /** @return array<string, string> chemin du champ => gabarit d’affichage */
+    private function gabarits(): array
+    {
+        $trouves = [];
+
+        foreach ($this->champs() as $chemin => $champ) {
+            if (isset($champ['opts']['display']) && is_string($champ['opts']['display'])) {
+                $trouves[$chemin] = $champ['opts']['display'];
+            }
+        }
+
+        return $trouves;
+    }
+
+    /**
+     * Les composants de champ que Cockpit enregistre côté navigateur.
+     *
+     * Ils se lisent dans l’installation, donc pas avant que
+     * bin/install-cockpit.php ait tourné.
+     *
+     * @return list<string>|null
+     */
+    private function composantsEnregistres(): ?array
+    {
+        $racine = dirname(__DIR__, 2).'/public/admin';
+
+        if (!is_dir($racine)) {
+            return null;
+        }
+
+        $noms = [];
+        $motifs = ['/modules/*/assets/*.js', '/modules/*/assets/js/*.js', '/addons/*/assets/js/*.js'];
+
+        foreach ($motifs as $motif) {
+            foreach (glob($racine.$motif) ?: [] as $fichier) {
+                preg_match_all(
+                    '/VueView\.component\(\s*[\'"]([a-zA-Z-]+)[\'"]/',
+                    (string) file_get_contents($fichier),
+                    $m,
+                );
+
+                foreach ($m[1] as $nom) {
+                    // Le moteur de rendu résout les deux formes : avec et sans
+                    // le préfixe « field- ».
+                    $noms[$nom] = true;
+
+                    if (str_starts_with($nom, 'field-')) {
+                        $noms[substr($nom, 6)] = true;
+                    }
+                }
+            }
+        }
+
+        return array_keys($noms);
+    }
+
     #[Test]
     public function le_parcours_des_modeles_trouve_des_gabarits(): void
     {
         // Sans ce contrôle, un parcours cassé rendrait les deux suivants verts
         // en n’examinant plus rien.
         $this->assertNotSame([], $this->gabarits(), 'aucun gabarit d’affichage trouvé dans cockpit/models/');
+    }
+
+    #[Test]
+    public function chaque_type_de_champ_correspond_a_un_composant(): void
+    {
+        $composants = $this->composantsEnregistres();
+
+        if ($composants === null) {
+            $this->markTestSkipped('Cockpit n’est pas installé : lancer php bin/install-cockpit.php');
+        }
+
+        // Si la lecture des composants cassait, la boucle ci-dessous
+        // n’examinerait plus rien et le test resterait vert.
+        $this->assertContains('wysiwyg', $composants, 'la lecture des composants de Cockpit ne renvoie plus rien d’attendu');
+
+        foreach ($this->champs() as $chemin => $champ) {
+            $type = $champ['type'] ?? null;
+
+            if (!is_string($type)) {
+                continue;
+            }
+
+            $this->assertContains(
+                $type,
+                $composants,
+                "{$chemin} : le type « {$type} » n’est enregistré par aucun composant — l’administration retombe sur un éditeur d’objet brut",
+            );
+        }
     }
 
     #[Test]

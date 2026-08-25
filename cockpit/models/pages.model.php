@@ -116,7 +116,7 @@ return [
                     ],
                     [
                         'name' => 'texte',
-                        'type' => 'richtext',
+                        'type' => 'wysiwyg',
                         'label' => 'Texte',
                         'info' => 'Le corps de la section.',
                         'width' => '1-1',

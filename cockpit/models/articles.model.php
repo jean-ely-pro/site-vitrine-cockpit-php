@@ -124,7 +124,7 @@ return [
         ],
         [
             'name' => 'contenu',
-            'type' => 'richtext',
+            'type' => 'wysiwyg',
             'label' => 'Texte',
             'info' => 'Le corps de l’actualité.',
             'required' => false,

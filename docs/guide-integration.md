@@ -148,7 +148,7 @@ Dans `cockpit/models/pages.model.php` :
 - déclarer les champs propres au type, chacun avec
   `'condition' => "data.type === 'mon-type'"`.
 
-Types de champ disponibles : `text`, `richtext`, `boolean`, `select`, `color`, `date`,
+Types de champ disponibles : `text`, `wysiwyg`, `boolean`, `select`, `color`, `date`,
 `datetime`, `number`, `asset`, `set`, `table`, `tags`, `contentItemLink`.
 
 **Un type inconnu ne provoque aucune erreur.** L'administration retombe sur un éditeur d'objet
@@ -268,7 +268,7 @@ Interdits : `opacity` sur du texte, polices distantes, contraste inférieur à 4
 ## Vérifier
 
 ```bash
-composer test                          # 188 tests, moins d’une seconde
+composer test                          # 189 tests, moins d’une seconde
 php bin/verifier-accessibilite.php     # sur le HTML réellement servi
 php bin/purge-cache.php                # après toute modification de gabarit ou de CSS
 ```
