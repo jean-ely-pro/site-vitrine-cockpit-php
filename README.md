@@ -241,7 +241,7 @@ que de devenir illisible, et l'administration le signale au moment de la saisie.
 composer test
 ```
 
-225 tests couvrent les garde-fous du produit : ce qui décide de ce qu'un visiteur reçoit, et
+229 tests couvrent les garde-fous du produit : ce qui décide de ce qu'un visiteur reçoit, et
 ce qui empêche le site d'être cassé depuis l'administration.
 
 | Ce qui est protégé | Exemples |
@@ -259,6 +259,7 @@ ce qui empêche le site d'être cassé depuis l'administration.
 | Brouillons | jamais demandés au service de contenu : seul l’état publié l’est |
 | Amorçage de l’administration | les classes et chemins cités par les addons existent bien |
 | Modèles de l’administration | types de champ réellement enregistrés, libellés de listes interpolés |
+| Types de section | chaque type proposé au client a son gabarit, et réciproquement |
 
 Les tests ne touchent pas au réseau et ne démarrent pas Cockpit : ils s'exécutent en moins
 d'une seconde. Un seul lit les fichiers de l'administration installée, pour confronter les

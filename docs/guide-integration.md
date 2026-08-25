@@ -180,6 +180,11 @@ Trois règles, chacune vérifiée par `composer test` :
 Ces chaînes sont évaluées comme des **gabarits JavaScript**, pas comme du Twig — d'où la
 première règle, qui ne produit ni erreur ni avertissement quand elle est enfreinte.
 
+Le type et son gabarit doivent porter **le même nom**. `composer test` refuse un type proposé
+dans l’administration sans gabarit — le client ajouterait une section qui n’apparaît pas — et
+un gabarit qu’aucune option ne permet de choisir. Une `condition` citant un type inexistant est
+refusée de même : ses champs ne s’afficheraient jamais.
+
 ### 3. Appliquer
 
 ```bash
@@ -293,7 +298,7 @@ Interdits : `opacity` sur du texte, polices distantes, contraste inférieur à 4
 ## Vérifier
 
 ```bash
-composer test                          # 225 tests, moins d’une seconde
+composer test                          # 229 tests, moins d’une seconde
 php bin/verifier-accessibilite.php     # sur le HTML réellement servi
 php bin/purge-cache.php                # après toute modification de gabarit ou de CSS
 ```
