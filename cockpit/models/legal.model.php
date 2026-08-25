@@ -90,7 +90,7 @@ return [
         // ── Compléments ───────────────────────────────────────────────────
         [
             'name' => 'complementMentions',
-            'type' => 'richtext',
+            'type' => 'wysiwyg',
             'label' => 'À ajouter aux mentions légales',
             'info' => 'Facultatif. Ce texte est ajouté à la fin de la page des mentions légales.',
             'required' => false,
@@ -102,7 +102,7 @@ return [
         ],
         [
             'name' => 'complementConfidentialite',
-            'type' => 'richtext',
+            'type' => 'wysiwyg',
             'label' => 'À ajouter à la politique de confidentialité',
             'info' => 'Facultatif. Ce texte est ajouté à la fin de la page de confidentialité.',
             'required' => false,

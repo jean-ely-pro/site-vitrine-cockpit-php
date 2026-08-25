@@ -41,7 +41,7 @@ final class Headings
             $multiple = !empty($field['multiple']);
             $value = $data[$name];
 
-            if ($type === 'richtext') {
+            if ($type === 'wysiwyg') {
 
                 if ($multiple && is_array($value)) {
                     $data[$name] = array_map(
