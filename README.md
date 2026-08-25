@@ -241,7 +241,7 @@ que de devenir illisible, et l'administration le signale au moment de la saisie.
 composer test
 ```
 
-210 tests couvrent les garde-fous du produit : ce qui décide de ce qu'un visiteur reçoit, et
+220 tests couvrent les garde-fous du produit : ce qui décide de ce qu'un visiteur reçoit, et
 ce qui empêche le site d'être cassé depuis l'administration.
 
 | Ce qui est protégé | Exemples |
@@ -251,6 +251,7 @@ ce qui empêche le site d'être cassé depuis l'administration.
 | Couleurs | une couleur sous 4,5:1 n'atteint jamais le site |
 | Référencement | horaires ambigus laissés de côté, aucun champ vide publié |
 | Aperçu partagé | adresse revendiquée absolue ou absente, jamais fausse ; image en adresse complète |
+| Site en ligne | l’adresse revendiquée est celle où la page répond — un SITE_URL erroné est signalé |
 | Accessibilité | chaque défaut détectable est vérifié sur une page fautive |
 | Mots de passe | longueur, variété, mots courants, nom du compte |
 | Niveaux de titre | corrigés à l'enregistrement, sections imbriquées comprises |
@@ -275,6 +276,10 @@ Le script lit **le HTML réellement servi** — cache compris — sur toutes les
 site : langue, titre unique, hiérarchie des titres, descriptions d'images, dimensions,
 intitulés de formulaire, ressources tierces, transparence sur du texte et contraste des
 couleurs. Aucune dépendance à installer.
+
+Il confronte aussi **l'adresse que chaque page revendique** à celle où elle vient d'être lue.
+C'est le seul contrôle qui attrape un `SITE_URL` erroné : la page se rend correctement, mais
+annonce aux moteurs et aux réseaux une adresse qui n'est pas la sienne.
 
 ## Sécurité
 

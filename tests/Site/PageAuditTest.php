@@ -43,6 +43,19 @@ final class PageAuditTest extends TestCase
     }
 
     #[Test]
+    public function le_lien_canonique_nest_pas_une_ressource_tierce(): void
+    {
+        // Il désigne une adresse, il n’en charge aucune. Ce qu’il annonce est
+        // vérifié par App\Seo\CanonicalAudit.
+        $html = $this->page(
+            '<h1>Titre</h1><p>Du texte.</p>',
+            tete: '<link rel="canonical" href="https://domaine.tld/services">',
+        );
+
+        $this->assertSame([], (new PageAudit())->problems($html));
+    }
+
+    #[Test]
     #[DataProvider('defauts')]
     public function un_defaut_est_signale(string $html, string $extraitAttendu): void
     {

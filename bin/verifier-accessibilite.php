@@ -19,9 +19,11 @@ if (PHP_SAPI !== 'cli') {
 $root = dirname(__DIR__);
 
 require_once "{$root}/src/Accessibility/PageAudit.php";
+require_once "{$root}/src/Seo/CanonicalAudit.php";
 require_once "{$root}/src/View/Colours.php";
 
 use App\Accessibility\PageAudit;
+use App\Seo\CanonicalAudit;
 use App\View\Colours;
 
 $base = rtrim($argv[1] ?? 'http://localhost:8080', '/');
@@ -147,7 +149,7 @@ function colourProblems(array $settings): array
 
 // ── Exécution ─────────────────────────────────────────────────────────────
 
-echo "\nVérification de l'accessibilité — {$base}\n\n";
+echo "\nVérification de l'accessibilité et du référencement — {$base}\n\n";
 
 $audit = new PageAudit();
 $pages = addresses($base);
@@ -164,7 +166,12 @@ foreach ($pages as $address) {
         continue;
     }
 
-    $problems = $audit->problems($page['corps']);
+    $problems = array_merge(
+        $audit->problems($page['corps']),
+        // Comparée à l'adresse d'où la page vient d'être lue, et non à celle
+        // que le site croit avoir : c'est ce désaccord même qu'on cherche.
+        CanonicalAudit::problems($page['corps'], $base.$path),
+    );
     $total += count($problems);
 
     printf("  %-40s %s\n", $path, $problems === [] ? 'conforme' : count($problems).' à corriger');

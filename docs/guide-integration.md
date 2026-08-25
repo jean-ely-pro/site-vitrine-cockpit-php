@@ -293,7 +293,7 @@ Interdits : `opacity` sur du texte, polices distantes, contraste inférieur à 4
 ## Vérifier
 
 ```bash
-composer test                          # 210 tests, moins d’une seconde
+composer test                          # 220 tests, moins d’une seconde
 php bin/verifier-accessibilite.php     # sur le HTML réellement servi
 php bin/purge-cache.php                # après toute modification de gabarit ou de CSS
 ```
@@ -301,7 +301,10 @@ php bin/purge-cache.php                # après toute modification de gabarit ou
 `verifier-accessibilite.php` contrôle : langue, titre, méta-description, `<main>`, titre
 principal unique, hiérarchie des titres, lien d'évitement, descriptions et dimensions
 d'images, intitulés de formulaire, ressources tierces, transparence sur du texte, contraste
-des couleurs.
+des couleurs, et **l'adresse revendiquée par chaque page**.
+
+Cette dernière est confrontée à l'adresse d'où la page vient d'être lue. Un écart signale un
+`SITE_URL` erroné — invisible autrement, puisque la page se rend parfaitement.
 
 ## Adresses réservées
 
