@@ -79,7 +79,7 @@ return [
             'group' => 'Contenu',
             'width' => '1-1',
             'opts' => [
-                'display' => '{{ data.titre }}',
+                'display' => '${data.titre || data.type || \'Section\'}',
                 'fields' => [
                     [
                         'name' => 'type',
@@ -194,7 +194,7 @@ return [
                         'width' => '1-1',
                         'condition' => $isTemoignages,
                         'opts' => [
-                            'display' => '{{ data.auteur }}',
+                            'display' => '${data.auteur || \'Témoignage\'}',
                             'fields' => [
                                 [
                                     'name' => 'citation',

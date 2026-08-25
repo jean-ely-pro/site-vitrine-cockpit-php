@@ -11,6 +11,9 @@
     --couleur-fond: #ffffff;
     --couleur-fond-doux: #f6f3f4;
     --couleur-trait: #d6dbe0;
+    /* Contrastes mesurés sur blanc : 6,5:1 et 9,1:1. */
+    --couleur-erreur: #b3261e;
+    --couleur-succes: #14532d;
     --largeur: 60rem;
 }
 
@@ -34,7 +37,9 @@ a {
 }
 
 a:focus-visible,
-button:focus-visible {
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
     outline: 3px solid var(--couleur-lien);
     outline-offset: 2px;
 }
@@ -436,4 +441,116 @@ address {
 
 .pied__liste li + li {
     margin-top: 0.25rem;
+}
+
+.pied__legal {
+    max-width: var(--largeur);
+    margin: 0 auto;
+    padding: 1rem 1.25rem 2rem;
+    border-top: 1px solid var(--couleur-trait);
+}
+
+.pied__liens-legaux {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 0.9375rem;
+}
+
+/* ── Formulaire ───────────────────────────────────────────────────────── */
+
+/* Champ-piège anti-spam : hors écran, mais toujours trouvé par les robots.
+   `display: none` le rendrait invisible aux robots, donc inopérant. */
+.formulaire__piege {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+.formulaire {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 34rem;
+    margin-top: 1.5rem;
+}
+
+.formulaire__champ {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0;
+}
+
+.formulaire label {
+    font-weight: 600;
+}
+
+.formulaire input[type="text"],
+.formulaire input[type="email"],
+.formulaire textarea {
+    width: 100%;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid var(--couleur-trait);
+    border-radius: 4px;
+    background: var(--couleur-fond);
+    color: var(--couleur-texte);
+    font: inherit;
+}
+
+.formulaire textarea {
+    resize: vertical;
+}
+
+.formulaire [aria-invalid="true"] {
+    border-color: var(--couleur-erreur);
+}
+
+.formulaire__erreur {
+    color: var(--couleur-erreur);
+    font-size: 0.9375rem;
+}
+
+.formulaire__consentement {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.5rem;
+    align-items: start;
+    margin: 0;
+}
+
+.formulaire__consentement label {
+    font-weight: 400;
+}
+
+.formulaire__consentement .formulaire__erreur {
+    grid-column: 2;
+}
+
+/* Le bouton d'envoi est un <button> : sans cela il garde la bordure et la
+   police du navigateur, contrairement aux liens portant la même classe. */
+button.bouton {
+    border: 0;
+    font: inherit;
+    cursor: pointer;
+}
+
+.message {
+    margin: 0 0 1.5rem;
+    padding: 0.75rem 1rem;
+    border-left: 4px solid;
+    border-radius: 4px;
+}
+
+.message--succes {
+    background: #eef6f0;
+    border-color: var(--couleur-succes);
+}
+
+.message--erreur {
+    background: #fdf1f0;
+    border-color: var(--couleur-erreur);
 }
