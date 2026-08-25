@@ -43,16 +43,42 @@ final class PageAuditTest extends TestCase
     }
 
     #[Test]
-    public function le_lien_canonique_nest_pas_une_ressource_tierce(): void
+    #[DataProvider('ressourcesTierces')]
+    public function une_ressource_venue_dailleurs_est_signalee(string $tete, string $corps): void
     {
-        // Il désigne une adresse, il n’en charge aucune. Ce qu’il annonce est
-        // vérifié par App\Seo\CanonicalAudit.
-        $html = $this->page(
-            '<h1>Titre</h1><p>Du texte.</p>',
-            tete: '<link rel="canonical" href="https://domaine.tld/services">',
-        );
+        $problemes = (new PageAudit())->problems($this->page($corps, tete: $tete));
 
-        $this->assertSame([], (new PageAudit())->problems($html));
+        $this->assertContains('ressource chargée depuis un autre site : cdn.exemple.net', $problemes);
+    }
+
+    /** @return array<string, array{string, string}> */
+    public static function ressourcesTierces(): array
+    {
+        return [
+            'image' => ['', '<h1>Titre</h1><img src="https://cdn.exemple.net/photo.jpg" alt="Une photo" width="8" height="8">'],
+            'script' => ['<script src="https://cdn.exemple.net/mesure.js"></script>', '<h1>Titre</h1>'],
+            'feuille de style' => ['<link rel="stylesheet" href="https://cdn.exemple.net/style.css">', '<h1>Titre</h1>'],
+            'police' => ['<link rel="preload" as="font" href="https://cdn.exemple.net/police.woff2">', '<h1>Titre</h1>'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('adressesSeulementNommees')]
+    public function une_adresse_seulement_nommee_nest_pas_une_ressource(string $tete, string $corps): void
+    {
+        // Ni l’un ni l’autre ne fait charger quoi que ce soit à la page. Un
+        // contrôle qui crie au loup sur le lien Facebook du pied de page finit
+        // par être ignoré, et les vraies ressources tierces passent avec.
+        $this->assertSame([], (new PageAudit())->problems($this->page($corps, tete: $tete)));
+    }
+
+    /** @return array<string, array{string, string}> */
+    public static function adressesSeulementNommees(): array
+    {
+        return [
+            'lien vers un réseau social' => ['', '<h1>Titre</h1><p>Suivez-nous sur <a href="https://www.facebook.com/atelier">Facebook</a>.</p>'],
+            'adresse revendiquée' => ['<link rel="canonical" href="https://domaine.tld/services">', '<h1>Titre</h1>'],
+        ];
     }
 
     #[Test]

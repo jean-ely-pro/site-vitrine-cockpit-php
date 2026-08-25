@@ -293,7 +293,7 @@ Interdits : `opacity` sur du texte, polices distantes, contraste inférieur à 4
 ## Vérifier
 
 ```bash
-composer test                          # 220 tests, moins d’une seconde
+composer test                          # 225 tests, moins d’une seconde
 php bin/verifier-accessibilite.php     # sur le HTML réellement servi
 php bin/purge-cache.php                # après toute modification de gabarit ou de CSS
 ```
@@ -305,6 +305,10 @@ des couleurs, et **l'adresse revendiquée par chaque page**.
 
 Cette dernière est confrontée à l'adresse d'où la page vient d'être lue. Un écart signale un
 `SITE_URL` erroné — invisible autrement, puisque la page se rend parfaitement.
+
+Une ressource tierce est ce que la page **fait charger** : image, script, feuille de style,
+police. Un lien vers un autre site n'en est pas une — le pied de page peut renvoyer aux
+réseaux sociaux du client sans que rien ne soit signalé.
 
 ## Adresses réservées
 
