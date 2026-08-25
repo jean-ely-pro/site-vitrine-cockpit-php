@@ -67,10 +67,16 @@ dossier qui contient `src/` — une seule ligne à changer.
 | `.git/` | historique du dépôt |
 | `docs/` | documentation |
 | `.env` | secrets — celui de l'hébergement est écrit à l'étape 4 |
+| `tests/`, `phpunit.xml` | ne s'exécutent jamais en production ; `--no-dev` a déjà retiré PHPUnit de `vendor/` |
 | `src/Audit/` **et** `bin/verifier-accessibilite.php` | contrôle avant mise en ligne, lancé depuis un poste de développement |
 
-Les deux derniers vont **ensemble** : le script ne se charge pas sans le dossier. Envoyer l'un
-sans l'autre laisse sur l'hébergement une commande qui s'arrête sur une erreur.
+`src/Audit/` et `bin/verifier-accessibilite.php` se retirent **ensemble** : le script ne se
+charge pas sans le dossier. Envoyer l'un sans l'autre laisse sur l'hébergement une commande qui
+s'arrête sur une erreur.
+
+**Règle générale** : ce que `.gitignore` exclut n'a rien à faire sur l'hébergement — à deux
+exceptions près, `vendor/` et `public/admin/`, produits par les commandes de l'étape 2 et donc
+absents du dépôt mais indispensables en ligne.
 
 ### Droits d'écriture
 
