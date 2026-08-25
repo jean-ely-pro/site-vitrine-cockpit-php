@@ -52,7 +52,7 @@ Ne recopier que ce que vous modifiez réellement, et relire ce qui a changé en 
 mise à jour :
 
 ```bash
-git log --oneline upstream/main -- templates/
+git log --oneline socle/main -- templates/
 ```
 
 Pour du CSS, la question ne se pose pas : `client.css` s'ajoute, il ne remplace rien.
@@ -62,20 +62,8 @@ se modifie sur place — c'est le seul fichier partagé, et les conflits y sont 
 
 ## Récupérer une correction du socle
 
-À la première installation du site :
-
-```bash
-git remote add upstream https://github.com/jean-ely-pro/site-vitrine-cockpit-php.git
-```
-
-Puis à chaque correction à récupérer :
-
-```bash
-git fetch upstream
-git merge upstream/main
-composer test
-php bin/purge-cache.php
-```
+La procédure complète est dans [mise-a-jour-socle.md](mise-a-jour-socle.md) : déclaration du
+dépôt distant `socle`, première fusion, fusions suivantes, commandes à passer après.
 
 Si un conflit apparaît sur un fichier de `templates/` ou sur `site.css`, c'est que la règle
 ci-dessus n'a pas été suivie : déplacer la personnalisation du côté `templates-client/`.
@@ -161,9 +149,36 @@ Dans `cockpit/models/pages.model.php` :
   `'condition' => "data.type === 'mon-type'"`.
 
 Types de champ disponibles : `text`, `richtext`, `boolean`, `select`, `color`, `date`,
-`datetime`, `number`, `asset`, `set`, `table`, `tags`, `content-item-link`.
+`datetime`, `number`, `asset`, `set`, `table`, `tags`, `contentItemLink`.
+
+**Un type inconnu ne provoque aucune erreur.** L'administration retombe sur un éditeur d'objet
+brut, et le client se retrouve à saisir du JSON à la main. Les noms ci-dessus sont ceux sous
+lesquels Cockpit enregistre ses composants — les recopier tels quels, casse comprise.
 
 Contenu répétable : un champ `set` avec `'multiple' => true` et `opts.fields`.
+
+### Le libellé des entrées répétables
+
+Un `set` en `'multiple' => true` affiche chaque entrée dans une liste. `opts.display` décide de
+ce qui y est écrit.
+
+```php
+'opts' => [
+    'display' => '${data.titre || \'Section\'}',
+    'fields' => [ /* … */ ],
+],
+```
+
+Trois règles, chacune vérifiée par `composer test` :
+
+| Règle | Sans elle |
+|---|---|
+| Écrire `${…}`, jamais `{{ … }}` | l'administration affiche `{{ data.titre }}` tel quel |
+| Prévoir un repli avec `\|\|` | un champ vide affiche `undefined` |
+| Guillemets simples dans le repli | le libellé d'un `contentItemLink` casse l'attribut HTML |
+
+Ces chaînes sont évaluées comme des **gabarits JavaScript**, pas comme du Twig — d'où la
+première règle, qui ne produit ni erreur ni avertissement quand elle est enfreinte.
 
 ### 3. Appliquer
 
@@ -220,7 +235,7 @@ Variables disponibles :
 ```css
 --couleur-texte        --couleur-texte-doux    --couleur-lien
 --couleur-fond         --couleur-fond-doux     --couleur-trait
---largeur
+--couleur-erreur       --couleur-succes        --largeur
 ```
 
 ### Classes des sections livrées
@@ -237,6 +252,10 @@ De quoi styler sans copier aucun gabarit.
 | `temoignages` | `bloc-temoignages`, `__introduction`, `temoignage`, `__contenu`, `__fonction` |
 | commun | `bouton`, `message`, `message--succes`, `message--erreur` |
 
+Le formulaire, les messages de retour et le bouton ont une base sobre dans `site.css` :
+champs, libellés, états d'erreur. Elle est là pour qu'un site livré sans habillage reste
+utilisable — `client.css` la remplace librement.
+
 Structure du site : `en-tete`, `en-tete__nom`, `en-tete__slogan`, `menu`, `menu__liste`,
 `pied`, `pied__colonnes`, `pied__titre`, `pied__liens-legaux`, `lien-evitement`,
 `page__titre`, `actualites`, `actualite-resume`, `actualite__meta`.
@@ -249,7 +268,7 @@ Interdits : `opacity` sur du texte, polices distantes, contraste inférieur à 4
 ## Vérifier
 
 ```bash
-composer test                          # 161 tests, moins d’une seconde
+composer test                          # 188 tests, moins d’une seconde
 php bin/verifier-accessibilite.php     # sur le HTML réellement servi
 php bin/purge-cache.php                # après toute modification de gabarit ou de CSS
 ```
@@ -283,8 +302,8 @@ Pages écrites par le site, non modifiables depuis l'administration :
 
 ## Plusieurs sites
 
-Un site = un dépôt, avec ce socle en `upstream`. Voir « Récupérer une correction du socle »
-plus haut.
+Un site = un dépôt, avec ce socle en dépôt distant `socle`. Voir
+[mise-a-jour-socle.md](mise-a-jour-socle.md).
 
 Un type de section qui revient sur plusieurs sites a sa place dans le socle : déplacer le
 fichier de `templates-client/blocs/` vers `templates/blocs/`, avec ses champs et ses styles.
