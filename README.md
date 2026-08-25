@@ -307,8 +307,12 @@ quels. Ils ne sont convertis en données structurées que lorsqu'ils se lisent s
 
 ## Documentation
 
+Le sommaire ordonné par situation est dans [docs/README.md](docs/README.md).
+
 - [Architecture du site public](docs/architecture.md) — trajet d'une requête, rôle de chaque
   dossier, où intervenir, décisions structurantes
+- [Créer un site et le tenir à jour](docs/mise-a-jour-socle.md) — créer le dépôt depuis le
+  socle, récupérer les corrections par fusion
 - [Intégrer une maquette](docs/guide-integration.md) — pour le développeur : types de section,
   contrat du partial, images, CSS, vérifications, pièges
 - [Ce que le client peut faire](docs/guide-client.md) — modèles de page, menu, actualités,
