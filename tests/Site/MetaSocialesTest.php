@@ -6,6 +6,7 @@ namespace Tests\Site;
 
 use App\Media\MediaUrls;
 use App\Media\Picture;
+use App\Seo\CanonicalAudit;
 use App\Seo\SocialMeta;
 use App\View\SiteExtension;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -118,6 +119,88 @@ final class MetaSocialesTest extends TestCase
 
         $this->assertStringNotContainsString('content="noindex"', $html);
         $this->assertStringContainsString('<link rel="canonical" href="https://exemple.fr/actualites">', $html);
+    }
+
+    // ── L’adresse revendiquée par le site en ligne ────────────────────────
+
+    private function servie(string $canonical = '', bool $noindex = false): string
+    {
+        return '<!doctype html><html lang="fr"><head>'
+            .($noindex ? '<meta name="robots" content="noindex">' : '')
+            .($canonical === '' ? '' : '<link rel="canonical" href="'.$canonical.'">')
+            .'</head><body></body></html>';
+    }
+
+    #[Test]
+    public function une_page_qui_revendique_son_adresse_ne_pose_aucun_probleme(): void
+    {
+        $this->assertSame([], CanonicalAudit::problems(
+            $this->servie('https://domaine.tld/services'),
+            'https://domaine.tld/services',
+        ));
+    }
+
+    #[Test]
+    public function une_adresse_manquante_renvoie_a_la_configuration(): void
+    {
+        // Le cas réel : SITE_URL absente du .env de l'hébergement. Invisible
+        // depuis les gabarits, qui n'ont pas de configuration.
+        $problemes = CanonicalAudit::problems($this->servie(), 'https://domaine.tld/services');
+
+        $this->assertCount(1, $problemes);
+        $this->assertStringContainsString('SITE_URL', $problemes[0]);
+    }
+
+    #[Test]
+    public function une_adresse_qui_designe_un_autre_hote_est_signalee(): void
+    {
+        // L'autre cas réel : le site livré garde le SITE_URL d'une préproduction.
+        $problemes = CanonicalAudit::problems(
+            $this->servie('https://preprod.domaine.tld/services'),
+            'https://domaine.tld/services',
+        );
+
+        $this->assertCount(1, $problemes);
+        $this->assertStringContainsString('preprod.domaine.tld', $problemes[0]);
+        $this->assertStringContainsString('https://domaine.tld/services', $problemes[0]);
+    }
+
+    #[Test]
+    public function une_adresse_relative_est_signalee(): void
+    {
+        $problemes = CanonicalAudit::problems($this->servie('/services'), 'https://domaine.tld/services');
+
+        $this->assertCount(1, $problemes);
+        $this->assertStringContainsString('relative', $problemes[0]);
+    }
+
+    #[Test]
+    public function une_page_en_noindex_ne_doit_rien_revendiquer(): void
+    {
+        $this->assertSame([], CanonicalAudit::problems($this->servie('', true), 'https://domaine.tld/introuvable'));
+
+        $this->assertCount(1, CanonicalAudit::problems(
+            $this->servie('https://domaine.tld/introuvable', true),
+            'https://domaine.tld/introuvable',
+        ));
+    }
+
+    #[Test]
+    #[DataProvider('memeAdresseEcriteAutrement')]
+    public function la_meme_adresse_ecrite_autrement_ne_compte_pas_comme_un_ecart(string $revendiquee, string $servie): void
+    {
+        $this->assertSame([], CanonicalAudit::problems($this->servie($revendiquee), $servie));
+    }
+
+    /** @return array<string, array{string, string}> */
+    public static function memeAdresseEcriteAutrement(): array
+    {
+        return [
+            'barre finale' => ['https://domaine.tld/services', 'https://domaine.tld/services/'],
+            'hôte en majuscules' => ['https://Domaine.TLD/services', 'https://domaine.tld/services'],
+            'racine' => ['https://domaine.tld/', 'https://domaine.tld/'],
+            'port' => ['http://localhost:8080/services', 'http://localhost:8080/services'],
+        ];
     }
 
     // ── L’aperçu ──────────────────────────────────────────────────────────

@@ -167,6 +167,12 @@ final class PageAudit
 
         foreach ($xpath->query('//*[@src or @href]') as $node) {
 
+            // The canonical link loads nothing: it names an address. What it
+            // says is checked by App\Seo\CanonicalAudit.
+            if ($node->nodeName === 'link' && strtolower($node->getAttribute('rel')) === 'canonical') {
+                continue;
+            }
+
             $url = $node->getAttribute('src') ?: $node->getAttribute('href');
 
             if (preg_match('#^https?://#', $url) !== 1) {
