@@ -241,7 +241,7 @@ que de devenir illisible, et l'administration le signale au moment de la saisie.
 composer test
 ```
 
-220 tests couvrent les garde-fous du produit : ce qui décide de ce qu'un visiteur reçoit, et
+225 tests couvrent les garde-fous du produit : ce qui décide de ce qu'un visiteur reçoit, et
 ce qui empêche le site d'être cassé depuis l'administration.
 
 | Ce qui est protégé | Exemples |
