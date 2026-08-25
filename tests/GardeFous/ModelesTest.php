@@ -104,12 +104,106 @@ final class ModelesTest extends TestCase
         return array_keys($noms);
     }
 
+    /** @return list<string> Les types de section proposés au client. */
+    private function typesProposes(): array
+    {
+        $champ = $this->champs()['pages/blocs/type'] ?? null;
+        $valeurs = [];
+
+        foreach ((is_array($champ) ? $champ['opts']['options'] ?? [] : []) as $option) {
+            $valeur = is_array($option) ? ($option['value'] ?? '') : $option;
+
+            if (is_string($valeur) && $valeur !== '') {
+                $valeurs[] = $valeur;
+            }
+        }
+
+        return $valeurs;
+    }
+
+    /** @return list<string> Les types de section qui ont un gabarit. */
+    private function typesRendus(): array
+    {
+        $racine = dirname(__DIR__, 2);
+        $trouves = [];
+
+        // Les deux dossiers que le site consulte au rendu, dans le même ordre
+        // que App\Content\Blocks.
+        foreach (['/templates/blocs', '/templates-client/blocs'] as $dossier) {
+            foreach (glob($racine.$dossier.'/*.html.twig') ?: [] as $gabarit) {
+                $trouves[basename($gabarit, '.html.twig')] = true;
+            }
+        }
+
+        return array_keys($trouves);
+    }
+
     #[Test]
     public function le_parcours_des_modeles_trouve_des_gabarits(): void
     {
         // Sans ce contrôle, un parcours cassé rendrait les deux suivants verts
         // en n’examinant plus rien.
         $this->assertNotSame([], $this->gabarits(), 'aucun gabarit d’affichage trouvé dans cockpit/models/');
+    }
+
+    #[Test]
+    public function les_types_de_section_sont_trouves(): void
+    {
+        // Un parcours cassé rendrait les trois contrôles suivants verts en
+        // ne comparant plus que des listes vides.
+        $this->assertNotSame([], $this->typesProposes(), 'aucun type de section trouvé dans pages.model.php');
+        $this->assertNotSame([], $this->typesRendus(), 'aucun gabarit de section trouvé dans templates/blocs/');
+    }
+
+    #[Test]
+    public function chaque_type_propose_au_client_a_son_gabarit(): void
+    {
+        foreach ($this->typesProposes() as $type) {
+            $this->assertContains(
+                $type,
+                $this->typesRendus(),
+                "« {$type} » est proposé dans l’administration mais aucun gabarit ne le rend : le client ajoute une section qui n’apparaît pas sur sa page",
+            );
+        }
+    }
+
+    #[Test]
+    public function chaque_gabarit_est_proposable_au_client(): void
+    {
+        foreach ($this->typesRendus() as $type) {
+            $this->assertContains(
+                $type,
+                $this->typesProposes(),
+                "le gabarit « {$type} » existe mais n’est proposé nulle part dans l’administration : personne ne peut s’en servir",
+            );
+        }
+    }
+
+    #[Test]
+    public function les_conditions_ne_citent_que_des_types_existants(): void
+    {
+        // Une condition qui nomme un type disparu ou mal orthographié cache
+        // ses champs pour toujours, sans rien dire.
+        $proposes = $this->typesProposes();
+
+        foreach ($this->champs() as $chemin => $champ) {
+
+            $condition = $champ['condition'] ?? null;
+
+            if (!is_string($condition) || !str_contains($condition, 'data.type')) {
+                continue;
+            }
+
+            preg_match_all("/'([^']+)'/", $condition, $cites);
+
+            foreach ($cites[1] as $type) {
+                $this->assertContains(
+                    $type,
+                    $proposes,
+                    "{$chemin} n’apparaît que pour le type « {$type} », qui n’est proposé nulle part",
+                );
+            }
+        }
     }
 
     #[Test]
