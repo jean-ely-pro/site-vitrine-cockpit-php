@@ -61,8 +61,16 @@ dossier qui contient `src/` — une seule ligne à changer.
 
 ### Ne pas envoyer
 
-`var/`, `.git/`, `docs/`, `.env` : données d'exécution, historique, documentation et secrets
-n'ont rien à faire sur l'hébergement du client.
+| Chemin | Pourquoi |
+|---|---|
+| `var/` | données d'exécution — recréé sur place |
+| `.git/` | historique du dépôt |
+| `docs/` | documentation |
+| `.env` | secrets — celui de l'hébergement est écrit à l'étape 4 |
+| `src/Audit/` **et** `bin/verifier-accessibilite.php` | contrôle avant mise en ligne, lancé depuis un poste de développement |
+
+Les deux derniers vont **ensemble** : le script ne se charge pas sans le dossier. Envoyer l'un
+sans l'autre laisse sur l'hébergement une commande qui s'arrête sur une erreur.
 
 ### Droits d'écriture
 
@@ -201,4 +209,4 @@ continuent de recevoir l'ancienne mise en page.
 | `php bin/purge-cache.php` | après un envoi de fichiers |
 | `php bin/generer-variantes.php` | après un changement de largeurs d'images |
 | `php bin/message-test.php` | vérifier que les e-mails partent |
-| `php bin/verifier-accessibilite.php` | avant chaque mise en ligne |
+| `php bin/verifier-accessibilite.php` | avant chaque mise en ligne — **depuis un poste de développement**, avec l'adresse du site |
