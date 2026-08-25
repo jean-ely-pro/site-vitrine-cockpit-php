@@ -6,11 +6,15 @@
     'conseil': 'Conseil'
 } %}
 
+{% set resume = 'Les dernières actualités' ~ (site.nom ? ' de ' ~ site.nom : '') ~ '.' %}
+
+{# Nothing published yet: the page stays reachable, but has nothing to index —
+   and nothing to claim as its own address either. #}
+{% set canonique = articles is empty ? null : canonique|default(null) %}
+
 {% block title %}Actualités{% if site.nom %} — {{ site.nom }}{% endif %}{% endblock %}
 
 {% block head %}
-    <meta name="description" content="Les dernières actualités{% if site.nom %} de {{ site.nom }}{% endif %}.">
-    {# Nothing published yet: the page stays reachable, but has nothing to index. #}
     {% if articles is empty %}<meta name="robots" content="noindex">{% endif %}
 {% endblock %}
 

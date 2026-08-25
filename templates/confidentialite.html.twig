@@ -6,11 +6,9 @@
 
 {% set duree = legal.dureeConservation|default('12 mois') %}
 
-{% block title %}Politique de confidentialité{% if site.nom %} — {{ site.nom }}{% endif %}{% endblock %}
+{% set resume = 'Ce que deviennent les informations transmises par le formulaire de contact.' %}
 
-{% block head %}
-    <meta name="description" content="Ce que deviennent les informations transmises par le formulaire de contact.">
-{% endblock %}
+{% block title %}Politique de confidentialité{% if site.nom %} — {{ site.nom }}{% endif %}{% endblock %}
 
 {% block main %}
     <article class="page page--legale">

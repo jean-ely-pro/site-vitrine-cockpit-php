@@ -1,0 +1,41 @@
+{# What a search engine and a social network read about this page.
+
+   Every value here is one the page already uses: the title comes from the
+   rendered <title>, the description from `resume`. Two sources for the same
+   sentence would drift apart at the first correction.
+
+   `canonique` is set to null by pages that must not be indexed: an address
+   claimed by a page that asks not to be indexed contradicts itself. #}
+
+{# The site-wide image first, so a link to any page carries the same face; the
+   page's own image when none was chosen; the logo as a last resort. #}
+{% set assetPartage = site.imagePartage|default(null) ?: imagePartage|default(null) ?: site.logo|default(null) %}
+{% set urlPartage = assetPartage ? image_absolue(assetPartage) : null %}
+{% if resume|default('') %}
+    <meta name="description" content="{{ resume }}">
+{% endif %}
+{% if canonique|default('') %}
+    <link rel="canonical" href="{{ canonique }}">
+    <meta property="og:url" content="{{ canonique }}">
+{% endif %}
+    <meta property="og:type" content="{{ typePartage|default('website') }}">
+    <meta property="og:title" content="{{ titrePartage }}">
+{% if resume|default('') %}
+    <meta property="og:description" content="{{ resume }}">
+{% endif %}
+{% if site.nom|default('') %}
+    <meta property="og:site_name" content="{{ site.nom }}">
+{% endif %}
+    <meta property="og:locale" content="fr_FR">
+{% if urlPartage %}
+    <meta property="og:image" content="{{ urlPartage }}">
+    {% if assetPartage == imagePartage|default(null) and imagePartageAlt|default('') %}
+    <meta property="og:image:alt" content="{{ imagePartageAlt }}">
+    {% endif %}
+    <meta name="twitter:card" content="summary_large_image">
+{% else %}
+    <meta name="twitter:card" content="summary">
+{% endif %}
+{% if datePartage|default('') %}
+    <meta property="article:published_time" content="{{ datePartage }}">
+{% endif %}

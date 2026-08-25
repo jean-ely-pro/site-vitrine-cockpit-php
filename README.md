@@ -241,7 +241,7 @@ que de devenir illisible, et l'administration le signale au moment de la saisie.
 composer test
 ```
 
-189 tests couvrent les garde-fous du produit : ce qui décide de ce qu'un visiteur reçoit, et
+210 tests couvrent les garde-fous du produit : ce qui décide de ce qu'un visiteur reçoit, et
 ce qui empêche le site d'être cassé depuis l'administration.
 
 | Ce qui est protégé | Exemples |
@@ -250,6 +250,7 @@ ce qui empêche le site d'être cassé depuis l'administration.
 | Formulaire de contact | consentement jamais supposé, retour toujours sur le site, anti-spam, limite par adresse |
 | Couleurs | une couleur sous 4,5:1 n'atteint jamais le site |
 | Référencement | horaires ambigus laissés de côté, aucun champ vide publié |
+| Aperçu partagé | adresse revendiquée absolue ou absente, jamais fausse ; image en adresse complète |
 | Accessibilité | chaque défaut détectable est vérifié sur une page fautive |
 | Mots de passe | longueur, variété, mots courants, nom du compte |
 | Niveaux de titre | corrigés à l'enregistrement, sections imbriquées comprises |
@@ -293,9 +294,15 @@ Tout est détaillé dans [docs/securite.md](docs/securite.md), avec les commande
 
 ## Référencement
 
-Chaque page porte son propre `<title>` et sa méta-description, et le site publie
-`/sitemap.xml` et `/robots.txt`. L'établissement est décrit en JSON-LD `LocalBusiness` à
-partir de l'identité, des coordonnées et des horaires.
+Chaque page porte son propre `<title>`, sa méta-description et **l'adresse qu'elle revendique**
+(`rel="canonical"`), et le site publie `/sitemap.xml` et `/robots.txt`. L'établissement est
+décrit en JSON-LD `LocalBusiness` à partir de l'identité, des coordonnées et des horaires.
+
+**Un lien partagé affiche un aperçu maîtrisé.** Les balises Open Graph et la carte Twitter
+reprennent le titre et la description de la page — jamais une seconde version qui dériverait —
+et une image en adresse complète : l'*Image de partage* de l'identité du site, à défaut l'image
+de la page, à défaut le logo. Rien n'est revendiqué quand `SITE_URL` est absente ou ne
+ressemble pas à une adresse : un canonique faux envoie moteurs et réseaux ailleurs.
 
 **Les horaires sont saisis en texte libre** — « 9h – 12h, 14h – 18h30 » — et affichés tels
 quels. Ils ne sont convertis en données structurées que lorsqu'ils se lisent sans ambiguïté ;

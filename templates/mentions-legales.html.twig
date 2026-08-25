@@ -3,11 +3,9 @@
 {# Built from the site identity and the legal notices, never typed twice:
    a SIRET that appears in two places is a SIRET that ends up wrong in one. #}
 
-{% block title %}Mentions légales{% if site.nom %} — {{ site.nom }}{% endif %}{% endblock %}
+{% set resume = 'Éditeur, hébergeur et informations légales' ~ (site.nom ? ' de ' ~ site.nom : '') ~ '.' %}
 
-{% block head %}
-    <meta name="description" content="Éditeur, hébergeur et informations légales{% if site.nom %} de {{ site.nom }}{% endif %}.">
-{% endblock %}
+{% block title %}Mentions légales{% if site.nom %} — {{ site.nom }}{% endif %}{% endblock %}
 
 {% block main %}
     <article class="page page--legale">

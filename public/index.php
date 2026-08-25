@@ -119,6 +119,7 @@ $context = new ViewContext(
     $media,
     new Colours(__DIR__.'/assets/css/couleurs.css'),
     $siteUrl,
+    $homePageSlug,
 );
 
 $page = new PageAction(

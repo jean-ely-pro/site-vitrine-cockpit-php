@@ -58,6 +58,18 @@ return [
             'opts' => ['filter' => ['type' => 'image']],
         ],
         [
+            'name' => 'imagePartage',
+            'type' => 'asset',
+            'label' => 'Image de partage',
+            'info' => "Apparaît quand un lien du site est partagé sur les réseaux sociaux ou dans une messagerie. Format paysage, au moins 1200 × 630 pixels. Vide, l'image de la page est reprise, puis le logo.",
+            'required' => false,
+            'localize' => false,
+            'multiple' => false,
+            'group' => 'Identité',
+            'width' => '1-2',
+            'opts' => ['filter' => ['type' => 'image']],
+        ],
+        [
             'name' => 'description',
             'type' => 'text',
             'label' => 'Description du site',
