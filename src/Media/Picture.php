@@ -25,6 +25,17 @@ final class Picture
     /** Width a browser without `srcset` support should end up loading. */
     private const FALLBACK_WIDTH = 960;
 
+    /**
+     * The address of the original, written in full.
+     *
+     * Social networks and messaging apps fetch preview images from their own
+     * servers: a path relative to the site means nothing to them.
+     */
+    public function absolute(mixed $asset): ?string
+    {
+        return $this->urls->absoluteUrl($asset);
+    }
+
     public function from(mixed $asset): ?array
     {
         $original = $this->urls->url($asset);

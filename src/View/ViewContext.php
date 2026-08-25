@@ -8,6 +8,7 @@ use App\Contact\ContactForm;
 use App\Content\Repository;
 use App\Media\MediaUrls;
 use App\Seo\LocalBusiness;
+use App\Seo\SocialMeta;
 use App\View\Colours;
 
 /**
@@ -24,6 +25,7 @@ final class ViewContext
         private readonly MediaUrls $media,
         private readonly Colours $colours,
         private readonly string $siteUrl,
+        private readonly string $homePageSlug = 'accueil',
     ) {
     }
 
@@ -45,11 +47,25 @@ final class ViewContext
             'menu' => $this->content->menu(),
             'afficherActualites' => $this->content->hasArticles(),
             'slug' => $slug,
+            'canonique' => SocialMeta::canonical($this->siteUrl, $this->path($slug)),
             'jsonld' => $this->jsonLd($settings),
             'contactActif' => $this->contactForm->isConfigured(),
             'jetonContact' => $this->contactForm->stamp(),
             'formulaire' => [],
         ], $extra);
+    }
+
+    /**
+     * Where a page is served, given the slug it is stored under.
+     *
+     * The home page answers at the root, not at its slug — the address the
+     * page claims must be the one visitors reach.
+     */
+    private function path(string $slug): string
+    {
+        $slug = trim($slug, '/');
+
+        return $slug === '' || $slug === $this->homePageSlug ? '/' : '/'.$slug;
     }
 
     /**

@@ -1,5 +1,8 @@
 {% extends 'base.html.twig' %}
 
+{# A page that does not exist claims no address of its own. #}
+{% set canonique = null %}
+
 {% block title %}Page introuvable{% if site.nom is defined and site.nom %} — {{ site.nom }}{% endif %}{% endblock %}
 
 {% block head %}

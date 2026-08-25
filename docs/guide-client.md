@@ -58,6 +58,15 @@ L'onglet *Référencement* porte deux champs, chacun avec son compteur de caract
 
 Pour une actualité, c'est le champ *Résumé* qui joue ce rôle.
 
+## L'aperçu quand un lien est partagé
+
+*Identité du site → Image de partage*. C'est l'image qui s'affiche quand une page du site est
+partagée sur les réseaux sociaux ou envoyée dans une messagerie. Format paysage, au moins
+1200 × 630 pixels.
+
+Vide, l'image de la page partagée est reprise ; à défaut, le logo. Le titre et le résumé de
+l'aperçu sont ceux de la page : il n'y a rien de plus à saisir.
+
 ## L'éditeur de texte
 
 Il ne propose que ce que la structure du site autorise : **Titre 2**, **Titre 3**, gras,

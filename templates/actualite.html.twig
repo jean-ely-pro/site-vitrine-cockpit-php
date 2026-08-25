@@ -6,11 +6,13 @@
     'conseil': 'Conseil'
 } %}
 
-{% block title %}{{ article.titre }}{% if site.nom %} — {{ site.nom }}{% endif %}{% endblock %}
+{% set resume = article.resume|default('') %}
+{% set typePartage = 'article' %}
+{% set datePartage = article.date|default('') %}
+{% set imagePartage = article.image|default(null) %}
+{% set imagePartageAlt = article.alt|default('') %}
 
-{% block head %}
-    {% if article.resume %}<meta name="description" content="{{ article.resume }}">{% endif %}
-{% endblock %}
+{% block title %}{{ article.titre }}{% if site.nom %} — {{ site.nom }}{% endif %}{% endblock %}
 
 {% block main %}
     <article class="actualite">

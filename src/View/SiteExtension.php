@@ -25,6 +25,7 @@ final class SiteExtension extends AbstractExtension
     {
         return [
             new TwigFunction('image', $this->picture->from(...)),
+            new TwigFunction('image_absolue', $this->picture->absolute(...)),
             new TwigFunction('tel_href', $this->telHref(...)),
         ];
     }

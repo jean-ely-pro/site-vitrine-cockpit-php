@@ -8,13 +8,13 @@
 {% set premierBloc = page.blocs|first %}
 {% set titreDansBandeau = premierBloc and premierBloc.type == 'hero' %}
 
+{# The banner image stands for the page when a link to it is shared. #}
+{% set imagePartage = titreDansBandeau ? premierBloc.image|default(null) : null %}
+{% set imagePartageAlt = titreDansBandeau ? premierBloc.alt|default('') : '' %}
+
 {# The site name is appended only when the title does not already carry it,
    so a hand-written SEO title never reads « … Bloom — Bloom ». #}
 {% block title %}{{ titreOnglet }}{% if site.nom and site.nom not in titreOnglet %} — {{ site.nom }}{% endif %}{% endblock %}
-
-{% block head %}
-    {% if resume %}<meta name="description" content="{{ resume }}">{% endif %}
-{% endblock %}
 
 {% block main %}
     {% if not titreDansBandeau %}

@@ -225,6 +225,31 @@ Vérifiées automatiquement. Les ignorer fait échouer `composer test` ou
 
 Copies produites : 480, 960 et 1440 px en WebP, jamais plus larges que l'original.
 
+Pour une image destinée à sortir du site — aperçu de partage, données structurées —
+`image_absolue(asset)` rend l'adresse complète. Les réseaux et les moteurs vont chercher
+l'image depuis leurs propres serveurs : un chemin relatif ne leur dit rien.
+
+## Référencement et aperçu partagé
+
+`partials/meta-sociales.html.twig` est inclus dans le `<head>` de toutes les pages. Il produit
+la méta-description, le lien canonique, les balises Open Graph et la carte Twitter. **Il n'y a
+rien à inclure soi-même** : un gabarit règle son aperçu en posant des variables.
+
+| Variable | Effet | Par défaut |
+|---|---|---|
+| `resume` | méta-description **et** `og:description` | vide, aucune des deux |
+| `imagePartage` | image de la page, prise si l'identité du site n'en fournit pas | aucune |
+| `imagePartageAlt` | `og:image:alt`, seulement si l'image vient de la page | vide |
+| `typePartage` | `og:type` | `website` |
+| `datePartage` | `article:published_time` | absente |
+| `canonique` | adresse revendiquée — **mettre à `null` sur une page en `noindex`** | fournie par le site |
+
+Le titre de l'aperçu n'est pas une variable : il reprend le `<title>` rendu. Une seconde
+version dériverait de la première à la première correction.
+
+`canonique` vaut `null` d'office quand `SITE_URL` est absente ou ne ressemble pas à une
+adresse. Rien n'est alors revendiqué — un canonique faux envoie moteurs et réseaux ailleurs.
+
 ## CSS
 
 Tout dans `public/assets/css/client.css`. Nommer les classes d'après le partial :
@@ -268,7 +293,7 @@ Interdits : `opacity` sur du texte, polices distantes, contraste inférieur à 4
 ## Vérifier
 
 ```bash
-composer test                          # 189 tests, moins d’une seconde
+composer test                          # 210 tests, moins d’une seconde
 php bin/verifier-accessibilite.php     # sur le HTML réellement servi
 php bin/purge-cache.php                # après toute modification de gabarit ou de CSS
 ```

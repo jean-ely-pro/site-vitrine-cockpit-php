@@ -5,6 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{{ site.nom|default('Site') }}{% endblock %}</title>
+    {# Passed in rather than recomputed: the preview title must be the title. #}
+    {% include 'partials/meta-sociales.html.twig' with { titrePartage: block('title') } %}
     {% block head %}{% endblock %}
     <link rel="stylesheet" href="/assets/css/site.css">
     {# This site's own styles, loaded after so they take precedence. Edit that
