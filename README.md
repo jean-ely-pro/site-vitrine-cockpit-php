@@ -60,7 +60,7 @@ cette structure sont décrits dans [docs/architecture.md](docs/architecture.md).
 
 **Socle et personnalisation sont séparés.** Un gabarit placé dans `templates-client/` remplace
 celui de `templates/` sans le modifier, et `client.css` est chargé après `site.css`. Une
-correction du socle se récupère alors par `git merge upstream/main` sans conflit sur la
+correction du socle se récupère alors par `git merge socle/main` sans conflit sur la
 maquette — voir [docs/guide-integration.md](docs/guide-integration.md).
 
 Cockpit n'est **pas versionné** : `bin/install-cockpit.php` télécharge l'archive officielle
@@ -241,7 +241,7 @@ que de devenir illisible, et l'administration le signale au moment de la saisie.
 composer test
 ```
 
-179 tests couvrent les garde-fous du produit : ce qui décide de ce qu'un visiteur reçoit, et
+188 tests couvrent les garde-fous du produit : ce qui décide de ce qu'un visiteur reçoit, et
 ce qui empêche le site d'être cassé depuis l'administration.
 
 | Ce qui est protégé | Exemples |
@@ -256,6 +256,7 @@ ce qui empêche le site d'être cassé depuis l'administration.
 | Descriptions d’images | exigées dès qu’une image est posée, jamais sans image |
 | Brouillons | jamais demandés au service de contenu : seul l’état publié l’est |
 | Amorçage de l’administration | les classes et chemins cités par les addons existent bien |
+| Modèles de l’administration | libellés des listes réellement interpolés, jamais affichés bruts |
 
 Les tests ne touchent ni au réseau ni à Cockpit : ils s'exécutent en moins d'une seconde, sans
 rien installer d'autre. Ils ne remplacent pas la vérification ci-dessous, qui lit le site réel.
