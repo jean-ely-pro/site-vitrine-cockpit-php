@@ -182,7 +182,7 @@ return [
             'group' => 'Réseaux',
             'width' => '1-1',
             'opts' => [
-                'display' => '{{ data.nom }}',
+                'display' => '${data.nom || \'Réseau\'}',
                 'fields' => [
                     [
                         'name' => 'nom',

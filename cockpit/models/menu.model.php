@@ -31,7 +31,7 @@ return [
             'group' => null,
             'width' => '1-1',
             'opts' => [
-                'display' => '{{ data.libelle }}',
+                'display' => '${data.libelle || \'Entrée sans libellé\'}',
                 'fields' => [
                     [
                         'name' => 'libelle',
@@ -43,12 +43,12 @@ return [
                     ],
                     [
                         'name' => 'page',
-                        'type' => 'content-item-link',
+                        'type' => 'contentItemLink',
                         'label' => 'Page',
                         'info' => 'La page vers laquelle le lien conduit.',
                         'required' => true,
                         'width' => '1-2',
-                        'opts' => ['link' => 'pages', 'display' => '{{ data.titre }}'],
+                        'opts' => ['link' => 'pages', 'display' => '${data.titre || \'Page sans titre\'}'],
                     ],
                 ],
             ],
