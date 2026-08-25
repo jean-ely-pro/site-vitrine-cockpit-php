@@ -73,7 +73,7 @@ La structure est **figée** : le client remplit le contenu, il ne crée ni colle
 
 | Élément | Type | Contenu |
 |---|---|---|
-| `settings` | singleton | identité, couleurs, coordonnées, horaires, réseaux |
+| `settings` | singleton | identité, couleurs, coordonnées, horaires, réseaux, image de partage |
 | `pages` | collection | titre, adresse, sections, référencement |
 | `articles` | collection | titre, adresse, date, catégorie, résumé, image, texte |
 | `menu` | singleton | entrées ordonnées, chacune pointant sur une page |
@@ -146,7 +146,7 @@ Détails dans [docs/medias.md](docs/medias.md) — point focal, alerte de poids,
 
 ## Sections de page
 
-Une page est une suite de **sections**. Trois types sont fournis :
+Une page est une suite de **sections**. Cinq types sont fournis :
 
 | Type | Rôle | Champs propres |
 |---|---|---|
@@ -162,17 +162,19 @@ Cockpit et styles, avec les règles à respecter. Voir
 
 ### Ajouter un type de section
 
-1. Créer `templates/blocs/mon-type.html.twig`. Le partial reçoit `bloc` (les valeurs
-   saisies), `site` (l'identité), `titre`, `niveau` (1 ou 2, pour la balise de titre) et
-   `premier` (vrai pour la première section de la page).
+1. Créer le partial. Sur le site d'un client : `templates-client/blocs/mon-type.html.twig`.
+   Dans le socle, pour un type livré à tous les sites : `templates/blocs/mon-type.html.twig`.
+   Le partial reçoit `bloc` (les valeurs saisies), `site` (l'identité), `titre`, `niveau`
+   (1 ou 2, pour la balise de titre) et `premier` (vrai pour la première section de la page).
 2. Ajouter `mon-type` à la liste du champ « Type de section » dans
    `cockpit/models/pages.model.php`, puis les champs qui lui sont propres, chacun avec une
    `condition` du genre `data.type === 'mon-type'` — c'est elle qui n'affiche ces champs que
    pour ce type.
 3. `php bin/install-cockpit.php --force`
 
-Rien d'autre à déclarer : un type existe dès qu'un partial porte son nom. Une section dont le
-type n'a pas de partial n'est simplement pas affichée.
+**Les deux premières étapes vont ensemble.** Le nom du fichier est le nom du type, et
+`composer test` refuse qu'ils se séparent : un type proposé au client sans partial ajoute à sa
+page une section qui n'apparaît pas, un partial sans option ne peut être choisi par personne.
 
 Marche à suivre détaillée, contrat du partial, règles et pièges :
 [docs/guide-integration.md](docs/guide-integration.md).

@@ -87,7 +87,7 @@ dossier ne dépend de `Controller`.
 
 | Besoin | Fichier à ouvrir |
 |---|---|
-| Ajouter un type de section | `templates/blocs/`, puis `cockpit/models/pages.model.php` — voir [guide-integration.md](guide-integration.md) |
+| Ajouter un type de section | `templates-client/blocs/` sur un site, `templates/blocs/` dans le socle, puis `cockpit/models/pages.model.php` — voir [guide-integration.md](guide-integration.md) |
 | Changer l'apparence | `templates-client/`, `public/assets/css/client.css` |
 | Ajouter une adresse | `src/Http/Route.php`, puis un `Action` dans `src/Controller/` |
 | Changer ce que reçoivent **tous** les gabarits | `src/View/ViewContext.php` |
