@@ -58,7 +58,7 @@ final class DependancesTest extends TestCase
     {
         // Ce sont les briques réutilisables : elles se testent seules, sans
         // rien monter autour. Leur donner une dépendance leur ferait perdre ça.
-        $isoles = ['Accessibility', 'Cache', 'Cockpit', 'Http', 'Media', 'Seo'];
+        $isoles = ['Audit', 'Cache', 'Cockpit', 'Http', 'Media', 'Seo'];
 
         $dependances = $this->dependances();
 

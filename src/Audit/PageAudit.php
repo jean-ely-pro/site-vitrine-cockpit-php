@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Accessibility;
+namespace App\Audit;
 
 use DOMDocument;
 use DOMElement;

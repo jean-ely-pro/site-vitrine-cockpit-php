@@ -73,10 +73,13 @@ s'occupe, pas ce qu'il est.
 | `Media/` | adresses d'images, `srcset`, dimensions | rien |
 | `Seo/` | JSON-LD `LocalBusiness`, horaires, plan du site | rien |
 | `Cache/` | écrire et purger les pages statiques | rien |
-| `Accessibility/` | contrôler le HTML réellement servi (`bin/verifier-accessibilite.php`) | rien |
+| `Audit/` | contrôler le HTML réellement servi — **hors du service d’une page** | rien |
 
 Le tableau est trié : ce qui dépend le plus est en haut, ce qui ne dépend de rien en bas. Les
-cinq derniers dossiers s'utilisent isolément et se testent sans rien monter autour.
+six derniers dossiers s'utilisent isolément et se testent sans rien monter autour.
+
+`Audit/` est le seul dossier que le site n'ouvre jamais : ses classes ne servent qu'à
+`bin/verifier-accessibilite.php`, avant une mise en ligne.
 
 `Application.php` est à la racine de `src/` : il n'appartient à aucun sujet, il les relie.
 
@@ -128,6 +131,16 @@ sujet : créer un dossier qui le nomme.
 Même raison. « Ce qui est central » n'est pas un sujet : le dossier finit par contenir ce
 qu'on n'a pas su classer. `Application.php` est seul à la racine de `src/` parce qu'il relie
 les sujets sans en traiter aucun.
+
+### Ce qui vérifie un site est séparé de ce qui le sert
+
+`Audit/` réunit les classes qui ne tournent qu'avant une mise en ligne. Classées par sujet
+elles étaient dispersées — l'accessibilité d'un côté, le référencement de l'autre — alors
+qu'elles partagent le seul trait qui compte pour situer du code : elles ne s'exécutent jamais
+quand un visiteur demande une page.
+
+Une classe va dans `Audit/` si le site ne l'ouvre pas. Sinon elle va dans le dossier de son
+sujet.
 
 ### L'accès à l'API passe par une interface
 

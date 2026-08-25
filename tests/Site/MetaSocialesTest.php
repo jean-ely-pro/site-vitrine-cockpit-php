@@ -6,7 +6,7 @@ namespace Tests\Site;
 
 use App\Media\MediaUrls;
 use App\Media\Picture;
-use App\Seo\CanonicalAudit;
+use App\Audit\CanonicalAudit;
 use App\Seo\SocialMeta;
 use App\View\SiteExtension;
 use PHPUnit\Framework\Attributes\DataProvider;

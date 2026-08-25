@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Seo;
+namespace App\Audit;
 
 /**
  * The address a served page claims, checked against the one it answers on.
