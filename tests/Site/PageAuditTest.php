@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Site;
 
-use App\Accessibility\PageAudit;
+use App\Audit\PageAudit;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
