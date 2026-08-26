@@ -31,9 +31,12 @@ final class ViewContext
 
     /**
      * @param array<string, mixed> $extra What this page adds to the common set.
+     * @param string|null $path Where this page is served, when that is not the
+     *                          slug itself: a news item is reached under the
+     *                          news slug, but claims an address of its own.
      * @return array<string, mixed>
      */
-    public function forPage(string $slug, array $extra = []): array
+    public function forPage(string $slug, array $extra = [], ?string $path = null): array
     {
         $settings = $this->content->settings();
 
@@ -46,8 +49,10 @@ final class ViewContext
             'site' => $settings,
             'menu' => $this->content->menu(),
             'afficherActualites' => $this->content->hasArticles(),
+            // The slug drives the menu's active entry; the path drives the
+            // address the page claims. They part company on a news item.
             'slug' => $slug,
-            'canonique' => SocialMeta::canonical($this->siteUrl, $this->path($slug)),
+            'canonique' => SocialMeta::canonical($this->siteUrl, $path ?? $this->path($slug)),
             'jsonld' => $this->jsonLd($settings),
             'contactActif' => $this->contactForm->isConfigured(),
             'jetonContact' => $this->contactForm->stamp(),

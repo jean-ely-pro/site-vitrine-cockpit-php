@@ -54,6 +54,7 @@ final class NewsAction
             $this->twig->render('actualite.html.twig', $this->context->forPage(
                 trim(Route::NEWS, '/'),
                 ['article' => $article],
+                Route::NEWS.'/'.$slug,
             )),
             200,
             Response::cacheable('text/html; charset=utf-8'),
