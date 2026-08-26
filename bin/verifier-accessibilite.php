@@ -114,6 +114,31 @@ function stylesheetProblems(string $root): array
 }
 
 /**
+ * The customer's colours, once written to the file the browser loads.
+ *
+ * Written on the first render after a purge, so by the time the pages above
+ * have been fetched it is there — unless the folder is not writable. Nothing
+ * else reports that: the page asks for a stylesheet that answers 404 and
+ * quietly keeps the default colours.
+ *
+ * @return list<string>
+ */
+function colourSheetProblems(string $base): array
+{
+    $code = fetch("{$base}/assets/css/couleurs.css")['code'];
+
+    if ($code === 200) {
+        return [];
+    }
+
+    return [sprintf(
+        'la feuille des couleurs répond %d : « public/assets/css/ » n’est pas inscriptible '
+        .'par le serveur, et le site garde ses couleurs par défaut',
+        $code,
+    )];
+}
+
+/**
  * @param array<string, mixed> $settings
  * @return list<string>
  */
@@ -182,7 +207,7 @@ foreach ($pages as $address) {
 }
 
 // Checks that belong to the site as a whole rather than to one page.
-$global = stylesheetProblems($root);
+$global = array_merge(stylesheetProblems($root), colourSheetProblems($base));
 
 $apiUrl = env($root, 'COCKPIT_API_URL');
 $apiKey = env($root, 'COCKPIT_API_KEY');

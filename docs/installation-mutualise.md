@@ -74,21 +74,29 @@ dossier qui contient `src/` — une seule ligne à changer.
 charge pas sans le dossier. Envoyer l'un sans l'autre laisse sur l'hébergement une commande qui
 s'arrête sur une erreur.
 
-**Règle générale** : ce que `.gitignore` exclut n'a rien à faire sur l'hébergement — à deux
+**Règle générale** : ce que `.gitignore` exclut n'a rien à faire dans l'envoi — à deux
 exceptions près, `vendor/` et `public/admin/`, produits par les commandes de l'étape 2 et donc
-absents du dépôt mais indispensables en ligne.
+absents du dépôt mais indispensables en ligne. Ce qui s'écrit tout seul sur l'hébergement —
+`var/`, les pages en cache, `couleurs.css` — n'est jamais envoyé non plus.
 
 ### Droits d'écriture
 
-Trois dossiers doivent être inscriptibles par le serveur :
+Quatre dossiers doivent être inscriptibles par le serveur :
 
 ```
 var/                          base de données et caches
 public/cache/                 pages mises en cache
+public/assets/css/            couleurs choisies dans l'administration
 public/admin/storage/         médias et copies allégées
 ```
 
 En général `755` suffit ; certains hébergeurs demandent `775`.
+
+`public/assets/css/` surprend, puisqu'il contient déjà des fichiers envoyés avec le site : le
+site y écrit `couleurs.css` au premier rendu, à partir des couleurs choisies par le client, et
+l'efface à chaque purge. Sans droit d'écriture, **rien ne le signale** — les pages réclament
+une feuille de style qui répond 404, et le site s'affiche avec les couleurs par défaut.
+L'étape 8 le vérifie.
 
 ## 4. Renseigner la configuration
 
