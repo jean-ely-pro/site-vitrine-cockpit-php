@@ -12,11 +12,75 @@ Avant toute chose, dans le panneau de l'hébergeur :
 | Version de PHP | **8.3** ou plus |
 | Extensions | `pdo_sqlite`, `gd`, `curl`, `fileinfo`, `zip` |
 | Certificat HTTPS | actif sur le domaine |
+| Processus PHP simultanés | **2 au minimum** — voir ci-dessous |
 | Racine du site | modifiable, si possible |
 
 La plupart des hébergeurs permettent de choisir la version de PHP et d'activer des extensions
 depuis leur panneau. Si `pdo_sqlite` manque et ne peut pas être activée, **cet hébergement ne
 convient pas** : c'est la base de données du site.
+
+### Processus PHP simultanés — le critère le moins évident
+
+Le site est rendu côté serveur et lit son contenu **par une requête HTTP vers son propre
+domaine**. Servir une page occupe donc un processus PHP, qui en réclame aussitôt un second pour
+se répondre à lui-même.
+
+Un hébergement limité à **un seul** processus ne peut rendre aucune page : l'appel imbriqué
+attend un processus occupé à l'attendre, expire au bout de cinq secondes, et le visiteur reçoit
+« Site momentanément indisponible ». Le formulaire de contact échoue pour la même raison.
+
+Rien ne le signale à l'installation, et le montage de développement ne le révèle pas non plus :
+`composer serve` et `composer serve-admin` lancent deux serveurs indépendants, donc l'appel
+traverse deux jeux de processus distincts et ne peut jamais s'auto-bloquer. **Ce point ne se
+découvre qu'en ligne.**
+
+Pour le mesurer, déposer ce fichier à la racine du site — puis le supprimer :
+
+```php
+<?php sleep(3); echo "ok\n";
+```
+
+```bash
+time ( for i in 1 2 3 4; do curl -s https://domaine-du-client.tld/t.php & done; wait )
+```
+
+Environ **3 secondes** : quatre processus au moins, l'hébergement convient. Environ **12
+secondes** : un seul, et le site ne fonctionnera pas tant que la limite n'est pas relevée.
+
+### Hébergeur vérifié
+
+**alwaysdata, offre gratuite** — convient, à une condition.
+
+| Point | Résultat |
+|---|---|
+| PHP 8.3 et les cinq extensions | disponibles |
+| Racine du site | réglable : la pointer sur `site/public`, le reste du projet restant hors de la racine web |
+| Accès SSH | inclus — `git clone` et les scripts de `bin/` fonctionnent |
+| Processus PHP | **1 par défaut : à corriger avant tout** |
+
+Apache y est servi par `mod_fcgid`, configuré à un seul processus :
+
+```
+FcgidMaxProcesses 1
+```
+
+Le relever dans *Web → Configuration → Apache → **Directives globales d'Apache*** :
+
+```apache
+FcgidMaxProcesses 4
+```
+
+La portée **globale** est indispensable : `FcgidMaxProcesses` n'est admise ni dans un
+`<VirtualHost>` ni dans un `<Directory>`. Posée au mauvais niveau, elle est ignorée ou empêche
+Apache de redémarrer.
+
+Vérifier ensuite, **pendant** le chargement d'une page :
+
+```bash
+ps -u $USER -o pid,etime,args | grep '[p]hp-cgi'
+```
+
+Plusieurs lignes `php-cgi` confirment que la limite est levée.
 
 ## 2. Préparer l'envoi, en local
 
