@@ -12,6 +12,15 @@ qu'il prend pour un socle recopié chez chaque client :
 La version installée est inscrite dans le fichier `VERSION`, à la racine. La procédure de
 fusion est dans [docs/mise-a-jour-socle.md](docs/mise-a-jour-socle.md).
 
+## 2.0.1 — 2026-09-01
+
+Documentation seule. Rien à faire sur un site existant au-delà de la fusion.
+
+- Procédure de retour à la version précédente, sous 2.0.0 : annulation de la fusion,
+  identification du commit à annuler, sort des adresses d'images déjà publiées.
+- Le tableau des rangs, en tête de ce journal, annonce désormais que toute version majeure
+  décrit aussi son retour arrière.
+
 ## 2.0.0 — 2026-09-01
 
 Les médias quittent le dossier de l'administration.
