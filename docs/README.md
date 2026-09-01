@@ -37,6 +37,7 @@ Les documents se lisent par situation, dans l'ordre donné ci-dessous.
 
 | Document | Contenu |
 |---|---|
+| [../CHANGELOG.md](../CHANGELOG.md) | ce que chaque version apporte et ce qu'elle demande |
 | [mise-a-jour-socle.md](mise-a-jour-socle.md) | récupérer les corrections du socle |
 | [installation-mutualise.md](installation-mutualise.md#mettre-à-jour) | mettre à jour Cockpit et PHP chez le client |
 | [securite.md](securite.md#à-vérifier-sur-chaque-installation) | contrôles à repasser après chaque mise à jour |
