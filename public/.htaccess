@@ -20,6 +20,11 @@ AddDefaultCharset UTF-8
     RewriteCond %{HTTP_HOST} !\.(local|test)$ [NC]
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
+    # Nothing under the admin's storage is public: media are served from
+    # /medias. Said here rather than only inside public/admin/, whose own rules
+    # live in hidden files that an upload can silently leave behind.
+    RewriteRule ^admin/storage(/|$) - [F,L]
+
     # The admin and its API ship their own rules: never rewrite them here, and
     # never serve them from the cache.
     RewriteRule ^admin(/|$) - [L]

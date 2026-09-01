@@ -115,7 +115,7 @@ ou `htdocs` selon les cas), et tout le reste **au-dessus**, hors du dossier publ
 
 ```
 compte/
-├── public_html/   ← contenu de public/ : index.php, .htaccess, assets/, admin/
+├── public_html/   ← contenu de public/ : index.php, .htaccess, assets/, medias/, admin/
 ├── src/  templates/  vendor/  cockpit/  bin/
 └── var/
 ```
@@ -143,15 +143,20 @@ exceptions près, `vendor/` et `public/admin/`, produits par les commandes de l'
 absents du dépôt mais indispensables en ligne. Ce qui s'écrit tout seul sur l'hébergement —
 `var/`, les pages en cache, `couleurs.css` — n'est jamais envoyé non plus.
 
+`public/medias/` relève des deux : son contenu s'écrit sur place et ne s'envoie pas, mais
+**`public/medias/.htaccess` doit partir avec le site**. C'est lui qui ouvre le dossier à la
+consultation et refuse tout fichier exécutable qui s'y trouverait.
+
 ### Droits d'écriture
 
-Quatre dossiers doivent être inscriptibles par le serveur :
+Cinq dossiers doivent être inscriptibles par le serveur :
 
 ```
 var/                          base de données et caches
 public/cache/                 pages mises en cache
 public/assets/css/            couleurs choisies dans l'administration
-public/admin/storage/         médias et copies allégées
+public/medias/                images envoyées et copies allégées
+public/admin/storage/         caches et fichiers temporaires de l'administration
 ```
 
 En général `755` suffit ; certains hébergeurs demandent `775`.
@@ -171,7 +176,7 @@ remplir :
 APP_ENV=prod
 SITE_URL=https://domaine-du-client.tld
 COCKPIT_API_URL=https://domaine-du-client.tld/admin/api
-MEDIA_BASE_URL=/admin/storage/uploads
+MEDIA_BASE_URL=/medias
 HOME_PAGE_SLUG=accueil
 PAGE_CACHE=
 ```
@@ -244,7 +249,7 @@ la notification par e-mail part réellement.
 Chaque installation se met à jour séparément. Tenir la liste des sites livrés, avec pour chacun
 la version de Cockpit installée et la date de la dernière mise à jour.
 
-1. **Sauvegarder** `var/` et `public/admin/storage/` — base de données et médias.
+1. **Sauvegarder** `var/` et `public/medias/` — base de données et médias.
 2. En local, changer la version et l'empreinte dans `bin/install-cockpit.php`, puis
    `php bin/install-cockpit.php --force`.
 3. Envoyer `public/admin/` en écrasant, **sauf `public/admin/storage/` et

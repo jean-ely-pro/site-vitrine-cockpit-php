@@ -33,7 +33,7 @@ Changer alors le port dans `composer.json` (`serve`, `serve-admin`) **et** dans 
 | `COCKPIT_API_URL` | Adresse de l'API de contenu, terminée par `/api`. |
 | `COCKPIT_API_KEY` | Clé de lecture, écrite par `bin/cockpit-init.php`. Elle n'autorise aucune écriture. |
 | `SITE_URL` | Adresse publique du site. Sert au plan du site et aux données structurées, qui exigent des adresses complètes. |
-| `MEDIA_BASE_URL` | Où sont servies les images. En développement l'administration a son propre port, d'où une adresse complète ; en production, `/admin/storage/uploads`. |
+| `MEDIA_BASE_URL` | Où sont servies les images — `public/medias/`, sous la racine du site. En développement, une adresse complète sur le port du **site** (8080), pour que l'administration, servie sur 8090, affiche ses aperçus ; en production, `/medias`. |
 | `HOME_PAGE_SLUG` | Adresse de la page servie à la racine du site. |
 
 ## Le point d'entrée sert aussi de routeur en développement
@@ -133,9 +133,12 @@ curl -s -o /dev/null -w '%{http_code}\n' -H "api-key: LA_CLE" http://localhost:8
 
 `200` attendu. `412` signale une clé inconnue, `401` un rôle sans droit de lecture.
 
-**L'administration affiche « Something broke ».** Un dossier d'exécution manque sous
-`public/admin/storage` (`cache`, `tmp/thumbs`, `uploads`). Relancer
+**L'administration affiche « Something broke ».** Un dossier d'exécution manque : `cache` ou
+`tmp/thumbs` sous `public/admin/storage`, ou `public/medias`. Relancer
 `php bin/install-cockpit.php --force`, qui les recrée.
+
+`public/medias` est le plus sensible des trois : Cockpit le cherche sur le disque et abandonne
+s'il ne le trouve pas.
 
 **Des fichiers disparaissent pendant l'installation.** Un antivirus supprime les scripts PHP
 qui écrivent des fichiers, et les `index.php` placés dans un dossier `admin`. Ajouter une
