@@ -12,6 +12,25 @@ qu'il prend pour un socle recopié chez chaque client :
 La version installée est inscrite dans le fichier `VERSION`, à la racine. La procédure de
 fusion est dans [docs/mise-a-jour-socle.md](docs/mise-a-jour-socle.md).
 
+## 2.0.5 — 2026-09-02
+
+Documentation seule. Rien à faire sur un site existant au-delà de la fusion.
+
+`docs/mise-a-jour-socle.md` restructuré : la mise à jour d'un site, qui se fait souvent, passe
+en tête ; l'installation d'un nouveau site, qui se fait une fois, la suit. Les règles de
+version, jusque-là en préambule, sont ramenées à l'endroit où l'on choisit une étiquette.
+
+Une consigne était fausse et l'est restée depuis la 1.0.0 : `php bin/install-cockpit.php
+--force` n'était présenté comme nécessaire que si la version de Cockpit avait changé. Il l'est
+en réalité après **toute** fusion touchant `cockpit/` — configuration, modèles ou addons — car
+`public/admin/` n'est pas versionné et le script s'arrête sans rien faire quand la version
+installée correspond. La condition est supprimée : les quatre commandes d'après-fusion se
+lancent désormais sans se poser de question.
+
+Ajouts : comment lire la version installée, comment lister les étiquettes du socle sans celles
+du site, le traitement des conflits lors d'une mise à jour courante, et la distinction entre la
+mise à jour du dépôt et celle du site en ligne.
+
 ## 2.0.4 — 2026-09-01
 
 Documentation seule. Rien à faire sur un site existant au-delà de la fusion.
