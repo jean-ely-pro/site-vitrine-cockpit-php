@@ -21,6 +21,10 @@ Lire le journal **avant** de fusionner un changement de rang majeur : l'interven
 hors ligne, elle ne s'improvise pas sur un site en service. Chaque version majeure y décrit
 aussi le retour à la version précédente.
 
+Une étiquette ne se pose pas à chaque fusion sur le socle : plusieurs correctifs peuvent
+attendre la même. On en ajoute une quand il y a quelque chose qu'un site doit pouvoir
+reprendre — c'est l'étiquette, et non la branche, qui est l'unité livrée.
+
 ## 1. Créer le dépôt du site
 
 Sur GitHub, ouvrir le dépôt socle et cliquer **Use this template → Create a new repository**.
