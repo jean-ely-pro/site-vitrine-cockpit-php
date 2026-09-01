@@ -171,4 +171,7 @@ Le sommaire ordonné par situation est dans [docs/README.md](docs/README.md).
 
 ## Licence
 
-Propriétaire — tous droits réservés.
+Propriétaire — tous droits réservés. Conditions dans [LICENSE](LICENSE).
+
+Les composants tiers — Cockpit et les dépendances Composer — restent régis par leur propre
+licence, rappelée dans le même fichier.

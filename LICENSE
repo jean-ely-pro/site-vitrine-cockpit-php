@@ -1,0 +1,46 @@
+Licence propriétaire
+
+Copyright (c) 2026 Jean-Ely Gendrau. Tous droits réservés.
+
+
+CONDITIONS
+
+Ce logiciel et sa documentation sont la propriété exclusive du titulaire des
+droits nommé ci-dessus. Ils ne sont publiés sous aucune licence libre ni open
+source.
+
+Sauf autorisation écrite et préalable du titulaire des droits, il est interdit
+de :
+
+  - copier, reproduire ou distribuer tout ou partie de ce logiciel ;
+  - le modifier, l'adapter ou en tirer une oeuvre dérivée ;
+  - le concéder, le louer, le vendre ou le mettre à la disposition d'un tiers ;
+  - le déployer pour le compte d'un tiers.
+
+La publication du code sur un dépôt consultable ne vaut pas concession de
+droits.
+
+
+COMPOSANTS TIERS
+
+Ce dépôt s'appuie sur des composants qui ne sont pas couverts par la présente
+licence et restent régis par la leur. Aucun n'est versionné ici : ils sont
+installés par « composer install » et « php bin/install-cockpit.php », et le
+texte de leur licence est livré avec eux.
+
+  Cockpit CMS                       MIT            public/admin/
+  twig/twig                         BSD-3-Clause   vendor/
+  vlucas/phpdotenv                  BSD-3-Clause   vendor/
+  symfony/polyfill-ctype            MIT            vendor/
+  symfony/polyfill-mbstring         MIT            vendor/
+  symfony/polyfill-php80            MIT            vendor/
+  symfony/deprecation-contracts     MIT            vendor/
+  graham-campbell/result-type       MIT            vendor/
+  phpoption/phpoption               Apache-2.0     vendor/
+
+
+ABSENCE DE GARANTIE
+
+Le logiciel est fourni « en l'état », sans garantie d'aucune sorte, expresse ou
+implicite. Le titulaire des droits ne saurait être tenu responsable d'un
+dommage résultant de son utilisation.
