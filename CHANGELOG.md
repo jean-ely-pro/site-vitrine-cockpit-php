@@ -12,6 +12,19 @@ qu'il prend pour un socle recopié chez chaque client :
 La version installée est inscrite dans le fichier `VERSION`, à la racine. La procédure de
 fusion est dans [docs/mise-a-jour-socle.md](docs/mise-a-jour-socle.md).
 
+## 2.0.3 — 2026-09-01
+
+Le `robots.txt` public n'annonce plus l'emplacement de l'administration.
+
+- `Disallow: /admin` retiré du `robots.txt` généré. Ce fichier est public et figure parmi les
+  premières adresses demandées par un outil de reconnaissance ; la directive y donnait
+  l'adresse du panneau, tout en interdisant l'exploration et non l'indexation.
+- `public/.htaccess` envoie `X-Robots-Tag: noindex, nofollow` sur la zone d'administration.
+  L'instruction n'est reçue que par le robot qui demande la page.
+
+Rien à faire sur un site existant au-delà de la fusion et de la purge du cache, qui suit toute
+fusion.
+
 ## 2.0.2 — 2026-09-01
 
 Documentation seule. Rien à faire sur un site existant au-delà de la fusion.

@@ -156,11 +156,14 @@ final class SeoTest extends TestCase
     }
 
     #[Test]
-    public function le_fichier_dindexation_ecarte_ladministration(): void
+    public function le_fichier_dindexation_ne_nomme_pas_ladministration(): void
     {
         $robots = Sitemap::robotsTxt('https://exemple.fr');
 
-        $this->assertStringContainsString('Disallow: /admin', $robots);
+        // Ce fichier est public : y écrire l'adresse du panneau la donnerait à
+        // quiconque le demande. L'indexation est refusée par un en-tête, dans
+        // public/.htaccess.
+        $this->assertStringNotContainsString('admin', $robots);
         $this->assertStringContainsString('Sitemap: https://exemple.fr/sitemap.xml', $robots);
     }
 }

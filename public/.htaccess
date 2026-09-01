@@ -107,6 +107,12 @@ AddDefaultCharset UTF-8
     Header always set Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; font-src 'self'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'" env=!ADMIN_AREA
     Header always set X-Frame-Options "DENY" env=!ADMIN_AREA
 
+    # Keeps the admin out of search results. Said here rather than in
+    # robots.txt: that file is public, so naming /admin there would hand its
+    # address to anyone reading it — and a Disallow line forbids crawling, not
+    # indexing. This header is sent only to the robot that asked for the page.
+    Header always set X-Robots-Tag "noindex, nofollow" env=ADMIN_AREA
+
 </IfModule>
 
 <IfModule mod_expires.c>

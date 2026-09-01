@@ -137,10 +137,17 @@ curl -sI http://domaine.tld/ | head -2                # 301 vers https
 curl -sI https://domaine.tld/ | grep -i content-security
 curl -sI https://domaine.tld/admin/storage/ | head -1 # 403, jamais 200
 curl -s https://domaine.tld/ | grep -c 'admin/storage' # 0 : aucune page ne nomme l'admin
+curl -s https://domaine.tld/robots.txt | grep -c admin # 0 : ni le fichier d'indexation
+curl -sI https://domaine.tld/admin | grep -i x-robots  # noindex, nofollow
 ```
 
 Les médias sont servis depuis `/medias`, sous la racine du site. Rien sous `/admin` n'a à
 répondre autrement que par la page de connexion.
+
+**L'administration est tenue hors des résultats de recherche par un en-tête**, non par une
+ligne dans `robots.txt`. Ce fichier est public : y nommer `/admin` reviendrait à en donner
+l'adresse à qui la cherche, et une directive `Disallow` interdit l'exploration, pas
+l'indexation. L'en-tête n'est envoyé qu'au robot qui demande la page.
 
 Puis, dans l'administration : double authentification active sur chaque compte, et aucune clé
 d'API dont l'usage n'est pas connu.
