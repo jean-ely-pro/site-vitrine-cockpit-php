@@ -3,29 +3,138 @@
 Un site client est créé depuis le dépôt socle, puis vit dans son propre dépôt. Les corrections
 apportées au socle se récupèrent ensuite par fusion, site par site.
 
-## Versions du socle
+Deux situations, dans l'ordre où elles se présentent le plus souvent : mettre à jour un site
+qui existe, et en installer un nouveau.
 
-Chaque état publié du socle porte une étiquette Git — `v1.0.0`, `v1.1.0`, `v2.0.0` — et le
-fichier `VERSION`, à la racine, indique celle qui est installée. Ce que chaque version apporte
-est dans [CHANGELOG.md](../CHANGELOG.md).
+## Mettre à jour un site
 
-Le rang qui change annonce ce que la fusion va demander :
+Tout se passe dans le dépôt du site, sur un poste de développement. La mise en ligne vient
+après, à l'étape 6.
 
-| Rang | Exemple | Ce que le site doit faire |
-|---|---|---|
-| **MAJEUR** | `1.4.0` → `2.0.0` | une intervention manuelle — déplacer des fichiers, modifier `.env`, migrer des données. La marche à suivre est donnée sous la version dans le journal. |
-| **MINEUR** | `1.3.0` → `1.4.0` | rien de plus que la fusion |
-| **CORRECTIF** | `1.3.0` → `1.3.1` | rien de plus que la fusion |
+### 1. Voir où en est le site
 
-Lire le journal **avant** de fusionner un changement de rang majeur : l'intervention se prépare
-hors ligne, elle ne s'improvise pas sur un site en service. Chaque version majeure y décrit
-aussi le retour à la version précédente.
+```bash
+cd <site-client>
+cat VERSION
+```
 
-Une étiquette ne se pose pas à chaque fusion sur le socle : plusieurs correctifs peuvent
-attendre la même. On en ajoute une quand il y a quelque chose qu'un site doit pouvoir
-reprendre — c'est l'étiquette, et non la branche, qui est l'unité livrée.
+Le numéro affiché est celui du socle installé. S'il n'y a pas de fichier `VERSION`, le site est
+antérieur à `v1.0.0` : la première fusion le posera.
 
-## 1. Créer le dépôt du site
+### 2. Choisir la version à prendre
+
+```bash
+git fetch socle --tags
+git tag -l 'v*'
+```
+
+`git tag -l` sans motif listerait aussi les étiquettes propres au site ; `'v*'` ne garde que
+celles du socle.
+
+Lire ensuite ce qu'apporte chaque version entre celle du site et celle visée, dans
+[CHANGELOG.md](../CHANGELOG.md).
+
+> **Le premier chiffre est le seul qui coûte.** `1.4.0` → `2.0.0` annonce une intervention
+> manuelle — déplacer des fichiers, modifier `.env`, migrer des données. La marche à suivre est
+> donnée sous la version dans le journal, et se prépare **avant** de fusionner : elle ne
+> s'improvise pas sur un site en service. Tout autre changement — `1.3.0` → `1.4.0`,
+> `1.3.0` → `1.3.1` — se fusionne sans rien de plus.
+
+Rien n'oblige à passer les versions une par une : fusionner directement la plus récente reprend
+tout ce qui la précède. Si plusieurs versions majeures sont franchies d'un coup, appliquer
+leurs interventions dans l'ordre du journal.
+
+### 3. Fusionner
+
+```bash
+git checkout main
+git pull
+git checkout -b maj-socle
+git merge v2.0.4
+```
+
+Toujours sur une branche : la fusion se relit avant d'entrer dans `main`.
+
+`VERSION` fait partie de la fusion, donc le site porte le nouveau numéro sans qu'on ait à
+l'écrire.
+
+L'étiquette est fusionnée plutôt que `socle/main` : ce qui entre dans le site est un état
+publié et décrit dans le journal, et non l'avancement du moment.
+
+### 4. Régler les conflits, s'il y en a
+
+```bash
+git diff --name-only --diff-filter=U
+```
+
+Vide, il n'y en a pas — passer à l'étape suivante. Sinon, ouvrir chaque fichier listé, garder
+les deux apports, puis :
+
+```bash
+git add <fichier>
+git commit
+```
+
+La liste des fichiers susceptibles de rentrer en conflit est plus bas.
+
+### 5. Après la fusion
+
+Les quatre commandes, dans cet ordre, sans condition :
+
+```bash
+composer install                       # sans effet si composer.lock n'a pas bougé
+php bin/install-cockpit.php --force    # obligatoire, voir ci-dessous
+php bin/purge-cache.php
+composer test
+```
+
+**`--force` n'est pas facultatif.** `public/admin/` n'est pas versionné : une fusion qui touche
+`cockpit/config.php`, `cockpit/bootstrap.php`, `cockpit/models/` ou `cockpit/addons/` ne change
+rien tant que le script ne les a pas recopiés. Sans `--force`, il constate que la version de
+Cockpit est déjà installée et s'arrête sans rien faire.
+
+La commande est sans danger si rien n'a changé : elle réinstalle le cœur de Cockpit, laisse
+`var/`, `public/medias/` et `public/admin/.env` intacts, et ne retélécharge l'archive que si
+elle est absente.
+
+Ouvrir enfin une page du site et `/admin`, puis pousser pour relecture :
+
+```bash
+git push -u origin maj-socle
+```
+
+### 6. Mettre à jour le site en ligne
+
+Les étapes précédentes n'ont touché que le dépôt. Une fois la branche fusionnée dans `main`,
+reporter les fichiers sur l'hébergement — voir
+[installation-mutualise.md](installation-mutualise.md).
+
+Sur l'hébergement, après l'envoi :
+
+```bash
+php bin/install-cockpit.php --force    # si l'accès en ligne de commande existe
+php bin/purge-cache.php
+```
+
+Sans ligne de commande, enregistrer n'importe quel contenu depuis l'administration vide le
+cache ; les fichiers de `public/admin/` doivent alors être préparés en local puis envoyés.
+
+## Ce qui entre en conflit
+
+| Fichiers | À la fusion |
+|---|---|
+| `templates-client/` | jamais — le socle n'y écrit pas |
+| `.env`, `var/`, `public/medias/`, `public/admin/` | jamais — non versionnés (sauf `public/medias/.htaccess`) |
+| `templates/`, `src/`, `public/assets/` | conflit s'ils ont été modifiés dans le site |
+
+Placer toute personnalisation dans `templates-client/` — voir
+[guide-integration.md](guide-integration.md).
+
+## Installer un nouveau site
+
+Trois étapes, une seule fois par client.
+
+### 1. Créer le dépôt du site
 
 Sur GitHub, ouvrir le dépôt socle et cliquer **Use this template → Create a new repository**.
 
@@ -49,32 +158,28 @@ php bin/cockpit-init.php
 La suite de l'installation locale est dans
 [developpement-local.md](developpement-local.md).
 
-## 2. Déclarer le socle — une fois par site
+### 2. Déclarer le socle
 
 ```bash
 git remote add socle https://github.com/jean-ely-pro/site-vitrine-cockpit-php.git
-git fetch socle
+git fetch socle --tags
 git remote -v
 ```
 
 `origin` est le dépôt du site. `socle` ne sert qu'à lire : ne jamais y pousser.
 
-## 3. Première fusion
+### 3. Première fusion
 
-Le dépôt créé depuis un template démarre sur un historique neuf, sans ancêtre commun avec le
-socle. La première fusion demande une option supplémentaire :
+Un dépôt créé depuis un template démarre sur un historique neuf, sans ancêtre commun avec le
+socle. La première fusion demande donc une option que les suivantes n'auront pas :
 
 ```bash
 git checkout -b maj-socle
-git merge socle/main --allow-unrelated-histories
+git merge v2.0.4 --allow-unrelated-histories
 ```
 
 Les fichiers identiques des deux côtés fusionnent sans intervention, et ceux que le socle a
-ajoutés depuis sont repris. Seuls les fichiers dont le contenu diffère sont signalés :
-
-```bash
-git diff --name-only --diff-filter=U
-```
+ajoutés depuis sont repris. Seuls ceux dont le contenu diffère sont signalés.
 
 **Si le site n'a pas encore été personnalisé**, prendre le socle en bloc :
 
@@ -84,55 +189,34 @@ git add -A
 git commit -m "Fusionner le socle"
 ```
 
-**Si le site a déjà été personnalisé**, ouvrir chaque fichier listé, garder les deux apports,
-puis `git add` fichier par fichier avant de committer.
+**Si le site a déjà été personnalisé**, ouvrir chaque fichier listé par
+`git diff --name-only --diff-filter=U` et garder les deux apports.
 
-## 4. Fusions suivantes
+Reprendre ensuite à l'étape 5 de la mise à jour.
 
-Un ancêtre commun existe désormais : plus aucune option.
+## Cas particuliers
 
-```bash
-git fetch socle --tags
-git checkout -b maj-socle
-git merge v1.4.0
-```
+### Reprendre un seul correctif
 
-Fusionner l'étiquette plutôt que `socle/main` : ce qui entre dans le site est alors un état
-publié et décrit dans le journal, et non l'avancement du moment. `VERSION` fait partie de la
-fusion, donc il porte le nouveau numéro sans qu'on ait à l'écrire.
-
-`git tag -l` après le `fetch` liste les versions disponibles.
-
-## 5. Après chaque fusion
-
-| Commande | Quand |
-|---|---|
-| `composer install` | `composer.lock` a changé |
-| `php bin/install-cockpit.php --force` | la version de Cockpit a changé dans `bin/install-cockpit.php` |
-| `php bin/purge-cache.php` | toujours |
-| `composer test` | toujours |
-
-Puis ouvrir une page du site et `/admin`, et pousser la branche pour relecture :
-
-```bash
-git push -u origin maj-socle
-```
-
-## Ce qui entre en conflit
-
-| Fichiers | À la fusion |
-|---|---|
-| `templates-client/` | jamais — le socle n'y écrit pas |
-| `.env`, `var/`, `public/medias/`, `public/admin/` | jamais — non versionnés (sauf `public/medias/.htaccess`) |
-| `templates/`, `src/`, `public/assets/` | conflit s'ils ont été modifiés dans le site |
-
-Placer toute personnalisation dans `templates-client/` — voir
-[guide-integration.md](guide-integration.md).
-
-## Reprendre un seul correctif
+Quand une seule correction est attendue, sans prendre le reste :
 
 ```bash
 git fetch socle
 git log --oneline socle/main
 git cherry-pick <empreinte>
 ```
+
+Le site garde alors son numéro de version : `VERSION` n'est pas repris. Le noter dans le suivi
+du client, sans quoi l'écart devient invisible.
+
+### Revenir à la version précédente
+
+Chaque version majeure décrit son retour arrière sous son entrée dans
+[CHANGELOG.md](../CHANGELOG.md) : commit à annuler, fichiers à replacer, adresses déjà
+publiées.
+
+### Comment les étiquettes sont posées
+
+Une étiquette ne se pose pas à chaque fusion sur le socle : plusieurs correctifs peuvent
+attendre la même. On en ajoute une quand il y a quelque chose qu'un site doit pouvoir
+reprendre — c'est l'étiquette, et non la branche, qui est l'unité livrée.
