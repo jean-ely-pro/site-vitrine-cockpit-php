@@ -57,6 +57,11 @@ navigateur ◄────────────────┘
 L'écriture du cache a lieu **avant** l'envoi, dans `public/index.php`. La visite suivante
 emprunte le premier trajet.
 
+Ne sont **jamais** mis en cache : l'administration et son API, les réponses en erreur, et toute
+adresse portant des paramètres. Une réponse en erreur stockée survivrait à la cause qui l'a
+produite, et une adresse à paramètres répond autre chose selon ces paramètres. L'en-tête
+`X-Page-Cache` dit qui a répondu — `hit` pour le serveur web, `miss` pour PHP.
+
 ## Rôle de chaque dossier de `src/`
 
 L'organisation est **par sujet**, pas par couche technique. Le nom d'un dossier dit de quoi il

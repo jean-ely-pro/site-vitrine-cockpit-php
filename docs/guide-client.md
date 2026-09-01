@@ -58,6 +58,16 @@ L'onglet *Référencement* porte deux champs, chacun avec son compteur de caract
 
 Pour une actualité, c'est le champ *Résumé* qui joue ce rôle.
 
+## Les horaires
+
+*Identité du site → Horaires*. Le champ est libre : ce qui est saisi est affiché tel quel sur
+le site — « 9h – 12h, 14h – 18h30 », « Fermé le lundi », « sur rendez-vous ».
+
+Les moteurs de recherche reçoivent en plus une version lisible par machine, mais **seulement
+quand les horaires se lisent sans ambiguïté**. « sur rendez-vous » ou « 24h/24 » s'affichent
+normalement sur le site et sont laissés de côté pour les moteurs : mieux vaut ne rien leur
+annoncer qu'annoncer un horaire faux.
+
 ## L'aperçu quand un lien est partagé
 
 *Identité du site → Image de partage*. C'est l'image qui s'affiche quand une page du site est

@@ -12,6 +12,19 @@ qu'il prend pour un socle recopié chez chaque client :
 La version installée est inscrite dans le fichier `VERSION`, à la racine. La procédure de
 fusion est dans [docs/mise-a-jour-socle.md](docs/mise-a-jour-socle.md).
 
+## 2.0.4 — 2026-09-01
+
+Documentation seule. Rien à faire sur un site existant au-delà de la fusion.
+
+Trois points perdus lors de l'allégement du README en 2.0.2, replacés dans le document qui les
+concerne :
+
+- `docs/architecture.md` — ce qui n'est jamais mis en cache, et le rôle de l'en-tête
+  `X-Page-Cache`.
+- `docs/guide-client.md` — les horaires sont un champ libre affiché tel quel, converti pour les
+  moteurs de recherche seulement lorsqu'il se lit sans ambiguïté.
+- `docs/guide-integration.md` — le nombre de tests annoncé, resté à 229.
+
 ## 2.0.3 — 2026-09-01
 
 Le `robots.txt` public n'annonce plus l'emplacement de l'administration.

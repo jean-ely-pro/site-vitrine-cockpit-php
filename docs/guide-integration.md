@@ -298,7 +298,7 @@ Interdits : `opacity` sur du texte, polices distantes, contraste inférieur à 4
 ## Vérifier
 
 ```bash
-composer test                          # 229 tests, moins d’une seconde
+composer test                          # 234 tests, moins d’une seconde
 php bin/verifier-accessibilite.php     # sur le HTML réellement servi
 php bin/purge-cache.php                # après toute modification de gabarit ou de CSS
 ```
