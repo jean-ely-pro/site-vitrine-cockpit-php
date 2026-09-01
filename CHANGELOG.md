@@ -20,6 +20,8 @@ Documentation seule. Rien à faire sur un site existant au-delà de la fusion.
   dans `docs/` y sont résumés en une ligne, suivie du renvoi.
 - `docs/tests.md` — ce que couvre la suite de tests et ce que lit le contrôle avant mise en
   ligne, jusque-là dans le README.
+- `LICENSE` — conditions d'utilisation, et licences des composants tiers installés par
+  Composer et par `bin/install-cockpit.php`. Le dépôt n'en portait aucune.
 
 ## 2.0.1 — 2026-09-01
 
