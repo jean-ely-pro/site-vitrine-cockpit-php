@@ -8,6 +8,7 @@ Les documents se lisent par situation, dans l'ordre donné ci-dessous.
 |---|---|---|
 | 1 | [../README.md](../README.md) | ce que fait le produit, installation locale, commandes |
 | 2 | [architecture.md](architecture.md) | trajet d'une requête, rôle de chaque dossier, où intervenir |
+| 3 | [tests.md](tests.md) | ce que couvre la suite de tests, ce que lit le contrôle en ligne |
 
 ## Créer un site pour un client
 
