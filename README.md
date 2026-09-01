@@ -330,6 +330,8 @@ Le sommaire ordonné par situation est dans [docs/README.md](docs/README.md).
 
 - [Architecture du site public](docs/architecture.md) — trajet d'une requête, rôle de chaque
   dossier, où intervenir, décisions structurantes
+- [Journal des versions](CHANGELOG.md) — ce que chaque version apporte, et ce qu'elle demande
+  aux sites déjà installés
 - [Créer un site et le tenir à jour](docs/mise-a-jour-socle.md) — créer le dépôt depuis le
   socle, récupérer les corrections par fusion
 - [Intégrer une maquette](docs/guide-integration.md) — pour le développeur : types de section,
