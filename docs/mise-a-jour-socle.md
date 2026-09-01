@@ -18,7 +18,8 @@ Le rang qui change annonce ce que la fusion va demander :
 | **CORRECTIF** | `1.3.0` → `1.3.1` | rien de plus que la fusion |
 
 Lire le journal **avant** de fusionner un changement de rang majeur : l'intervention se prépare
-hors ligne, elle ne s'improvise pas sur un site en service.
+hors ligne, elle ne s'improvise pas sur un site en service. Chaque version majeure y décrit
+aussi le retour à la version précédente.
 
 ## 1. Créer le dépôt du site
 

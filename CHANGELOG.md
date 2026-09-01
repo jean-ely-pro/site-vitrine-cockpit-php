@@ -5,7 +5,7 @@ qu'il prend pour un socle recopié chez chaque client :
 
 | Rang | Ce qui change | Ce que la mise à jour d'un site demande |
 |---|---|---|
-| **MAJEUR** | l'installation elle-même : emplacement de fichiers, configuration, données | une intervention manuelle, décrite sous la version |
+| **MAJEUR** | l'installation elle-même : emplacement de fichiers, configuration, données | une intervention manuelle — la marche à suivre et le retour arrière sont décrits sous la version |
 | **MINEUR** | une capacité nouvelle | rien de plus que la fusion |
 | **CORRECTIF** | une correction | rien de plus que la fusion |
 
@@ -67,6 +67,87 @@ Après la fusion, sur l'hébergement :
 
 Les enregistrements d'images portent un chemin relatif, jamais une adresse : **aucune
 modification de la base de données n'est nécessaire.**
+
+### Revenir à la version précédente
+
+Le retour déplace des fichiers et ne touche pas davantage à la base de données. À exécuter dans
+cet ordre, sur l'hébergement.
+
+1. Annuler la fusion dans le dépôt du site.
+
+   ```bash
+   git revert -m 1 <fusion>
+   ```
+
+   > [!NOTE]
+   > **`<fusion>`** est l'empreinte du commit de **fusion** qui a introduit la version 2.0.0
+   > dans le dépôt du site — jamais celle d'un commit du socle.
+   >
+   > Le retrouver :
+   >
+   > ```bash
+   > git log --oneline --first-parent -5
+   > ```
+   >
+   > Le confirmer avant d'agir. Au commit cherché, `VERSION` vaut `2.0.0` ; chez son premier
+   > parent, `1.0.0` :
+   >
+   > ```bash
+   > git show <fusion>:VERSION      # 2.0.0
+   > git show <fusion>^1:VERSION    # 1.0.0
+   > ```
+   >
+   > Ce contrôle ne dépend pas du message de commit, qui diffère selon que la fusion vient
+   > d'une demande de tirage ou d'un `git merge v2.0.0`.
+   >
+   > `-m 1` désigne ce premier parent : la ligne du site, celle qu'il faut conserver.
+   >
+   > `git log --merges -- VERSION` ne renvoie rien — Git écarte les fusions quand l'historique
+   > est restreint à un chemin. Passer par `--first-parent`.
+
+2. Recréer le dossier d'origine et sa règle d'accès, écrite par le script d'installation et
+   absente du dépôt.
+
+   ```bash
+   php bin/install-cockpit.php --force
+   ```
+
+3. Replacer les fichiers.
+
+   ```bash
+   mv public/medias/2026 public/medias/variantes public/admin/storage/uploads/
+   ```
+
+   Nommer les dossiers un à un plutôt qu'écrire `public/medias/*` : `public/medias/.htaccess`
+   doit rester où il est. `ls public/medias` donne la liste quand l'administration a servi plus
+   d'une année.
+
+4. Dans `.env`, remettre `MEDIA_BASE_URL=/admin/storage/uploads`.
+
+5. Purger le cache.
+
+   ```bash
+   php bin/purge-cache.php
+   ```
+
+6. Contrôler.
+
+   ```bash
+   curl -s https://domaine-du-client.tld/ | grep -c '/medias/'        # 0
+   curl -s https://domaine-du-client.tld/ | grep -c 'admin/storage'   # au moins 1
+   ```
+
+> [!IMPORTANT]
+> **Adresses déjà publiées.** Les images servies sous `/medias` pendant la période 2.0.0
+> répondent 404 après le retour. Sur un site en ligne depuis plusieurs semaines, poser la
+> redirection dans `public/.htaccess` **avant** de purger, au-dessus des règles du cache :
+>
+> ```apache
+> RewriteRule ^medias/(.*)$ /admin/storage/uploads/$1 [R=301,L]
+> ```
+
+Pour repasser en 2.0.0 plus tard, annuler ce retour — `git revert <retour>` — plutôt que
+fusionner de nouveau : Git tient la fusion pour déjà faite et n'apporterait rien.
 
 ## 1.0.0 — 2026-09-01
 
