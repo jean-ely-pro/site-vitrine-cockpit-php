@@ -65,12 +65,20 @@ sauvegardes.
 ## Où vivent les fichiers
 
 ```
-public/admin/storage/uploads/AAAA/MM/JJ/…   images envoyées
-public/admin/storage/uploads/variantes/…    copies allégées
+public/medias/AAAA/MM/JJ/…    images envoyées
+public/medias/variantes/…     copies allégées
 ```
 
-Les deux sont servis directement par le serveur web. Le reste du dossier `storage` — modèle de
-contenu, fichiers temporaires, caches — reste fermé à la consultation.
+Les deux sont servis directement par le serveur web, à l'adresse `/medias`.
+
+Ils vivent sous la racine du site, **et non dans le dossier de l'administration**. Une page
+publique ne nomme donc jamais `/admin`, et rien sous `/admin` n'a besoin d'être lisible depuis
+l'extérieur : le dossier `storage` de Cockpit — modèle de contenu, fichiers temporaires,
+caches — est fermé en entier.
+
+`public/medias/.htaccess` est versionné et part avec le site. Il ouvre le dossier à la
+consultation et refuse ce qui pourrait s'y exécuter. Cockpit refuse déjà ces fichiers à
+l'envoi, par extension et par type MIME ; la règle est la seconde barrière.
 
 ## Temps de traitement
 

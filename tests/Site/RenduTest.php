@@ -75,7 +75,7 @@ final class RenduTest extends TestCase
 
     private function picture(): Picture
     {
-        return new Picture(new MediaUrls('/admin/storage/uploads', 'https://exemple.fr'));
+        return new Picture(new MediaUrls('/medias', 'https://exemple.fr'));
     }
 
     /** @return array<string, mixed> */
@@ -99,9 +99,9 @@ final class RenduTest extends TestCase
         $image = $this->picture()->from($this->imageAvecCopies());
 
         $this->assertSame(
-            '/admin/storage/uploads/variantes/a.webp 480w, '
-            .'/admin/storage/uploads/variantes/b.webp 960w, '
-            .'/admin/storage/uploads/variantes/c.webp 1440w',
+            '/medias/variantes/a.webp 480w, '
+            .'/medias/variantes/b.webp 960w, '
+            .'/medias/variantes/c.webp 1440w',
             $image['srcset'],
         );
     }
@@ -111,7 +111,7 @@ final class RenduTest extends TestCase
     {
         $image = $this->picture()->from($this->imageAvecCopies());
 
-        $this->assertSame('/admin/storage/uploads/variantes/b.webp', $image['src']);
+        $this->assertSame('/medias/variantes/b.webp', $image['src']);
         $this->assertStringNotContainsString('photo.webp', $image['src']);
     }
 
@@ -129,7 +129,7 @@ final class RenduTest extends TestCase
     {
         $image = $this->picture()->from(['path' => '/2026/08/photo.webp', 'width' => 800, 'height' => 600]);
 
-        $this->assertSame('/admin/storage/uploads/2026/08/photo.webp', $image['src']);
+        $this->assertSame('/medias/2026/08/photo.webp', $image['src']);
         $this->assertSame('', $image['srcset']);
     }
 

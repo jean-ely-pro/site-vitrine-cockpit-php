@@ -77,7 +77,7 @@ $cache = new PageCache(
 );
 
 $media = new MediaUrls(
-    $_ENV['MEDIA_BASE_URL'] ?? '/admin/storage/uploads',
+    $_ENV['MEDIA_BASE_URL'] ?? '/medias',
     $siteUrl,
 );
 

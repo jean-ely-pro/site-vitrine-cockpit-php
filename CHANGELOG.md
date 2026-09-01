@@ -12,6 +12,62 @@ qu'il prend pour un socle recopié chez chaque client :
 La version installée est inscrite dans le fichier `VERSION`, à la racine. La procédure de
 fusion est dans [docs/mise-a-jour-socle.md](docs/mise-a-jour-socle.md).
 
+## 2.0.0 — 2026-09-01
+
+Les médias quittent le dossier de l'administration.
+
+### Pourquoi
+
+Les pages publiques servaient leurs images depuis `/admin/storage/uploads/`. Chaque page
+publiait ainsi l'emplacement du panneau d'administration, et l'arborescence des fichiers
+désignait le CMS employé. Le reste de `/admin` n'était par ailleurs tenu fermé que par des
+fichiers `.htaccess` cachés, qu'un envoi par FTP peut omettre sans que rien ne le signale.
+
+### Ce qui change
+
+- Les médias sont servis depuis `public/medias/`, à l'adresse `/medias`. Aucune page publique
+  ne nomme plus `/admin`.
+- `public/medias/.htaccess`, versionné et livré avec le site, ouvre le dossier à la
+  consultation et refuse ce qui pourrait s'y exécuter.
+- `public/.htaccess` refuse `/admin/storage/` — la règle est posée dans le fichier sans lequel
+  le site ne fonctionne pas, et non plus seulement dans les fichiers cachés de `public/admin/`.
+- `MEDIA_BASE_URL` vaut `/medias` en production, `http://localhost:8080/medias` en
+  développement. L'administration s'en sert aussi pour ses aperçus.
+- `bin/install-cockpit.php` crée `public/medias/variantes/` et ne crée plus
+  `public/admin/storage/uploads/`.
+
+### Mettre à jour un site existant
+
+Après la fusion, sur l'hébergement :
+
+1. Déplacer les fichiers.
+
+   ```bash
+   mv public/admin/storage/uploads/* public/medias/
+   rm -rf public/admin/storage/uploads
+   ```
+
+   `*` ne reprend pas les fichiers cachés, et c'est voulu : l'ancien dossier avait sa propre
+   règle d'accès, qui écraserait celle livrée dans `public/medias/`. Vérifier après coup que
+   `public/medias/.htaccess` contient bien la ligne `Options -Indexes`.
+
+2. Dans `.env`, remplacer la valeur par `MEDIA_BASE_URL=/medias`.
+
+3. Vérifier que `public/medias/` est inscriptible par le serveur — `755`, parfois `775`.
+
+4. Purger le cache : `php bin/purge-cache.php`, ou enregistrer n'importe quel contenu depuis
+   l'administration.
+
+5. Contrôler.
+
+   ```bash
+   curl -s https://domaine-du-client.tld/ | grep -c 'admin/storage'    # 0
+   curl -sI https://domaine-du-client.tld/admin/storage/ | head -1     # 403
+   ```
+
+Les enregistrements d'images portent un chemin relatif, jamais une adresse : **aucune
+modification de la base de données n'est nécessaire.**
+
 ## 1.0.0 — 2026-09-01
 
 Première version numérotée. Elle correspond au socle tel qu'il est déployé et vérifié sur un

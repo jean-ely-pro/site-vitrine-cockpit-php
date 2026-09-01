@@ -118,7 +118,7 @@ git push -u origin maj-socle
 | Fichiers | À la fusion |
 |---|---|
 | `templates-client/` | jamais — le socle n'y écrit pas |
-| `.env`, `var/`, `public/media/`, `public/admin/` | jamais — non versionnés |
+| `.env`, `var/`, `public/medias/`, `public/admin/` | jamais — non versionnés (sauf `public/medias/.htaccess`) |
 | `templates/`, `src/`, `public/assets/` | conflit s'ils ont été modifiés dans le site |
 
 Placer toute personnalisation dans `templates-client/` — voir

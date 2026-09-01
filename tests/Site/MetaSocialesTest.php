@@ -37,7 +37,7 @@ final class MetaSocialesTest extends TestCase
         );
 
         $twig->addExtension(new SiteExtension(new Picture(
-            new MediaUrls('/admin/storage/uploads', 'https://exemple.fr'),
+            new MediaUrls('/medias', 'https://exemple.fr'),
         )));
         $twig->addGlobal('accueilSlug', 'accueil');
 
@@ -242,7 +242,7 @@ final class MetaSocialesTest extends TestCase
         ]);
 
         $this->assertStringContainsString(
-            '<meta property="og:image" content="https://exemple.fr/admin/storage/uploads/bandeau.jpg">',
+            '<meta property="og:image" content="https://exemple.fr/medias/bandeau.jpg">',
             $html,
         );
         $this->assertStringContainsString('<meta property="og:image:alt" content="Un bouquet blanc">', $html);
@@ -262,7 +262,7 @@ final class MetaSocialesTest extends TestCase
         // balise d'aperçu qu'il faut lire, pas le HTML entier.
         preg_match('#<meta property="og:image" content="(.*?)">#', $html, $apercu);
 
-        $this->assertSame('https://exemple.fr/admin/storage/uploads/partage.jpg', $apercu[1] ?? null);
+        $this->assertSame('https://exemple.fr/medias/partage.jpg', $apercu[1] ?? null);
     }
 
     #[Test]
@@ -273,7 +273,7 @@ final class MetaSocialesTest extends TestCase
         ]);
 
         $this->assertStringContainsString(
-            '<meta property="og:image" content="https://exemple.fr/admin/storage/uploads/logo.png">',
+            '<meta property="og:image" content="https://exemple.fr/medias/logo.png">',
             $html,
         );
     }

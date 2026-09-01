@@ -32,7 +32,7 @@ final class PageErreurTest extends TestCase
             ['strict_variables' => false, 'autoescape' => 'html'],
         );
 
-        $media = new MediaUrls('/admin/storage/uploads', 'https://exemple.fr');
+        $media = new MediaUrls('/medias', 'https://exemple.fr');
         $twig->addExtension(new SiteExtension(new Picture($media)));
         $twig->addGlobal('accueilSlug', 'accueil');
 

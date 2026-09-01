@@ -234,7 +234,10 @@ foreach ([
     "{$root}/var/data",
     "{$target}/storage/cache",
     "{$target}/storage/tmp/thumbs",
-    "{$target}/storage/uploads",
+    // Media are served from the site's own folder — see 'paths' in
+    // cockpit/config.php. Cockpit resolves it by looking it up on disk, so it
+    // has to exist before the admin is ever opened.
+    "{$root}/public/medias/variantes",
 ] as $dir) {
     if (!is_dir($dir) && !mkdir($dir, 0o755, true) && !is_dir($dir)) {
         fail("création impossible : {$dir}");
@@ -242,13 +245,10 @@ foreach ([
 }
 
 // Cockpit's shipped .htaccess protects its code but says nothing about
-// storage. Everything there is internal — except uploads, which the public
-// site serves.
+// storage. Nothing there is public any more, media included.
 foreach (['storage', 'storage/content', 'storage/cache', 'storage/tmp'] as $dir) {
     file_put_contents("{$target}/{$dir}/.htaccess", "Require all denied\n<IfModule !mod_authz_core.c>\n    Deny from all\n</IfModule>\n");
 }
-
-file_put_contents("{$target}/storage/uploads/.htaccess", "Require all granted\n<IfModule !mod_authz_core.c>\n    Allow from all\n</IfModule>\n");
 
 step('Dossiers internes de Cockpit fermés à la consultation.');
 
@@ -265,10 +265,14 @@ if (!is_file($adminEnv)) {
 $expected = ['index.php', 'bootstrap.php', 'config/config.php', 'config/bootstrap.php', 'modules/App/bootstrap.php'];
 $absent = array_values(array_filter($expected, static fn (string $f): bool => !is_file("{$target}/{$f}")));
 
-foreach (['storage/cache', 'storage/tmp/thumbs', 'storage/uploads', 'storage/content'] as $dir) {
+foreach (['storage/cache', 'storage/tmp/thumbs', 'storage/content'] as $dir) {
     if (!is_dir("{$target}/{$dir}")) {
         $absent[] = "{$dir}/";
     }
+}
+
+if (!is_dir("{$root}/public/medias/variantes")) {
+    $absent[] = 'public/medias/variantes/';
 }
 
 if ($absent) {

@@ -162,7 +162,7 @@ final class ContextePageTest extends TestCase
 
     private function media(): MediaUrls
     {
-        return new MediaUrls('/admin/storage/uploads', 'https://exemple.fr');
+        return new MediaUrls('/medias', 'https://exemple.fr');
     }
 
     private function twig(): Environment

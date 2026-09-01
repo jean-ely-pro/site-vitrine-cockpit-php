@@ -135,8 +135,12 @@ styles en ligne, et son durcissement relève de Cockpit, pas de ce fichier.
 curl -sI https://domaine.tld/admin | head -1          # 302, jamais 200
 curl -sI http://domaine.tld/ | head -2                # 301 vers https
 curl -sI https://domaine.tld/ | grep -i content-security
-curl -s https://domaine.tld/admin/storage/            # jamais de liste de fichiers
+curl -sI https://domaine.tld/admin/storage/ | head -1 # 403, jamais 200
+curl -s https://domaine.tld/ | grep -c 'admin/storage' # 0 : aucune page ne nomme l'admin
 ```
+
+Les médias sont servis depuis `/medias`, sous la racine du site. Rien sous `/admin` n'a à
+répondre autrement que par la page de connexion.
 
 Puis, dans l'administration : double authentification active sur chaque compte, et aucune clé
 d'API dont l'usage n'est pas connu.
