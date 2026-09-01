@@ -70,7 +70,11 @@ $this->module('contact')->extend([
      * Sends the customer the message that was just received.
      *
      * @param array<string, mixed> $message
-     * @return array{envoye: bool, erreur: ?string, destinataire: ?string}
+     * « cause » says where to look when nothing left: « configuration » for
+     * something to fill in on this site, « envoi » for the hosting's mail.
+     * Sending someone to the wrong one costs an hour on shared hosting.
+     *
+     * @return array{envoye: bool, erreur: ?string, destinataire: ?string, cause: ?string}
      */
     'notify' => function (array $message): array {
 
@@ -78,7 +82,12 @@ $this->module('contact')->extend([
         $to = trim((string) ($settings['email'] ?? ''));
 
         if ($to === '') {
-            return ['envoye' => false, 'erreur' => 'Aucune adresse e-mail dans l’identité du site.', 'destinataire' => null];
+            return [
+                'envoye' => false,
+                'erreur' => 'Aucune adresse e-mail dans l’identité du site.',
+                'destinataire' => null,
+                'cause' => 'configuration',
+            ];
         }
 
         // Nothing leaves towards a domain reserved for documentation and
@@ -93,6 +102,7 @@ $this->module('contact')->extend([
                 'erreur' => "« {$to} » est une adresse de démonstration : aucun e-mail n’a été envoyé. "
                     .'Renseigner une vraie adresse dans « Identité du site » pour recevoir les notifications.',
                 'destinataire' => $to,
+                'cause' => 'configuration',
             ];
         }
 
@@ -117,9 +127,14 @@ $this->module('contact')->extend([
                 'reply_to' => $from !== '' ? $from : $to,
             ]);
 
-            return ['envoye' => (bool) $sent, 'erreur' => $sent ? null : 'Envoi refusé par le serveur.', 'destinataire' => $to];
+            return [
+                'envoye' => (bool) $sent,
+                'erreur' => $sent ? null : 'Envoi refusé par le serveur.',
+                'destinataire' => $to,
+                'cause' => $sent ? null : 'envoi',
+            ];
         } catch (\Throwable $e) {
-            return ['envoye' => false, 'erreur' => $e->getMessage(), 'destinataire' => $to];
+            return ['envoye' => false, 'erreur' => $e->getMessage(), 'destinataire' => $to, 'cause' => 'envoi'];
         }
     },
 ]);

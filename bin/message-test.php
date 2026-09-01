@@ -67,7 +67,14 @@ if ($mail['envoye']) {
 
 echo "  E-mail NON parti : {$mail['erreur']}\n";
 echo "  Les messages restent consultables dans l'administration, mais personne\n";
-echo "  ne sera prévenu. Vérifier l'envoi de courrier de l'hébergement.\n\n";
+echo "  ne sera prévenu.\n";
+
+// Where to look next. Naming the wrong place sends someone digging through the
+// hosting's mail for an address that simply has not been filled in.
+echo ($mail['cause'] ?? 'envoi') === 'configuration'
+    ? "  Rien à chercher du côté de l'hébergement : la cause est dans l'identité\n"
+        ."  du site, à corriger dans l'administration.\n\n"
+    : "  Vérifier l'envoi de courrier de l'hébergement.\n\n";
 
 // Not a failure of the script: the message is stored. Only the warning failed.
 exit(0);

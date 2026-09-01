@@ -23,6 +23,13 @@ AddDefaultCharset UTF-8
     # Nothing under the admin's storage is public: media are served from
     # /medias. Said here rather than only inside public/admin/, whose own rules
     # live in hidden files that an upload can silently leave behind.
+    #
+    # This rule looks dead when tested, and is not. mod_rewrite configuration
+    # is never inherited: as long as public/admin/.htaccess exists, its own
+    # RewriteEngine replaces this whole ruleset for anything under /admin/, and
+    # the refusal there comes from public/admin/storage/.htaccess instead. The
+    # rule below fires exactly when that file is missing — the case it is
+    # written for. Do not remove it because it appears to have no effect.
     RewriteRule ^admin/storage(/|$) - [F,L]
 
     # The admin and its API ship their own rules: never rewrite them here, and

@@ -106,18 +106,48 @@ git push -u origin maj-socle
 ### 6. Mettre à jour le site en ligne
 
 Les étapes précédentes n'ont touché que le dépôt. Une fois la branche fusionnée dans `main`,
-reporter les fichiers sur l'hébergement — voir
-[installation-mutualise.md](installation-mutualise.md).
+reporter le socle sur l'hébergement. Deux cas, selon ce que l'hébergeur permet.
 
-Sur l'hébergement, après l'envoi :
+#### Avec un accès SSH et un dépôt git sur le serveur
 
 ```bash
-php bin/install-cockpit.php --force    # si l'accès en ligne de commande existe
+cd ~/<dossier-du-site>
+git status                             # doit être propre : la prod n'a rien à committer
+git pull
+php bin/install-cockpit.php --force
 php bin/purge-cache.php
 ```
 
+À poser **une fois par hébergement**, avant la première mise à jour :
+
+```bash
+git config pull.ff only
+```
+
+Sur une production saine, `git pull` fait exactement ce que ferait `git merge --ff-only
+origin/main` : le serveur n'a aucun commit local, la fusion est une simple avance rapide. Les
+deux commandes sont indiscernables — jusqu'au jour où le serveur a dérivé, parce qu'un
+correctif y a été committé sur place ou qu'une reprise y a laissé un commit.
+
+- `git pull` fusionne quand même, et crée un commit de fusion que le serveur est seul à
+  porter. Chaque mise à jour suivante en ajoute un.
+- Si la fusion conflicte, git écrit les marqueurs `<<<<<<< HEAD` **dans les fichiers** — au
+  milieu d'un `public/index.php` que PHP est en train de servir.
+- Avec `pull.ff only`, git s'arrête sur `Not possible to fast-forward, aborting`. Rien n'est
+  touché, le site continue de répondre, et la dérive se règle à froid.
+
+Ce n'est donc pas une autre opération, c'est la même avec un garde-fou. Le réglage fixe au
+passage le comportement de `git pull`, qui dépend sinon de la version de git et de la
+configuration de la machine.
+
+#### Par envoi de fichiers
+
+Voir [installation-mutualise.md](installation-mutualise.md). Après l'envoi, relancer les deux
+commandes ci-dessus si la ligne de commande existe.
+
 Sans ligne de commande, enregistrer n'importe quel contenu depuis l'administration vide le
-cache ; les fichiers de `public/admin/` doivent alors être préparés en local puis envoyés.
+cache ; les fichiers de `public/admin/` doivent alors être préparés en local puis envoyés,
+puisque `install-cockpit.php` ne peut pas tourner sur place.
 
 ## Ce qui entre en conflit
 
