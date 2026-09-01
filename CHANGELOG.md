@@ -12,6 +12,15 @@ qu'il prend pour un socle recopié chez chaque client :
 La version installée est inscrite dans le fichier `VERSION`, à la racine. La procédure de
 fusion est dans [docs/mise-a-jour-socle.md](docs/mise-a-jour-socle.md).
 
+## 2.0.2 — 2026-09-01
+
+Documentation seule. Rien à faire sur un site existant au-delà de la fusion.
+
+- README ramené à l'installation et à l'orientation, de 353 à 174 lignes. Les sujets traités
+  dans `docs/` y sont résumés en une ligne, suivie du renvoi.
+- `docs/tests.md` — ce que couvre la suite de tests et ce que lit le contrôle avant mise en
+  ligne, jusque-là dans le README.
+
 ## 2.0.1 — 2026-09-01
 
 Documentation seule. Rien à faire sur un site existant au-delà de la fusion.
