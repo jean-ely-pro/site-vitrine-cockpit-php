@@ -43,11 +43,14 @@ final class Sitemap
     {
         $base = rtrim($siteUrl, '/');
 
+        // The admin is not named here. This file is public, and a Disallow
+        // line would hand its address to anyone who asks — while forbidding
+        // crawling, not indexing. An X-Robots-Tag header, sent only to the
+        // robot that asked for the page, does the job without the disclosure:
+        // see public/.htaccess.
         return implode("\n", [
             'User-agent: *',
             'Allow: /',
-            // The admin holds no public content and must never be indexed.
-            'Disallow: /admin',
             '',
             "Sitemap: {$base}/sitemap.xml",
             '',
