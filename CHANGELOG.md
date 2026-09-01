@@ -12,6 +12,31 @@ qu'il prend pour un socle recopié chez chaque client :
 La version installée est inscrite dans le fichier `VERSION`, à la racine. La procédure de
 fusion est dans [docs/mise-a-jour-socle.md](docs/mise-a-jour-socle.md).
 
+## 2.0.6 — 2026-09-02
+
+Trois corrections relevées en vérifiant une mise en ligne.
+
+**`bin/message-test.php` envoyait chercher au mauvais endroit.** Quand l'e-mail ne partait pas,
+le script nommait la cause puis concluait toujours par « Vérifier l'envoi de courrier de
+l'hébergement » — y compris lorsque la cause était une adresse à renseigner dans l'identité du
+site. `notify()` distingue désormais les deux situations par une clé `cause`, et le script
+adapte sa conclusion. Le bouton de l'administration était déjà correct.
+
+**`public/.htaccess` porte une explication.** La règle qui refuse `/admin/storage/` ne
+s'applique pas tant que `public/admin/.htaccess` existe : mod_rewrite n'hérite jamais d'un
+`.htaccess` parent. Elle joue exactement dans le cas pour lequel elle est écrite — ce fichier
+manquant à l'envoi — mais paraît morte à qui la teste sur une installation complète. Le
+commentaire dit de ne pas la retirer.
+
+**`docs/mise-a-jour-socle.md` couvre la mise à jour par git sur le serveur.** L'étape 6 ne
+décrivait que l'envoi de fichiers. Elle donne maintenant la marche à suivre en SSH, et le
+réglage `git config pull.ff only` à poser une fois par hébergement, avec ce qu'il évite : un
+commit de fusion propre au serveur, et des marqueurs de conflit écrits dans un fichier que PHP
+est en train de servir.
+
+Rien à faire sur un site existant au-delà de la fusion — `php bin/install-cockpit.php --force`
+étant, comme toujours, nécessaire pour que l'addon modifié atteigne `public/admin/`.
+
 ## 2.0.5 — 2026-09-02
 
 Documentation seule. Rien à faire sur un site existant au-delà de la fusion.
