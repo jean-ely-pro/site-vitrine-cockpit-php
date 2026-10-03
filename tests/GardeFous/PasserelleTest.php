@@ -50,4 +50,26 @@ final class PasserelleTest extends TestCase
         $this->assertStringContainsString("'expires' => time() - 3600", $amorce, 'sans session, le cookie doit être effacé');
         $this->assertStringContainsString("'samesite' => 'Lax'", $amorce);
     }
+
+    #[Test]
+    public function la_pastille_ne_s_affiche_que_si_l_addon_confirme_la_connexion(): void
+    {
+        $script = $this->fichier('public/assets/js/passerelle.js');
+
+        // L'addon répond lui-même : désactivé ou retiré, il ne répond plus, et la pastille disparaît.
+        $this->assertStringContainsString("'passerelle/etat'", $script);
+        $this->assertStringContainsString('etat.connecte === true', $script, 'la pastille ne doit s’afficher que sur un oui');
+        $this->assertStringContainsString('.catch(oublier)', $script, 'sans réponse, la pastille ne doit pas s’afficher');
+    }
+
+    #[Test]
+    public function l_etat_ne_repond_qu_a_l_adresse_du_site_et_ne_prolonge_pas_la_session(): void
+    {
+        $amorce = $this->fichier('cockpit/addons/Passerelle/bootstrap.php');
+
+        $this->assertStringContainsString("'/passerelle/etat'", $amorce);
+        $this->assertMatchesRegularExpression("/HTTP_ORIGIN'\\] \\?\\? ''\\) === \\\$origine/", $amorce, 'seule l’adresse du site (SITE_URL) peut poser la question depuis une autre origine');
+        $this->assertStringContainsString("'Access-Control-Allow-Credentials'", $amorce);
+        $this->assertMatchesRegularExpression('/return false;\s*\}, 1001\);/', $amorce, 'la question ne doit pas prolonger la session');
+    }
 }

@@ -66,6 +66,45 @@ $this->on('before', function () {
     }
 });
 
+// For the site's avatar (public/assets/js/passerelle.js): is someone still signed in? Asked here rather than
+// at Cockpit's /check-session so that the answer also says this addon is active: once it is disabled
+// (Modules addon), this address no longer exists, and the site removes the avatar and its cookie.
+// Same rules as /check-session: inactivity ends the session, and asking does not prolong it.
+$this->on('app.admin.request', function (Lime\Request $request) use ($passerelleSite) {
+
+    if ($request->route !== '/passerelle/etat') {
+        return;
+    }
+
+    $connecte = (bool) $this->helper('auth')->getUser();
+    $debut = $this->helper('session')->read('app.session.start', 0);
+
+    if ($connecte && $debut && ($debut + $this->retrieve('session.lifetime', 5400) < time())) {
+        $this->helper('auth')->logout();
+        $connecte = false;
+    }
+
+    $this->bind('/passerelle/etat', function () use ($connecte, $passerelleSite) {
+        $this->helper('session')->close();
+        $this->response->mime = 'json';
+
+        // The site may ask from another origin (in development: :8080 for the site, :8090 for the admin).
+        // Only the site's own address is answered, and the answer is a yes or no, nothing more.
+        $site = parse_url($passerelleSite());
+        $origine = isset($site['scheme'], $site['host']) ? $site['scheme'].'://'.$site['host'].(isset($site['port']) ? ':'.$site['port'] : '') : '';
+        if ($origine !== '' && ($_SERVER['HTTP_ORIGIN'] ?? '') === $origine) {
+            $this->response->headers['Access-Control-Allow-Origin'] = $origine;
+            $this->response->headers['Access-Control-Allow-Credentials'] = 'true';
+            $this->response->headers['Vary'] = 'Origin';
+        }
+
+        return ['connecte' => $connecte];
+    });
+
+    // Cockpit's own handler would record activity and keep the session alive: not for a background check.
+    return false;
+}, 1001);
+
 // The site's address and the page being edited, for the admin-side buttons.
 $this->bind('/passerelle/infos', function () use ($passerelleSite) {
 

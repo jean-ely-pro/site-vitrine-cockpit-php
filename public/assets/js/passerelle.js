@@ -66,16 +66,24 @@
         document.body.appendChild(lien);
     }
 
-    // On the admin's own origin, the session is checked to still be open. Elsewhere (admin on another
-    // origin) the check fails silently and the cookie stands.
-    fetch(infos.admin.replace(/\/?$/, '/') + 'check-session', { credentials: 'include' })
-        .then(function (r) { return r.ok ? r.json() : null; })
-        .then(function (session) {
-            if (session && session.status === false) {
-                document.cookie = 'passerelle=; path=/; max-age=0; samesite=lax';
+    function oublier() {
+        document.cookie = 'passerelle=; path=/; max-age=0; samesite=lax';
+    }
+
+    // The addon is asked whether someone is still signed in; it answers the site's own address, even from
+    // another origin. The avatar shows only on a clear yes. Anything else — signed out, the Passerelle addon
+    // disabled or removed (404, or a request the browser blocks), the admin unreachable — and the avatar
+    // stays hidden, its cookie forgotten (the admin sets it again on its next page).
+    fetch(infos.admin.replace(/\/?$/, '/') + 'passerelle/etat', { credentials: 'include' })
+        .then(function (r) {
+            return r.ok ? r.json() : null;
+        })
+        .then(function (etat) {
+            if (etat && etat.connecte === true) {
+                afficher();
                 return;
             }
-            afficher();
+            oublier();
         })
-        .catch(afficher);
+        .catch(oublier);
 }());
